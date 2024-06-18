@@ -73,6 +73,7 @@ jobs:
       - release-build
     permissions:
       id-token: write
+    environment: PyPi
 
     strategy:
       fail-fast: false
