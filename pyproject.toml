@@ -1,0 +1,152 @@
+[build-system]
+requires = ["setuptools >= 61.1.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "suricata-check"
+description = "A command line utility to provide feedback on Suricata rules."
+keywords = [
+  "suricata",
+  "cli",
+  "rule",
+  "rules",
+  "check",
+  "feedback",
+  "network intrusion detection",
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Koen Teuwen" }]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Private :: Do Not Upload",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Education",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "Natural Language :: English",
+  "Environment :: Console",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Security",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Education",
+  "Topic :: Education :: Computer Aided Instruction (CAI)",
+  "Topic :: Utilities",
+  "Topic :: File Formats",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3 :: Only",
+  "Operating System :: OS Independent",
+  "Operating System :: POSIX",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS",
+  "Framework :: Pytest",
+  "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
+]
+requires-python = ">=3.9"
+dependencies = ["click>=8.1.7", "idstools>=0.6.5"]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+performance = ["regex>=2024.5.15"]
+test = ["pytest>=8.2.1"]
+lint = ["flake8>=7.1.0", "ruff>=0.4.9", "black>=24.4.2", "pyright>=1.1.367"]
+
+[project.urls]
+homepage = "https://github.com/Koen1999/suricata-check"
+repository = "https://github.com/Koen1999/suricata-check"
+documentation = "https://github.com/Koen1999/suricata-check/README.md"
+bugtracker = "https://github.com/Koen1999/suricata-check/issues"
+
+[project.scripts]
+suricata-check = "suricata_check:main"
+
+[tool.setuptools.packages.find]
+include = ["suricata_check*"]
+
+[tool.pytest.ini_options]
+markers = """
+    serial: marks tests as unsuitable for concurrent execution with other tests
+    slow: marks tests as slow
+"""
+addopts = """
+    -p no:logging
+    -m "not slow"
+    --strict-markers
+    --color=yes
+"""
+
+[tool.ruff]
+line-length = 127
+indent-width = 4
+target-version = "py38"
+
+[tool.ruff.lint]
+# Some of these can be removed if blocking. For now, we check everything.
+select = [
+  "E",
+  "F",
+  "W",
+  "C",
+  "I",
+  "N",
+  "D",
+  "UP",
+  "YTT",
+  "ANN",
+  "ASYNC",
+  "TRIO",
+  "BLE",
+  "A",
+  "COM",
+  "C4",
+  "DTZ",
+  "T10",
+  "DJ",
+  "EXE",
+  "ISC",
+  "ICN",
+  "LOG",
+  "G",
+  "INP",
+  "PIE",
+  "T20",
+  "PYI",
+  "PT",
+  "Q",
+  "RSE",
+  "RET",
+  "SLF",
+  "SLOT",
+  "TCH",
+  "INT",
+  "ARG",
+  "FIX",
+  "ERA",
+  "PD",
+  "PGH",
+  "PL",
+  "FLY",
+  "NPY",
+  "AIR",
+  "RUF",
+]
+ignore = ["F401", "F403", "N807", "D203", "D213", "D401", "UP032"]
+fixable = ["ALL"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[tool.pyright]
+root = ['suricata_check']
+include = ["suricata_check", "tests"]
+exclude = ["**/__pycache__"]

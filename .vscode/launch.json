@@ -1,0 +1,116 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "subProcess": true,
+            "stopOnEntry": false,
+            "autoReload": {
+                "enable": false
+            },
+        },
+        {
+            "name": "Python: Current File with profiler",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "cProfile",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "subProcess": true,
+            "args": [
+                "-o",
+                "tmp.prof",
+                "${file}"
+            ]
+        },
+        {
+            "name": "Install Suricata-check",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/suricata-check",
+            "module": "pip",
+            "args": [
+                "install",
+                "--no-build-isolation",
+                "--check-build-dependencies",
+                "--use-pep517",
+                "--compile",
+                "--force-reinstall",
+                "--no-deps",
+                "-U",
+                "./src/",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "CUDA_VISIBLE_DEVICES": ""
+            },
+        },
+        {
+            "name": "Pytest",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "subProcess": true,
+            "stopOnEntry": false,
+            "autoReload": {
+                "enable": false
+            },
+        },
+        {
+            "name": "Profile Pytest",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "cProfile",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "subProcess": true,
+            "args": [
+                "-o",
+                "pytest.prof",
+                "-m",
+                "pytest",
+                "tests/test_suricata_check.py",
+                "-m",
+                "\"slow\"",
+                "-x"
+            ]
+        },
+        {
+            "name": "Pytest: ET OPEN Integration",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["-k", "et_open", "-m", "slow or not slow"],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "subProcess": true,
+            "stopOnEntry": false,
+            "autoReload": {
+                "enable": false
+            },
+        },
+        {
+            "name": "Pytest: Snort Community Integration",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["-k", "snort_community", "-m", "slow or not slow"],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "subProcess": true,
+            "stopOnEntry": false,
+            "autoReload": {
+                "enable": false
+            },
+        },
+    ]
+}

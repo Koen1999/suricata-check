@@ -1,0 +1,10 @@
+# Below we will put an empty line
+
+# Next we will put an empty comment
+#
+
+# Next we will put several invalid rules
+alert ip any -> any (msg:"Test"; sid:1;) # Misses source_port and dest_port
+alert ip any any -> any any (msg:"Test";) # Misses sid
+alert ip any any -> any any (sid:1;) # Misses msg
+alert http $HOME_NET any -> any any (msg:"Test"; sid:1; dns.query:"foo.bar") # Misses ; at end

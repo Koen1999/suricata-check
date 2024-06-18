@@ -1,0 +1,11 @@
+*__pycache__
+.*_cache
+*venv
+build
+dist
+*.egg-info
+*.whl
+*.prof
+suricata-check.log
+suricata-check.jsonl
+suricata-check.fast
