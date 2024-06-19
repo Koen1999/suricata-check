@@ -69,11 +69,7 @@ jobs:
 
       - name: Build wheel and install with pip
         run: |
-          pip wheel .
           pip install .
-
-      - name: Build package
-        run: python -m build
 
   lint:
     name: Lint

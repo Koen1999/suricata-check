@@ -27,7 +27,8 @@ LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
 
 OUTPUT_SUMMARY_TYPE = Mapping[
-    str, Union[Mapping[str, int], Mapping[str, Mapping[str, int]]]
+    str,
+    Union[Mapping[str, int], Mapping[str, Mapping[str, int]]],
 ]
 
 logger = logging.getLogger(__name__)
@@ -216,11 +217,13 @@ def _write_output(
                     overall_summary.items(),
                     headers=("Count",),
                 )
-                + "\n\n"
+                + "\n\n",
             )
 
             sys.stdout.write(f"Total issues found: {overall_summary['Total Issues']}\n")
-            sys.stdout.write(f"Rules with Issues found: {overall_summary['Rules with Issues']}\n")
+            sys.stdout.write(
+                f"Rules with Issues found: {overall_summary['Rules with Issues']}\n",
+            )
 
             issues_by_group: Mapping[str, int] = summary["issues_by_group"]  # type: ignore reportAssignmentType
 
@@ -229,19 +232,19 @@ def _write_output(
                     issues_by_group.items(),
                     headers=("Count",),
                 )
-                + "\n\n"
+                + "\n\n",
             )
 
             issues_by_type: Mapping[str, Mapping[str, int]] = summary["issues_by_type"]  # type: ignore reportAssignmentType
             for checker, checker_issues_by_type in issues_by_type.items():
-                stats_fh.write(" "+ checker + " " + "\n")
-                stats_fh.write("-" * (len(checker)+2) + "\n")
+                stats_fh.write(" " + checker + " " + "\n")
+                stats_fh.write("-" * (len(checker) + 2) + "\n")
                 stats_fh.write(
                     tabulate.tabulate(
                         checker_issues_by_type.items(),
                         headers=("Count",),
                     )
-                    + "\n\n"
+                    + "\n\n",
                 )
 
 

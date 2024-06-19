@@ -36,7 +36,9 @@ def find_rules_file(root: str) -> str:
             logger.critical(msg)
             raise click.BadParameter(f"Error: {msg}")
         if len(rules_files) > 1:
-            msg = f"Multiple Suricata rules files found in {root}\n" + "\n".join(rules_files)
+            msg = f"Multiple Suricata rules files found in {root}\n" + "\n".join(
+                rules_files,
+            )
             logger.critical(msg)
             raise click.BadParameter(f"Error: {msg}")
 
