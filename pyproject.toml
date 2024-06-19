@@ -54,7 +54,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 performance = ["regex>=2024.5.15"]
-dev = ["pytest>=8.2.1", "flake8>=7.1.0", "ruff>=0.4.9", "black>=24.4.2", "pyright>=1.1.367"]
+dev = ["pytest>=8.2.1", "pytest-cov>=5.0.0", "flake8>=7.1.0", "ruff>=0.4.9", "black>=24.4.2", "pyright>=1.1.367"]
 
 [project.urls]
 homepage = "https://github.com/Koen1999/suricata-check"
