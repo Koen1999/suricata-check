@@ -1,7 +1,7 @@
 # suricata-check
 
 [![Python Version](https://img.shields.io/pypi/pyversions/suricata-check)](https://www.python.org)
-[![PyPi](https://img.shields.io/pypi/status/suricata-check)](https://pypi.python.org/pypi/suricata-check)
+[![PyPi](https://img.shields.io/pypi/status/suricata-check)](https://pypi.org/project/suricata-check)
 [![GitHub License](https://img.shields.io/github/license/Koen1999/suricata-check)](https://github.com/Koen1999/suricata-check/blob/master/LICENSE)
 
 [![Python master](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml)
