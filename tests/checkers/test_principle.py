@@ -3,12 +3,13 @@ import sys
 
 import idstools.rule
 import pytest
-from suricata_check.checkers.principle import PrincipleChecker
 
 from .checker import GenericChecker
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import suricata_check
+
+CHECKER_CLASS = suricata_check.checkers.PrincipleChecker
 
 # These rules where mentioned in the Ruling the Unruly paper.
 # They originate from ET OPEN (https://rules.emergingthreats.net/OPEN_download_instructions.html)
@@ -138,13 +139,13 @@ http.header_names; content:!"Referer"; nocase;)""": {
 class TestPrinciple(GenericChecker):
     @pytest.fixture(autouse=True)
     def _run_around_tests(self):
-        self.checker = suricata_check.checkers.PrincipleChecker()
+        self.checker = CHECKER_CLASS()
 
     @pytest.mark.parametrize(
         ("code", "expected", "raw_rule"),
         [
             (code, True, raw_rule)
-            for code in PrincipleChecker.codes
+            for code in CHECKER_CLASS.codes
             for raw_rule, expected in RULES.items()
             if code in expected["should_raise"]
         ],
@@ -163,7 +164,7 @@ class TestPrinciple(GenericChecker):
         ("code", "expected", "raw_rule"),
         [
             (code, False, raw_rule)
-            for code in PrincipleChecker.codes
+            for code in CHECKER_CLASS.codes
             for raw_rule, expected in RULES.items()
             if code in expected["should_not_raise"]
         ],

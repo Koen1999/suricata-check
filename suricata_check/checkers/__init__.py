@@ -6,5 +6,6 @@ from suricata_check.checkers.principle import PrincipleChecker
 from suricata_check.checkers.styleguide import (
     OrderChecker,
     OverallChecker,
+    SidChecker,
     WhitespaceChecker,
 )
