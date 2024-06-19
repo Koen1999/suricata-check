@@ -4,10 +4,8 @@
 [![PyPi](https://img.shields.io/pypi/status/suricata-check)](https://pypi.python.org/pypi/suricata-check)
 [![GitHub License](https://img.shields.io/github/license/Koen1999/suricata-check)](https://github.com/Koen1999/suricata-check/blob/master/LICENSE)
 
-[![Python Lint](https://github.com/Koen1999/suricata-check/actions/workflows/python-lint.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-lint.yml)
-[![Python Pytest](https://github.com/Koen1999/suricata-check/actions/workflows/python-pytest.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-pytest.yml)
-[![Python Build](https://github.com/Koen1999/suricata-check/actions/workflows/python-build.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-build.yml)
-[![Python Publish](https://github.com/Koen1999/suricata-check/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-publish.yml)
+[![Python master](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml)
+[![Python Release](https://github.com/Koen1999/suricata-check/actions/workflows/python-release.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-release.yml)
 
 `suricata-check` is a command line utility to provide feedback on [Suricata](https://github.com/OISF/suricata) rules.
 The tool can detect various issues including those covering syntax validity, interpretability, rule specificity, rule coverage, and efficiency.
