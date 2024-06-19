@@ -52,15 +52,27 @@ Usage: suricata-check [OPTIONS]
 
   Processes all rules inside a rules file and outputs a list of issues found.
 
-  Args: ---- out: A path to a directory where the output will be written.
-  rules: A path to a Suricata rules file or a directory in which a single rule
-  file can be discovered single_rule: A single Suricata rule to be checked. If
-  set, the rules file will be ignored. log_level: The verbosity level for
-  logging. evaluate_disabled: A flag indicating whether disabled rules should
-  be evaluated.
+  Args:
 
-  Raises: ------   BadParameter: If provided arguments are invalid.
-  RuntimeError: If no checkers could be automatically discovered.
+  ----
+
+  out: A path to a directory where the output will be written.
+
+  rules: A path to a Suricata rules file or a directory in which a single rule file can be discovered
+
+  single_rule: A single Suricata rule to be checked. If set, the rules file will be ignored.
+
+  log_level: The verbosity level for logging.
+
+  evaluate_disabled: A flag indicating whether disabled rules should be evaluated.
+
+  Raises:
+
+  ------
+
+    BadParameter: If provided arguments are invalid.
+    
+    RuntimeError: If no checkers could be automatically discovered.
 
 Options:
   -o, --out TEXT               Path to suricata-check output folder.
@@ -73,7 +85,7 @@ Options:
                                [default: INFO]
   --evaluate-disabled BOOLEAN  Flag to evaluate disabled rules.  [default:
                                False]
-  --help                       Show this message and exit.
+  --help                       Show this message and exit
 ```
 
 Usage of suricata-check as a module is currently not documented in detail, but the type hints and docstrings in the code should provide a decent start.
