@@ -117,7 +117,7 @@ def main(
                 filename=os.path.join(out, "suricata-check.log"),
                 delay=True,
             ),
-            logging.StreamHandler(stream=sys.stdout),
+            logging.StreamHandler(stream=click.get_text_stream("stdout")),
         ),
     )
 
@@ -198,9 +198,9 @@ def _write_output(
                 code = issue["code"]
                 issue_msg = issue["message"].replace("\n", " ")
 
-                msg = f"[{code}] Line {line}, sid {rule['sid']}: {issue_msg}\n"
-                fast_fh.write(msg)
-                sys.stdout.write(msg)
+                msg = f"[{code}] Line {line}, sid {rule['sid']}: {issue_msg}"
+                fast_fh.write(msg + "\n")
+                click.echo(msg)
 
     if "summary" in output:
         with open(
@@ -220,9 +220,9 @@ def _write_output(
                 + "\n\n",
             )
 
-            sys.stdout.write(f"Total issues found: {overall_summary['Total Issues']}\n")
-            sys.stdout.write(
-                f"Rules with Issues found: {overall_summary['Rules with Issues']}\n",
+            click.echo(f"Total issues found: {overall_summary['Total Issues']}")
+            click.echo(
+                f"Rules with Issues found: {overall_summary['Rules with Issues']}",
             )
 
             issues_by_group: Mapping[str, int] = summary["issues_by_group"]  # type: ignore reportAssignmentType
