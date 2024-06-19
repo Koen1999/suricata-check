@@ -2,4 +2,5 @@
 
 from . import interface
 from .mandatory import MandatoryChecker
+from .principle import PrincipleChecker
 from .styleguide import *

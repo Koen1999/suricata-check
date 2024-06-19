@@ -299,9 +299,7 @@ def get_checkers() -> Sequence[CheckerInterface]:
                 msg = f"Checker {checker1.__class__.__name__} and {checker2.__class__.__name__} have overlapping codes."
                 logger.error(msg)
 
-    checkers = sorted(checkers, key=lambda x: x.__class__.__name__)
-
-    return checkers
+    return sorted(checkers, key=lambda x: x.__class__.__name__)
 
 
 def analyze_rule(

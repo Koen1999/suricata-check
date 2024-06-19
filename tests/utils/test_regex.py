@@ -9,7 +9,7 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import suricata_check
 
-REGEX_PROVIDER = suricata_check.utils.get_regex_provider()
+regex_provider = suricata_check.utils.get_regex_provider()
 
 
 def test_rule_regex():
@@ -44,7 +44,7 @@ def test_rule_regex():
 
 
 def test_header_regex():
-    regex = REGEX_PROVIDER.compile(r"(\s*#)?\s*([^\(\)]*)\(.*\)")
+    regex = regex_provider.compile(r"(\s*#)?\s*([^\(\)]*)\(.*\)")
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
@@ -73,7 +73,7 @@ def test_header_regex():
 
 def test_body_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
-        regex = REGEX_PROVIDER.compile(r"^[#a-zA-Z0-9:\$_\.\-<>\s]+(\(.*\))\s*(#.*)?$")
+        regex = regex_provider.compile(r"^[#a-zA-Z0-9:\$_\.\-<>\s]+(\(.*\))\s*(#.*)?$")
         for line in rules_fh.readlines():
             try:
                 rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)

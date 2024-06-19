@@ -10,41 +10,41 @@ from ...utils import (
 )
 from ..interface import CheckerInterface
 
-REGEX_PROVIDER = get_regex_provider()
+regex_provider = get_regex_provider()
 
 # Regular expressions are placed here such that they are compiled only once.
 # This has a significant impact on the performance.
-REGEX_S100 = REGEX_PROVIDER.compile(
+REGEX_S100 = regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\( .*\)\s*(#.*)?$",
 )
-REGEX_S101 = REGEX_PROVIDER.compile(
+REGEX_S101 = regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.* \)\s*(#.*)?$",
 )
-REGEX_S102 = REGEX_PROVIDER.compile(
+REGEX_S102 = regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+ :.+\)\s*(#.*)?$",
 )
-REGEX_S103 = REGEX_PROVIDER.compile(
+REGEX_S103 = regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+: .+\)\s*(#.*)?$",
 )
-REGEX_S104 = REGEX_PROVIDER.compile(
+REGEX_S104 = regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+ ;.+\)\s*(#.*)?$",
 )
-REGEX_S105 = REGEX_PROVIDER.compile(
+REGEX_S105 = regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+; \s+.+\)\s*(#.*)?$",
 )
-REGEX_S106 = REGEX_PROVIDER.compile(r'^".*\|.*  .*\|.*"$')
-REGEX_S110 = REGEX_PROVIDER.compile(
+REGEX_S106 = regex_provider.compile(r'^".*\|.*  .*\|.*"$')
+REGEX_S110 = regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+;(?! ).+\)\s*(#.*)?$",
 )
-REGEX_S111 = REGEX_PROVIDER.compile(r'^".*\|.*[a-fA-F0-9]{4}.*\|.*"$')
-REGEX_S120 = REGEX_PROVIDER.compile(
+REGEX_S111 = regex_provider.compile(r'^".*\|.*[a-fA-F0-9]{4}.*\|.*"$')
+REGEX_S120 = regex_provider.compile(
     r'^".*[\x3a\x3b\x20\x22\x27\x7b\x5c\x2f\x60\x24\x28\x29]+.*"$',
 )
-REGEX_S121 = REGEX_PROVIDER.compile(
+REGEX_S121 = regex_provider.compile(
     r'^"/.*(\\?[\x20]+|\\[\x3a\x3b\x22\x27\x7b\x5c\x7c\x2f\x60\x24\x28\x29]+).*/[ism]*"$',
 )
-REGEX_S122 = REGEX_PROVIDER.compile(r'^".*\\.*"$')
-REGEX_S123 = REGEX_PROVIDER.compile(r'^".*\\(?!x).*"$')
+REGEX_S122 = regex_provider.compile(r'^".*\\.*"$')
+REGEX_S123 = regex_provider.compile(r'^".*\\(?!x).*"$')
 
 
 class WhitespaceChecker(CheckerInterface):

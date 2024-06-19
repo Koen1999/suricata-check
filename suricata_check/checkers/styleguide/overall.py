@@ -18,13 +18,13 @@ from ...utils import (
 )
 from ..interface import CheckerInterface
 
-REGEX_PROVIDER = get_regex_provider()
+regex_provider = get_regex_provider()
 
 
 # Regular expressions are placed here such that they are compiled only once.
 # This has a significant impact on the performance.
-REGEX_S030 = REGEX_PROVIDER.compile(r"^[a-z\-]+$")
-REGEX_S031 = REGEX_PROVIDER.compile(r"^[^\|]*\|[0-9A-Z\s]+\|[^\|]*$")
+REGEX_S030 = regex_provider.compile(r"^[a-z\-]+$")
+REGEX_S031 = regex_provider.compile(r"^[^\|]*\|[0-9A-Z\s]+\|[^\|]*$")
 
 
 class OverallChecker(CheckerInterface):

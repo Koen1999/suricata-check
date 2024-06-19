@@ -1,7 +1,8 @@
 import os
-import re
 import sys
-from typing import Mapping, Sequence
+import warnings
+from functools import lru_cache
+from typing import Mapping, Optional, Sequence
 
 import idstools.rule
 import pytest
@@ -9,20 +10,54 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import suricata_check
 
-REGEX_PROVIDER = suricata_check.utils.get_regex_provider()
+regex_provider = suricata_check.utils.get_regex_provider()
 
 
 class GenericChecker:
     checker: suricata_check.checkers.interface.CheckerInterface
 
-    def check_issue(self, rule: idstools.rule.Rule, code: str, raised: bool):
-        issues = self.checker.check_rule(rule)
-        codes = {issue["code"] for issue in issues}
+    @lru_cache(maxsize=1)
+    def _check_rule(self, rule: idstools.rule.Rule) -> Sequence[Mapping]:
+        return self.checker.check_rule(rule)
+
+    def check_issue(
+        self,
+        rule: Optional[idstools.rule.Rule],
+        code: str,
+        raised: bool,
+        fail: bool = True,
+    ):
+        if rule is None:
+            pytest.fail("Rule is None")
+
+        issues = self._check_rule(rule)
+        correct: Optional[bool] = None
+        issue: Optional[Mapping] = None
 
         if raised:
-            assert code in codes
+            correct = False
+            for issue in issues:
+                if issue["code"] == code:
+                    correct = True
+                    break
+            issue = None
         elif not raised:
-            assert code not in codes
+            correct = True
+            for issue in issues:
+                if issue["code"] == code:
+                    correct = False
+                    break
+
+        if correct is not True:
+            msg = f"""\
+{'Unexpected' if not raised else 'Missing'} code {code}.
+{rule['raw']}
+{issue}\
+"""
+            if fail:
+                pytest.fail(msg)
+            else:
+                warnings.warn(RuntimeWarning(msg))
 
     def test_no_undeclared_codes(self):
         """Asserts the checker emits no undeclared codes."""
@@ -44,7 +79,7 @@ class GenericChecker:
 
     def test_code_structure(self):
         """Asserts the checker only emits codes following the allowed structure."""
-        regex = REGEX_PROVIDER.compile(r"[A-Z]{1,}[0-9]{3}")
+        regex = regex_provider.compile(r"[A-Z]{1,}[0-9]{3}")
         for code in self.checker.codes:
             if regex.match(code) is None:
                 pytest.fail(code)

@@ -85,21 +85,39 @@ def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
     return True
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
-def count_rule_options(rule: idstools.rule.Rule, name: str) -> int:
+def count_rule_options(
+    rule: idstools.rule.Rule,
+    name: Union[str, Iterable[str]],
+) -> int:
     """Counts how often an option is set in a rule.
 
     Args:
     ----
         rule (idstools.rule.Rule): rule to be inspected
-        name (str): name of the option
+        name (Union[str, Iterable[str]]): name or names of the option
 
     Returns:
     -------
         int: The number of times an option is set
 
     """
+    if not isinstance(name, str):
+        name = tuple(sorted(name))
+    return _count_rule_options(rule, name)
+
+
+@lru_cache(maxsize=LRU_CACHE_SIZE)
+def _count_rule_options(
+    rule: idstools.rule.Rule,
+    name: Union[str, Iterable[str]],
+) -> int:
     count = 0
+
+    if not isinstance(name, str):
+        for single_name in name:
+            count += count_rule_options(rule, single_name)
+        return count
+
     if name not in (
         "action",
         "proto",
@@ -121,7 +139,7 @@ def count_rule_options(rule: idstools.rule.Rule, name: str) -> int:
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
 def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
-    """Retrieves whether a rule has a certain option set.
+    """Retrieves one option of a rule with a certain name.
 
     If an option is set multiple times, it returns only one indeterminately.
 
@@ -135,9 +153,6 @@ def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
         Optional[str]: The value of the option or None if it was not set.
 
     """
-    if not is_rule_option_set(rule, name):
-        return None
-
     if name not in (
         "action",
         "proto",
@@ -155,8 +170,64 @@ def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
         return rule[name]
 
     msg = f"Option {name} not found in rule {rule}."
-    logger.critical(msg)
-    raise RuntimeError(msg)
+    logger.debug(msg)
+
+    return None
+
+
+def get_rule_options(
+    rule: idstools.rule.Rule,
+    name: Union[str, Iterable[str]],
+) -> Sequence[str]:
+    """Retrieves all options of a rule with a certain name.
+
+    Args:
+    ----
+        rule (idstools.rule.Rule): rule to be inspected
+        name (Union[str, Iterable[str]]): name or names of the option
+
+    Returns:
+    -------
+        Sequence[str]: The values of the option.
+
+    """
+    if not isinstance(name, str):
+        name = tuple(sorted(name))
+    return _get_rule_options(rule, name)
+
+
+@lru_cache(maxsize=LRU_CACHE_SIZE)
+def _get_rule_options(
+    rule: idstools.rule.Rule,
+    name: Union[str, Iterable[str]],
+) -> Sequence[str]:
+    values = []
+
+    if not isinstance(name, str):
+        for single_name in name:
+            values.extend(_get_rule_options(rule, single_name))
+        return values
+
+    if name not in (
+        "action",
+        "proto",
+        "source_addr",
+        "source_port",
+        "direction",
+        "dest_addr",
+        "dest_port",
+    ):
+        for option in rule["options"]:
+            if option["name"] == name:
+                values.append(option["value"])
+    elif name in rule:
+        values.append(rule[name])
+
+    if len(values) == 0:
+        msg = f"Option {name} not found in rule {rule}."
+        logger.debug(msg)
+
+    return values
 
 
 def is_rule_option_equal_to(rule: idstools.rule.Rule, name: str, value: str) -> bool:
@@ -187,7 +258,7 @@ def is_rule_option_equal_to(rule: idstools.rule.Rule, name: str, value: str) -> 
 def is_rule_option_equal_to_regex(
     rule: idstools.rule.Rule,
     name: str,
-    regex,
+    regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
 ) -> bool:
     """Checks whether a rule has a certain option set to match a certain regex.
 
@@ -197,7 +268,7 @@ def is_rule_option_equal_to_regex(
     ----
         rule (idstools.rule.Rule): rule to be inspected
         name (str): name of the option
-        regex (regex_provider.Pattern): regex to check for
+        regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
     Returns:
     -------
@@ -207,11 +278,11 @@ def is_rule_option_equal_to_regex(
     if not is_rule_option_set(rule, name):
         return False
 
-    value = get_rule_option(rule, name)
-    assert value is not None
+    values = get_rule_options(rule, name)
 
-    if regex.match(value) is not None:
-        return True
+    for value in values:
+        if regex.match(value) is not None:
+            return True
 
     return False
 
@@ -219,7 +290,7 @@ def is_rule_option_equal_to_regex(
 def are_rule_options_equal_to_regex(
     rule: idstools.rule.Rule,
     names: Iterable[str],
-    regex,
+    regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
 ) -> bool:
     """Checks whether a rule has certain options set to match a certain regex.
 
@@ -229,7 +300,7 @@ def are_rule_options_equal_to_regex(
     ----
         rule (idstools.rule.Rule): rule to be inspected
         names (Iterable[str]): names of the options
-        regex (regex_provider.Pattern): regex to check for
+        regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
     Returns:
     -------
@@ -246,7 +317,7 @@ def are_rule_options_equal_to_regex(
 def is_rule_option_one_of(
     rule: idstools.rule.Rule,
     name: str,
-    values: Union[Sequence[str], set[str]],
+    possible_values: Union[Sequence[str], set[str]],
 ) -> bool:
     """Checks whether a rule has a certain option set to a one of certain values.
 
@@ -256,7 +327,7 @@ def is_rule_option_one_of(
     ----
         rule (idstools.rule.Rule): rule to be inspected
         name (str): name of the option
-        values (Iterable[str]): values to check for
+        possible_values (Iterable[str]): values to check for
 
     Returns:
     -------
@@ -266,10 +337,11 @@ def is_rule_option_one_of(
     if not is_rule_option_set(rule, name):
         return False
 
-    value = get_rule_option(rule, name)
+    values = get_rule_options(rule, name)
 
-    if value in values:
-        return True
+    for value in values:
+        if value in possible_values:
+            return True
 
     return False
 
@@ -379,6 +451,14 @@ def get_rule_options_positions(
     names: Iterable[str],
 ) -> Iterable[int]:
     """Finds the positions of several options in the rule body."""
+    return _get_rule_options_positions(rule, tuple(sorted(names)))
+
+
+@lru_cache(maxsize=LRU_CACHE_SIZE)
+def _get_rule_options_positions(
+    rule: idstools.rule.Rule,
+    names: Iterable[str],
+) -> Iterable[int]:
     positions = []
 
     for name in names:
@@ -393,7 +473,7 @@ def is_rule_option_put_before(
     other_names: Union[Sequence[str], set[str]],
 ) -> Optional[bool]:
     """Checks whether a rule option is placed before one or more other options."""
-    return _is_rule_option_put_before(rule, name, tuple(other_names))
+    return _is_rule_option_put_before(rule, name, tuple(sorted(other_names)))
 
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
@@ -517,3 +597,17 @@ def select_rule_options_by_regex(
             options.append(name)
 
     return tuple(sorted(options))
+
+
+def get_flow_options(rule: idstools.rule.Rule) -> Sequence[str]:
+    """Returns a list of flow options set in a rule.
+
+    Notably ignores `flow.*` options, but only looks at `flow:.*`
+    """
+    flow_option = get_rule_option(rule, "flow")
+    if flow_option is None:
+        flow_options = []
+    else:
+        flow_options = [option.strip() for option in flow_option.split(",")]
+
+    return flow_options

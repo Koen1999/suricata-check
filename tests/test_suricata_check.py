@@ -13,7 +13,7 @@ from click.testing import CliRunner
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import suricata_check
 
-REGEX_PROVIDER = suricata_check.utils.get_regex_provider()
+regex_provider = suricata_check.utils.get_regex_provider()
 
 ET_OPEN_URL = (
     "https://rules.emergingthreats.net/open-nogpl/suricata-5.0/emerging-all.rules"
@@ -197,12 +197,12 @@ def test_analyze_rule():
 def _check_log_file():
     with open("tests/data/out/suricata-check.log") as log_fh:
         for line in log_fh.readlines():
-            if REGEX_PROVIDER.match(
+            if regex_provider.match(
                 r".+ - .+ - (ERROR|CRITICAL) - .+(?<!Error parsing rule)",
                 line,
             ):
                 pytest.fail(line)
-            if REGEX_PROVIDER.match(r".+ - .+ - (WARNING) - .+", line):
+            if regex_provider.match(r".+ - .+ - (WARNING) - .+", line):
                 warnings.warn(RuntimeWarning(line))
 
 

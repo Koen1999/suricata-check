@@ -16,7 +16,8 @@ if importlib.util.find_spec("regex") is not None:
 else:
     logger.warning(
         """Did not detect regex module as installed, using re instead.
-To increase suricata-check processing speed, consider isntalling the regex module by running `pip install suricata-check[performance]`.""",
+To increase suricata-check processing speed, consider isntalling the regex module \
+by running `pip install suricata-check[performance]`.""",
     )
     import re as regex_provider
 
@@ -104,7 +105,7 @@ CLASSTYPES = (
     "coin-mining",
     "command-and-control",
 )
-
+# TODO: The things below are called keywords (for options); should rename
 NON_FUNCTIONAL_OPTIONS = (
     "msg",
     "classtype",
@@ -160,9 +161,11 @@ OTHER_BUFFERS = (
 )
 
 BUFFER_OPTIONS: Sequence[str] = tuple(
-    set(STICKY_BUFFER_NAMING.keys())
-    .union(STICKY_BUFFER_NAMING.values())
-    .union(OTHER_BUFFERS),
+    sorted(
+        set(STICKY_BUFFER_NAMING.keys())
+        .union(STICKY_BUFFER_NAMING.values())
+        .union(OTHER_BUFFERS),
+    ),
 )
 
 SIZE_OPTIONS = (
@@ -358,6 +361,8 @@ ALL_METADATA_OPTIONS = tuple(
     sorted(set(METADATA_DATE_OPTIONS).union(METADATA_NON_DATE_OPTIONS)),
 )
 
+IP_ADDRESS_REGEX = regex_provider.compile(r"^.*\d+\.\d+\.\d+\.\d+.*$")
+
 GROUP_REGEX = regex_provider.compile(r"^(!)?\[(.*)\]$")
 VARIABLE_GROUP_REGEX = regex_provider.compile(r"^!?\$([A-Z\_]+)$")
 
@@ -413,12 +418,11 @@ def _escape_regex(s: str) -> str:
 
 def get_options_regex(options: Iterable[str]) -> regex_provider.Pattern:
     """Returns a regular expression that can match any of the provided options."""
-    return __get_options_regex(tuple(options))
+    return __get_options_regex(tuple(sorted(options)))
 
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
 def __get_options_regex(options: Sequence[str]) -> regex_provider.Pattern:
-    """Returns a regular expression that can match any of the provided options."""
     return regex_provider.compile(
         "(" + "|".join([_escape_regex(option) for option in options]) + ")",
     )

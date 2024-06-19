@@ -42,15 +42,15 @@ from ...utils import (
 )
 from ..interface import CheckerInterface
 
-REGEX_PROVIDER = get_regex_provider()
+regex_provider = get_regex_provider()
 
 
 # Regular expressions are placed here such that they are compiled only once.
 # This has a significant impact on the performance.
-REGEX_S210 = REGEX_PROVIDER.compile(
+REGEX_S210 = regex_provider.compile(
     r"^\(.*content\s*:.*;\s*content\s*:.*;.*(depth|offset)\s*:.*\)$",
 )
-REGEX_S230 = REGEX_PROVIDER.compile(
+REGEX_S230 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
         get_options_regex(CONTENT_OPTIONS).pattern,
         get_options_regex(BUFFER_OPTIONS).pattern,
@@ -59,7 +59,7 @@ REGEX_S230 = REGEX_PROVIDER.compile(
         get_options_regex(CONTENT_OPTIONS).pattern,
     ),
 )
-REGEX_S231 = REGEX_PROVIDER.compile(
+REGEX_S231 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
         get_options_regex(CONTENT_OPTIONS).pattern,
         get_options_regex(BUFFER_OPTIONS).pattern,
@@ -73,7 +73,7 @@ REGEX_S231 = REGEX_PROVIDER.compile(
         ).pattern,
     ),
 )
-REGEX_S232 = REGEX_PROVIDER.compile(
+REGEX_S232 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
         get_options_regex(CONTENT_OPTIONS).pattern,
         get_options_regex(BUFFER_OPTIONS).pattern,
@@ -88,7 +88,7 @@ REGEX_S232 = REGEX_PROVIDER.compile(
         ).pattern,
     ),
 )
-REGEX_S233 = REGEX_PROVIDER.compile(
+REGEX_S233 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
         get_options_regex(CONTENT_OPTIONS).pattern,
         get_options_regex(BUFFER_OPTIONS).pattern,
@@ -97,7 +97,7 @@ REGEX_S233 = REGEX_PROVIDER.compile(
         get_options_regex(CONTENT_OPTIONS).pattern,
     ),
 )
-REGEX_S234 = REGEX_PROVIDER.compile(
+REGEX_S234 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
         get_options_regex(CONTENT_OPTIONS).pattern,
         get_options_regex(BUFFER_OPTIONS).pattern,
@@ -114,7 +114,7 @@ REGEX_S234 = REGEX_PROVIDER.compile(
         ).pattern,
     ),
 )
-REGEX_S235 = REGEX_PROVIDER.compile(
+REGEX_S235 = regex_provider.compile(
     r"^\(.*{}(?!{}).*{}.*\)$".format(
         get_options_regex(
             set(TRANSFORMATION_OPTIONS)
@@ -125,7 +125,7 @@ REGEX_S235 = REGEX_PROVIDER.compile(
         get_options_regex(SIZE_OPTIONS).pattern,
     ),
 )
-REGEX_S236 = REGEX_PROVIDER.compile(
+REGEX_S236 = regex_provider.compile(
     r"^\(.*{}(?!{}).*{}.*\)$".format(
         get_options_regex(
             set(CONTENT_OPTIONS).union(OTHER_PAYLOAD_OPTIONS),
