@@ -1,5 +1,6 @@
 # noqa: D100
-from typing import Mapping, Optional, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Optional
 
 import idstools.rule
 
@@ -132,6 +133,7 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
         assert match is not None
 
         parts = match.group(1).split(" ")
+        prefix: str = ""
         for i in reversed(range(len(parts))):
             prefix = " ".join(parts[:i])
             if prefix in SID_ALLOCATION.keys():

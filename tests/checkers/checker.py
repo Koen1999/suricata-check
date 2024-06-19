@@ -1,8 +1,9 @@
 import os
 import sys
 import warnings
+from collections.abc import Mapping, Sequence
 from functools import lru_cache
-from typing import Mapping, Optional, Sequence, Union
+from typing import Optional, Union
 
 import idstools.rule
 import pytest

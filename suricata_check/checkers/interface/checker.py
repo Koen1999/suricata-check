@@ -4,7 +4,7 @@ Implementation of the `CheckerInterface` is neccessary for checker auto-discover
 """
 
 import abc
-from typing import Iterable, Mapping, MutableMapping, Sequence
+from collections.abc import Iterable, Mapping, MutableMapping, Sequence
 
 import idstools.rule
 

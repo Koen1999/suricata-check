@@ -1,8 +1,9 @@
 """The `suricata_check.utils.checker` module contains several utilities for developing rule checkers."""
 
 import logging
+from collections.abc import Iterable, Sequence
 from functools import lru_cache
-from typing import Iterable, Optional, Sequence, Union
+from typing import Optional, Union
 
 import idstools.rule
 

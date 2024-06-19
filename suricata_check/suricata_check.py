@@ -5,14 +5,12 @@ import logging
 import os
 import sys
 from collections import defaultdict
+from collections.abc import Mapping, MutableMapping, Sequence
 from importlib.metadata import PackageNotFoundError, version
 from typing import (
     Any,
     Literal,
-    Mapping,
-    MutableMapping,
     Optional,
-    Sequence,
     Union,
 )
 
@@ -239,7 +237,7 @@ def _write_output(
                 f"Rules with Issues found: {overall_summary['Rules with Issues']}",
             )
 
-            issues_by_group: Mapping[str, int] = summary["issues_by_group"]  # type: ignore reportAssignmentType
+            issues_by_group: Mapping[str, int] = summary["issues_by_group"]
 
             stats_fh.write(
                 tabulate.tabulate(
@@ -249,7 +247,7 @@ def _write_output(
                 + "\n\n",
             )
 
-            issues_by_type: Mapping[str, Mapping[str, int]] = summary["issues_by_type"]  # type: ignore reportAssignmentType
+            issues_by_type: Mapping[str, Mapping[str, int]] = summary["issues_by_type"]
             for checker, checker_issues_by_type in issues_by_type.items():
                 stats_fh.write(" " + checker + " " + "\n")
                 stats_fh.write("-" * (len(checker) + 2) + "\n")
@@ -360,7 +358,7 @@ def process_rules_file(
 
     output["summary"] = __summarizes_rules(output)
 
-    return output  # type: ignore reportReturnType
+    return output
 
 
 def get_checkers() -> Sequence[CheckerInterface]:

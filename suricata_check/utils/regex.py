@@ -2,8 +2,8 @@
 
 import importlib.util
 import logging
+from collections.abc import Iterable, Sequence
 from functools import lru_cache
-from typing import Iterable, Sequence
 
 import idstools.rule
 

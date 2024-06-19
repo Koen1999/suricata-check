@@ -1,5 +1,5 @@
 # noqa: D100
-from typing import Mapping, Sequence
+from collections.abc import Mapping, Sequence
 
 import idstools.rule
 
