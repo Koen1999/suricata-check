@@ -5,10 +5,20 @@ import logging
 import os
 import sys
 from collections import defaultdict
-from typing import Iterable, Literal, Mapping, MutableMapping, Optional, Sequence, Union
+from typing import (
+    Any,
+    Iterable,
+    Literal,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Union,
+)
 
 import click
 import idstools.rule
+import tabulate
 
 from .checkers.interface import CheckerInterface
 from .utils import check_rule_option_recognition, find_rules_file
@@ -16,23 +26,17 @@ from .utils import check_rule_option_recognition, find_rules_file
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
 
+OUTPUT_SUMMARY_TYPE = Mapping[
+    str, Union[Mapping[str, int], Mapping[str, Mapping[str, int]]]
+]
+
 logger = logging.getLogger(__name__)
 
-# TODO: Now
-# - Implement a report that provides statistics over a rule given all issues for that rule.
-# - Implement a report that provides statistics over an entire ruleset.
+# TODO:
 # - Implement checkers based on the Suricata Style Guide.
 # - Implement checkers based on Ruling the Unruly.
-# - Make it possible to only run checkers emitting certain codes through regular expression selection and an include exclude mechanism.
-# - Some issues are irrelevant when other issues are present. I.e., whitespace in body is not relevant if sid is missing. Implement a way to filter out irrelevant issues.
-# -
-
-# TODO: Before publication
-# - Better define how to contribute to this project by setting up CONTRIBUTING.md and providing issue templates
-# - Make a wheel for PyPi
-# - Investigate possibilities to allow for custom checkers through third party packages with similar interfaces.
-# - Add some shields.io badges to the README.md
-# - Profile the tool and make it faster (regular expression matches?)
+# - Implement sid allocation checkers using rule msg prefixes
+# - Add support in regex.py for all Suricata options used in the Snort and ET OPEN rulesets.
 
 
 @click.command()
@@ -78,19 +82,28 @@ def main(
     """Processes all rules inside a rules file and outputs a list of issues found.
 
     Args:
+    
     ----
+    
     out: A path to a directory where the output will be written.
+    
     rules: A path to a Suricata rules file or a directory in which a single rule file can be discovered
+    
     single_rule: A single Suricata rule to be checked. If set, the rules file will be ignored.
+    
     log_level: The verbosity level for logging.
+    
     evaluate_disabled: A flag indicating whether disabled rules should be evaluated.
 
     Raises:
+    
     ------
+    
       BadParameter: If provided arguments are invalid.
+      
       RuntimeError: If no checkers could be automatically discovered.
 
-    """
+    """  # noqa: D412
     # Verify that out argument is valid
     if os.path.exists(out) and not os.path.isdir(out):
         raise click.BadParameter(f"Error: {out} is not a directory.")
@@ -141,7 +154,7 @@ def main(
 
         rule_dict = analyze_rule(rule, checkers=checkers)
 
-        _write_output([rule_dict], out)
+        _write_output({"rules": [rule_dict]}, out)
 
         # Return here so no rules file is processed.
         return
@@ -155,11 +168,19 @@ def main(
 
 
 def _write_output(
-    output: list[Mapping[str, Union[idstools.rule.Rule, list[Mapping], Mapping, int]]],
+    output: Mapping[
+        str,
+        Union[
+            list[
+                Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]
+            ],
+            Mapping[str, Any],
+        ],
+    ],
     out: str,
 ) -> None:
     logger.info(
-        "Writing output to suricata-check.jsonl and suricata-check.fast in %s",
+        "Writing output to suricata-check.jsonl and suricata-check-fast.log in %s",
         os.path.abspath(out),
     )
     with (
@@ -169,31 +190,81 @@ def _write_output(
             buffering=io.DEFAULT_BUFFER_SIZE,
         ) as jsonl_fh,
         open(
-            os.path.join(out, "suricata-check.fast"),
+            os.path.join(out, "suricata-check-fast.log"),
             "w",
             buffering=io.DEFAULT_BUFFER_SIZE,
         ) as fast_fh,
     ):
-        jsonl_fh.write("\n".join([str(rule) for rule in output]))
+        rules: list[Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]] = output["rules"]  # type: ignore reportAssignmentType
+        jsonl_fh.write("\n".join([str(rule) for rule in rules]))
 
-        for rule_dict in output:
+        for rule_dict in rules:
             rule: idstools.rule.Rule = rule_dict["rule"]  # type: ignore reportAssignmentType
             line: Optional[int] = rule_dict["line"] if "line" in rule_dict else None  # type: ignore reportAssignmentType
-            issues: list[Mapping] = rule_dict["issues"]  # type: ignore reportAssignmentType
+            issues: Sequence[Mapping] = rule_dict["issues"]  # type: ignore reportAssignmentType
             for issue in issues:
                 code = issue["code"]
                 issue_msg = issue["message"].replace("\n", " ")
 
                 msg = f"[{code}] Line {line}, sid {rule['sid']}: {issue_msg}\n"
                 fast_fh.write(msg)
-                print(msg)  # noqa: T201
+                sys.stdout.write(msg)
+
+    if "summary" in output:
+        with open(
+            os.path.join(out, "suricata-check-stats.log"),
+            "w",
+            buffering=io.DEFAULT_BUFFER_SIZE,
+        ) as stats_fh:
+            summary: Mapping[str, Any] = output["summary"]  # type: ignore reportAssignmentType
+
+            overall_summary: Mapping[str, int] = summary["overall_summary"]
+
+            stats_fh.write(
+                tabulate.tabulate(
+                    overall_summary.items(),
+                    headers=("Count",),
+                )
+                + "\n\n"
+            )
+
+            sys.stdout.write(f"Total issues found: {overall_summary['Total Issues']}\n")
+            sys.stdout.write(f"Rules with Issues found: {overall_summary['Rules with Issues']}\n")
+
+            issues_by_group: Mapping[str, int] = summary["issues_by_group"]  # type: ignore reportAssignmentType
+
+            stats_fh.write(
+                tabulate.tabulate(
+                    issues_by_group.items(),
+                    headers=("Count",),
+                )
+                + "\n\n"
+            )
+
+            issues_by_type: Mapping[str, Mapping[str, int]] = summary["issues_by_type"]  # type: ignore reportAssignmentType
+            for checker, checker_issues_by_type in issues_by_type.items():
+                stats_fh.write(" "+ checker + " " + "\n")
+                stats_fh.write("-" * (len(checker)+2) + "\n")
+                stats_fh.write(
+                    tabulate.tabulate(
+                        checker_issues_by_type.items(),
+                        headers=("Count",),
+                    )
+                    + "\n\n"
+                )
 
 
 def process_rules_file(
     rules: str,
     evaluate_disabled: bool,
     checkers: Optional[Sequence[CheckerInterface]] = None,
-) -> list[Mapping[str, Union[idstools.rule.Rule, list[Mapping], Mapping, int]]]:
+) -> Mapping[
+    str,
+    Union[
+        list[Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]],
+        Mapping[str, Any],
+    ],
+]:
     """Processes a rule file and returns a list of rules and their issues.
 
     Args:
@@ -214,7 +285,18 @@ def process_rules_file(
     if checkers is None:
         checkers = get_checkers()
 
-    output = []
+    output: MutableMapping[
+        str,
+        Union[
+            list[
+                Mapping[
+                    str,
+                    Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int],
+                ]
+            ],
+            Mapping[str, Any],
+        ],
+    ] = {"rules": []}
 
     with (
         open(
@@ -258,19 +340,19 @@ def process_rules_file(
 
             dict_out: MutableMapping[
                 str,
-                Union[idstools.rule.Rule, list[Mapping], Mapping, int],
+                Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int],
             ] = analyze_rule(
                 rule,
                 checkers=checkers,
             )  # type: ignore reportAssignmentType
             dict_out["line"] = number
-            output.append(dict_out)
+            output["rules"].append(dict_out)  # type: ignore reportAttributeAccessIssue
 
     logger.info("Completed processing rule file: %s", rules)
 
-    # TODO: Implement some sort of report that provides statistics over an entire ruleset.
+    output["summary"] = __summarizes_rules(output)
 
-    return output
+    return output  # type: ignore reportReturnType
 
 
 def get_checkers() -> Sequence[CheckerInterface]:
@@ -305,7 +387,7 @@ def get_checkers() -> Sequence[CheckerInterface]:
 def analyze_rule(
     rule: idstools.rule.Rule,
     checkers: Optional[Sequence[CheckerInterface]] = None,
-) -> MutableMapping[str, Union[idstools.rule.Rule, list[Mapping], Mapping]]:
+) -> MutableMapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping]]:
     """Checks a rule and returns a dictionary containing the rule and a list of issues found.
 
     Args:
@@ -322,7 +404,10 @@ def analyze_rule(
     if checkers is None:
         checkers = get_checkers()
 
-    dict_out: MutableMapping[str, Union[idstools.rule.Rule, list[Mapping], Mapping]] = {
+    dict_out: MutableMapping[
+        str,
+        Union[idstools.rule.Rule, Sequence[Mapping], Mapping],
+    ] = {
         "rule": rule,
     }
 
@@ -338,8 +423,8 @@ def analyze_rule(
 
 
 def __summarize_rule(
-    rule: MutableMapping[str, Union[idstools.rule.Rule, list[Mapping], Mapping]],
-) -> MutableMapping:
+    rule: Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping]],
+) -> Mapping:
     """Summarizes the issues found in a rule.
 
     Args:
@@ -358,6 +443,65 @@ def __summarize_rule(
     for issue in rule["issues"]:
         checker = issue["checker"]
         summary["issues_by_group"][checker] += 1
+
+    return summary
+
+
+def __summarizes_rules(
+    output: Mapping[
+        str,
+        Union[
+            Sequence[
+                Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]
+            ],
+            Mapping,
+        ],
+    ],
+) -> OUTPUT_SUMMARY_TYPE:
+    """Summarizes the issues found in a rules file.
+
+    Args:
+    ----
+    output: The unsammarized output of the rules file containing all rules and their issues.
+
+    Returns:
+    -------
+    A dictionary containing a summary of all issues found in the rules file.
+
+    """
+    summary: MutableMapping[
+        str,
+        Union[MutableMapping[str, int], MutableMapping[str, MutableMapping[str, int]]],
+    ] = {}
+
+    summary["overall_summary"] = defaultdict(int)
+    summary["issues_by_group"] = defaultdict(int)
+    summary["issues_by_type"] = defaultdict(lambda: defaultdict(int))
+    rules: Sequence[
+        Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]
+    ] = output[
+        "rules"
+    ]  # type: ignore reportAssignmentType
+    rule: Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]
+    for rule in rules:
+        issues: Sequence[Mapping] = rule["issues"]  # type: ignore reportAssignmentType
+        summary["overall_summary"]["Total Issues"] += len(issues)
+
+        if len(issues) == 0:
+            summary["overall_summary"]["Rules Without Issues"] += 1
+        else:
+            summary["overall_summary"]["Rules With Issues"] += 1
+
+        checker_codes = defaultdict(lambda: defaultdict(int))
+        for issue in issues:
+            checker = issue["checker"]
+            code = issue["code"]
+            summary["issues_by_group"][checker] += 1
+            checker_codes[checker][code] += 1
+
+        for checker, codes in checker_codes.items():
+            for code, count in codes.items():
+                summary["issues_by_type"][checker][code] += count
 
     return summary
 

@@ -84,9 +84,11 @@ The output of `suricata-check` is collected in a folder and spread across severa
 
 `suricata-check.log` contains log messages describing the executing flow of `suricata-check` and can be useful during development, as well as to detect potential issues with parsing rules or rule files.
 
-`suricata-check.fast` contains a condensed overview of all issues found by `suricata-check` and is useful during rule engineering as feedback points to further improve rules under development.
+`suricata-check-fast.log` contains a condensed overview of all issues found by `suricata-check` in individual rules and is useful during rule engineering as feedback points to further improve rules under development.
 
-`suricata-check.jsonl` is a jsonlines log file containing all the issues presented in `suricata-check.fast` together with parsed versions of _all_ rules and is useful for programatically further processing output of `suricata-check`.
+`suricata-check-stats.log` contains a very condensed overview of all issues found by `suricata-check` across all rules and is useful when reviewing the quality of an entire ruleset.
+
+`suricata-check.jsonl` is a jsonlines log file containing all the issues presented in `suricata-check-fast.log` together with parsed versions of _all_ rules and is useful for programatically further processing output of `suricata-check`. An example use-case could be to selectively disable rules affected by certain issues to prevent low-quality rules inducing additional workload in Security Operations Centers.
 
 ## Issue codes
 
@@ -102,7 +104,7 @@ For details regarding specific issues, we recommend you check the message of the
 | M000                    | Rules pertaining to the detection of valid Suricata syntax. |
 | S000                    | Rules derived from the Suricata Style Guide.                |
 | P000                    | Rules based [Ruling the Unruly]().                          |
-| C000                    | Rules based on community issues, such as this GitHub.  |
+| C000                    | Rules based on community issues, such as this GitHub.       |
 
 ### Mandatory issues
 

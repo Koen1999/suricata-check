@@ -2,7 +2,7 @@ import os
 import sys
 import warnings
 from functools import lru_cache
-from typing import Mapping, Optional, Sequence
+from typing import Mapping, Optional, Sequence, Union
 
 import idstools.rule
 import pytest
@@ -68,7 +68,12 @@ class GenericChecker:
         )
 
         codes = set()
-        for rule in output:
+        rules: Sequence[
+            Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]
+        ] = output[
+            "rules"
+        ]  # type: ignore reportAssignmentType
+        for rule in rules:
             issues: Sequence[Mapping] = rule["issues"]  # type: ignore reportAssignmentType
             for issue in issues:
                 codes.add(issue["code"])
@@ -92,7 +97,12 @@ class GenericChecker:
             checkers=[self.checker],
         )
 
-        for rule in output:
+        rules: Sequence[
+            Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]
+        ] = output[
+            "rules"
+        ]  # type: ignore reportAssignmentType
+        for rule in rules:
             issues: list[Mapping] = rule["issues"]  # type: ignore reportAssignmentType
             for issue in issues:
                 if "checker" not in issue:

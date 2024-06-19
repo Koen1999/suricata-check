@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 61.1.0", "wheel"]
+requires = ["setuptools >= 61.1.0", "wheel", "setuptools-git-versioning"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -67,6 +67,9 @@ suricata-check = "suricata_check:main"
 
 [tool.setuptools.packages.find]
 include = ["suricata_check*"]
+
+[tool.setuptools-git-versioning]
+enabled = true
 
 [tool.pytest.ini_options]
 markers = """

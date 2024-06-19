@@ -32,11 +32,11 @@ def find_rules_file(root: str) -> str:
                     rules_files.append(os.path.join(path, file))
 
         if len(rules_files) == 0:
-            msg = f"No Suricata rules file found in {root}."
+            msg = f"No Suricata rules file found in {root}"
             logger.critical(msg)
             raise click.BadParameter(f"Error: {msg}")
         if len(rules_files) > 1:
-            msg = f"Multiple Suricata rules files found in {root}."
+            msg = f"Multiple Suricata rules files found in {root}\n" + "\n".join(rules_files)
             logger.critical(msg)
             raise click.BadParameter(f"Error: {msg}")
 
