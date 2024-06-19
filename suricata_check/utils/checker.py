@@ -2,11 +2,11 @@
 
 import logging
 from functools import lru_cache
-from typing import Container, Iterable, Optional, Sequence, Sized, Union
+from typing import Iterable, Optional, Sequence, Union
 
 import idstools.rule
 
-from .regex import (
+from suricata_check.utils.regex import (
     ALL_METADATA_OPTIONS,
     ALL_OPTIONS,
     STICKY_BUFFER_NAMING,

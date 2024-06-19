@@ -1,7 +1,5 @@
 import os
-import re
 import sys
-from typing import Optional
 
 import idstools.rule
 import pytest

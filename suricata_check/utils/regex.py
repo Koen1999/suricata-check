@@ -3,7 +3,7 @@
 import importlib.util
 import logging
 from functools import lru_cache
-from typing import Container, Iterable, Literal, Sequence, Type, Union
+from typing import Iterable, Sequence
 
 import idstools.rule
 

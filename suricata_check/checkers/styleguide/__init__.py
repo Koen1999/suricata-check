@@ -3,6 +3,6 @@
 Reference: https://github.com/sidallocation/suricata-style-guide
 """
 
-from .order import OrderChecker
-from .overall import OverallChecker
-from .whitespace import WhitespaceChecker
+from suricata_check.checkers.styleguide.order import OrderChecker
+from suricata_check.checkers.styleguide.overall import OverallChecker
+from suricata_check.checkers.styleguide.whitespace import WhitespaceChecker

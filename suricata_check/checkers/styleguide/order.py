@@ -3,44 +3,30 @@ from typing import Mapping, Sequence
 
 import idstools.rule
 
-from ...utils import (
+from suricata_check.checkers.interface import CheckerInterface
+from suricata_check.utils import (
     ALL_DETECTION_OPTIONS,
     ALL_MODIFIER_OPTIONS,
-    ALL_VARIABLES,
     BUFFER_OPTIONS,
-    CLASSTYPES,
     CONTENT_OPTIONS,
     FLOW_STREAM_OPTIONS,
-    HEADER_REGEX,
     MATCH_LOCATION_OPTIONS,
     OTHER_PAYLOAD_OPTIONS,
     POINTER_MOVEMENT_OPTIONS,
     SIZE_OPTIONS,
     TRANSFORMATION_OPTIONS,
-    are_rule_options_always_put_before,
-    are_rule_options_equal_to_regex,
     are_rule_options_put_before,
     count_rule_options,
-    get_all_variable_groups,
     get_options_regex,
     get_regex_provider,
     get_rule_body,
-    get_rule_option,
     get_rule_option_position,
-    get_rule_option_positions,
-    get_rule_options_positions,
-    get_rule_sticky_buffer_naming,
     is_rule_option_always_put_before,
-    is_rule_option_equal_to,
-    is_rule_option_equal_to_regex,
     is_rule_option_first,
     is_rule_option_last,
-    is_rule_option_one_of,
     is_rule_option_put_before,
     is_rule_option_set,
-    select_rule_options_by_regex,
 )
-from ..interface import CheckerInterface
 
 regex_provider = get_regex_provider()
 
@@ -51,13 +37,7 @@ REGEX_S210 = regex_provider.compile(
     r"^\(.*content\s*:.*;\s*content\s*:.*;.*(depth|offset)\s*:.*\)$",
 )
 REGEX_S230 = regex_provider.compile(
-    r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
-        get_options_regex(CONTENT_OPTIONS).pattern,
-        get_options_regex(BUFFER_OPTIONS).pattern,
-        get_options_regex(CONTENT_OPTIONS).pattern,
-        get_options_regex(POINTER_MOVEMENT_OPTIONS).pattern,
-        get_options_regex(CONTENT_OPTIONS).pattern,
-    ),
+    rf"^\(((?!{get_options_regex(CONTENT_OPTIONS).pattern}).*|{get_options_regex(BUFFER_OPTIONS).pattern})(?!{get_options_regex(CONTENT_OPTIONS).pattern}).*{get_options_regex(POINTER_MOVEMENT_OPTIONS).pattern}.*{get_options_regex(CONTENT_OPTIONS).pattern}.*\)$",
 )
 REGEX_S231 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
@@ -89,13 +69,7 @@ REGEX_S232 = regex_provider.compile(
     ),
 )
 REGEX_S233 = regex_provider.compile(
-    r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
-        get_options_regex(CONTENT_OPTIONS).pattern,
-        get_options_regex(BUFFER_OPTIONS).pattern,
-        get_options_regex(CONTENT_OPTIONS).pattern,
-        get_options_regex(ALL_MODIFIER_OPTIONS).pattern,
-        get_options_regex(CONTENT_OPTIONS).pattern,
-    ),
+    rf"^\(((?!{get_options_regex(CONTENT_OPTIONS).pattern}).*|{get_options_regex(BUFFER_OPTIONS).pattern})(?!{get_options_regex(CONTENT_OPTIONS).pattern}).*{get_options_regex(ALL_MODIFIER_OPTIONS).pattern}.*{get_options_regex(CONTENT_OPTIONS).pattern}.*\)$",
 )
 REGEX_S234 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(

@@ -1,6 +1,5 @@
 import logging
 import os
-import re
 import shutil
 import sys
 import urllib.request
@@ -192,6 +191,13 @@ def test_analyze_rule():
     )
 
     suricata_check.analyze_rule(rule)
+
+
+def test_version():
+    if not hasattr(suricata_check, "__version__"):
+        pytest.fail("suricata_check has no attribute __version__")
+    if suricata_check.__version__ == "unknown":
+        pytest.fail("Version is unknown.")
 
 
 def _check_log_file():

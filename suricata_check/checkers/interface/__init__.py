@@ -3,4 +3,4 @@
 Implementation of the `CheckerInterface` is neccessary for checker auto-discovery.
 """
 
-from .checker import CheckerInterface
+from suricata_check.checkers.interface.checker import CheckerInterface

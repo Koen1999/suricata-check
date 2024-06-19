@@ -3,12 +3,12 @@ from typing import Mapping, Sequence
 
 import idstools.rule
 
-from ...utils import (
+from suricata_check.checkers.interface import CheckerInterface
+from suricata_check.utils import (
     HEADER_REGEX,
     get_regex_provider,
     is_rule_option_equal_to_regex,
 )
-from ..interface import CheckerInterface
 
 regex_provider = get_regex_provider()
 

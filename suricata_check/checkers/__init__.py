@@ -1,6 +1,10 @@
 """The `suricata_check.checkers` module contains all rule checkers."""
 
-from . import interface
-from .mandatory import MandatoryChecker
-from .principle import PrincipleChecker
-from .styleguide import *
+from suricata_check.checkers import interface
+from suricata_check.checkers.mandatory import MandatoryChecker
+from suricata_check.checkers.principle import PrincipleChecker
+from suricata_check.checkers.styleguide import (
+    OrderChecker,
+    OverallChecker,
+    WhitespaceChecker,
+)

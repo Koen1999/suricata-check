@@ -11,6 +11,7 @@ keywords = [
   "rule",
   "rules",
   "check",
+  "checker",
   "feedback",
   "network intrusion detection",
 ]
@@ -137,7 +138,7 @@ select = [
   "AIR",
   "RUF",
 ]
-ignore = ["F401", "F403", "N807", "D203", "D213", "D401", "UP032"]
+ignore = ["F401", "N807", "D203", "D213", "D401"]
 fixable = ["ALL"]
 
 [tool.ruff.format]

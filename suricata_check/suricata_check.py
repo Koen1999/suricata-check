@@ -5,9 +5,9 @@ import logging
 import os
 import sys
 from collections import defaultdict
+from importlib.metadata import PackageNotFoundError, version
 from typing import (
     Any,
-    Iterable,
     Literal,
     Mapping,
     MutableMapping,
@@ -20,8 +20,22 @@ import click
 import idstools.rule
 import tabulate
 
-from .checkers.interface import CheckerInterface
-from .utils import check_rule_option_recognition, find_rules_file
+# Add suricata-check to the front of the PATH, such that the version corresponding to the CLI is used.
+_suricata_check_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if sys.path[0] != _suricata_check_path:
+    sys.path.insert(0, _suricata_check_path)
+
+from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
+from suricata_check.utils import (  # noqa: E402
+    check_rule_option_recognition,
+    find_rules_file,
+)
+
+__version__: str = "unknown"
+try:
+    __version__ = version("suricata-check")
+except PackageNotFoundError:
+    pass
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
@@ -128,6 +142,11 @@ def main(
     logger.info("single_rule: %s", single_rule)
     logger.info("log_level: %s", log_level)
     logger.info("evaluate_disabled: %s", evaluate_disabled)
+
+    logger.debug("Platform: %s", sys.platform)
+    logger.debug("Python version: %s", sys.version)
+    logger.debug("suricata-check path: %s", _suricata_check_path)
+    logger.debug("suricata-check version: %s", __version__)
 
     checkers = get_checkers()
 

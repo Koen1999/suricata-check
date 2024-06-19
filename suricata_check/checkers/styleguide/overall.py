@@ -3,7 +3,8 @@ from typing import Mapping, Sequence
 
 import idstools.rule
 
-from ...utils import (
+from suricata_check.checkers.interface import CheckerInterface
+from suricata_check.utils import (
     ALL_VARIABLES,
     CLASSTYPES,
     count_rule_options,
@@ -16,7 +17,6 @@ from ...utils import (
     is_rule_option_one_of,
     is_rule_option_set,
 )
-from ..interface import CheckerInterface
 
 regex_provider = get_regex_provider()
 

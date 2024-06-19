@@ -3,9 +3,7 @@ from typing import Mapping, Optional, Sequence
 
 import idstools.rule
 
-from suricata_check.utils.regex import get_rule_body
-
-from ..utils import (
+from suricata_check.utils import (
     ALL_DETECTION_OPTIONS,
     CONTENT_OPTIONS,
     IP_ADDRESS_REGEX,
@@ -19,6 +17,8 @@ from ..utils import (
     is_rule_option_equal_to_regex,
     is_rule_option_set,
 )
+from suricata_check.utils.regex import get_rule_body
+
 from .interface import CheckerInterface
 
 regex_provider = get_regex_provider()
