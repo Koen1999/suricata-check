@@ -7,10 +7,10 @@ import warnings
 
 import idstools.rule
 import pytest
-from click.testing import CliRunner
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import suricata_check
+from click.testing import CliRunner
 
 regex_provider = suricata_check.utils.get_regex_provider()
 

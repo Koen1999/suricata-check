@@ -452,6 +452,17 @@ def __summarize_rule(
         checker = issue["checker"]
         summary["issues_by_group"][checker] += 1
 
+    # Ensure also checkers without issues are included in the report.
+    for checker in get_checkers():
+        if checker.__class__.__name__ not in summary["issues_by_group"]:
+            summary["issues_by_group"][checker.__class__.__name__] = 0
+
+    # Sort dictionaries for deterministic output
+    summary["issues_by_group"] = {
+        key: summary["issues_by_group"][key]
+        for key in sorted(summary["issues_by_group"].keys())
+    }
+
     return summary
 
 
@@ -482,9 +493,14 @@ def __summarizes_rules(
         Union[MutableMapping[str, int], MutableMapping[str, MutableMapping[str, int]]],
     ] = {}
 
-    summary["overall_summary"] = defaultdict(int)
+    summary["overall_summary"] = {
+        "Total Issues": 0,
+        "Rules with Issues": 0,
+        "Rules without Issues": 0,
+    }
     summary["issues_by_group"] = defaultdict(int)
     summary["issues_by_type"] = defaultdict(lambda: defaultdict(int))
+
     rules: Sequence[
         Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]
     ] = output[
@@ -496,9 +512,9 @@ def __summarizes_rules(
         summary["overall_summary"]["Total Issues"] += len(issues)
 
         if len(issues) == 0:
-            summary["overall_summary"]["Rules Without Issues"] += 1
+            summary["overall_summary"]["Rules without Issues"] += 1
         else:
-            summary["overall_summary"]["Rules With Issues"] += 1
+            summary["overall_summary"]["Rules with Issues"] += 1
 
         checker_codes = defaultdict(lambda: defaultdict(int))
         for issue in issues:
@@ -510,6 +526,28 @@ def __summarizes_rules(
         for checker, codes in checker_codes.items():
             for code, count in codes.items():
                 summary["issues_by_type"][checker][code] += count
+
+    # Ensure also checkers and codes without issues are included in the report.
+    for checker in get_checkers():
+        if checker.__class__.__name__ not in summary["issues_by_group"]:
+            summary["issues_by_group"][checker.__class__.__name__] = 0
+
+        for code in checker.codes:
+            if code not in summary["issues_by_type"][checker.__class__.__name__]:
+                summary["issues_by_type"][checker.__class__.__name__][code] = 0
+
+    # Sort dictionaries for deterministic output
+    summary["issues_by_group"] = {
+        key: summary["issues_by_group"][key]
+        for key in sorted(summary["issues_by_group"].keys())
+    }
+    summary["issues_by_type"] = {
+        key: {
+            key2: summary["issues_by_type"][key][key2]
+            for key2 in sorted(summary["issues_by_type"][key])
+        }
+        for key in sorted(summary["issues_by_type"].keys())
+    }
 
     return summary
 
