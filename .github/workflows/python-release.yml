@@ -78,7 +78,6 @@ jobs:
       id-token: write
     environment: 
       name: pypi
-      url: https://pypi.org/p/suricata-check
 
     strategy:
       fail-fast: true
