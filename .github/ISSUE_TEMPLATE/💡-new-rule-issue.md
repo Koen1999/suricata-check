@@ -1,5 +1,5 @@
 ---
-name: "\U0001F680 New Rule Issue"
+name: "\U0001F4A1 New Rule Issue"
 about: Suggest an new rule issue to be checked by this project.
 title: "[NEW RULE ISSUE]"
 labels: enhancement

@@ -82,28 +82,19 @@ def main(
     """Processes all rules inside a rules file and outputs a list of issues found.
 
     Args:
-    
     ----
-    
     out: A path to a directory where the output will be written.
-    
     rules: A path to a Suricata rules file or a directory in which a single rule file can be discovered
-    
     single_rule: A single Suricata rule to be checked. If set, the rules file will be ignored.
-    
     log_level: The verbosity level for logging.
-    
     evaluate_disabled: A flag indicating whether disabled rules should be evaluated.
 
     Raises:
-    
     ------
-    
       BadParameter: If provided arguments are invalid.
-      
       RuntimeError: If no checkers could be automatically discovered.
 
-    """  # noqa: D412
+    """
     # Verify that out argument is valid
     if os.path.exists(out) and not os.path.isdir(out):
         raise click.BadParameter(f"Error: {out} is not a directory.")
