@@ -25,17 +25,12 @@ _suricata_check_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "
 if sys.path[0] != _suricata_check_path:
     sys.path.insert(0, _suricata_check_path)
 
+from suricata_check import __version__
 from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
 from suricata_check.utils import (  # noqa: E402
     check_rule_option_recognition,
     find_rules_file,
 )
-
-__version__: str = "unknown"
-try:
-    __version__ = version("suricata-check")
-except PackageNotFoundError:
-    pass
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
