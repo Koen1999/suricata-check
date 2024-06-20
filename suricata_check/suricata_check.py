@@ -6,6 +6,7 @@ import os
 import sys
 from collections import defaultdict
 from collections.abc import Mapping, MutableMapping, Sequence
+from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, version
 from typing import (
     Any,
@@ -361,6 +362,7 @@ def process_rules_file(
     return output
 
 
+@lru_cache(maxsize=1)
 def get_checkers() -> Sequence[CheckerInterface]:
     """Auto discovers all available checkers that implement the CheckerInterface.
 

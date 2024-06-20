@@ -82,7 +82,9 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION["local"]}.
             )
 
         if prefix in SID_ALLOCATION.keys() and (
-            range_name is not None and prefix != range_name
+            range_name is not None
+            and not prefix.startswith(range_name)
+            and not range_name.startswith(prefix)
         ):
             issues.append(
                 {
