@@ -25,7 +25,7 @@ regex_provider = get_regex_provider()
 # Regular expressions are placed here such that they are compiled only once.
 # This has a significant impact on the performance.
 REGEX_S030 = regex_provider.compile(r"^[a-z\-]+$")
-REGEX_S031 = regex_provider.compile(r"^[^\|]*\|[0-9A-Z\s]+\|[^\|]*$")
+REGEX_S031 = regex_provider.compile(r"^[^\|]*\|[^\|]*[A-Z]+[^\|]*\|[^\|]*$")
 
 
 class OverallChecker(CheckerInterface):

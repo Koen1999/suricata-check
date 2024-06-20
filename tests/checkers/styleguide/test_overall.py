@@ -178,6 +178,13 @@ content:"long generic"; content:"short unique"; fast_pattern;)""",
 
         self.check_issue(rule, "S031", False)
 
+    def test_s031_good2(self):
+        rule = idstools.rule.parse(
+            """alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1; content:"|00 11 22|";)""",
+        )
+
+        self.check_issue(rule, "S031", False)
+
 
 def __main__():
     pytest.main()

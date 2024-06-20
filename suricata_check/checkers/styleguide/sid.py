@@ -1,4 +1,5 @@
 # noqa: D100
+import logging
 from collections.abc import Mapping, Sequence
 from typing import Optional
 
@@ -21,7 +22,9 @@ SID_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
 
 regex_provider = get_regex_provider()
 
-MSG_PREFIX_REGEX = regex_provider.compile(r"^\"(([A-Z0-9]+ )*).*\"$")
+MSG_PREFIX_REGEX = regex_provider.compile(r"^\"([A-Z0-9 ]*).*\"$")
+
+logger = logging.getLogger(__name__)
 
 
 class SidChecker(CheckerInterface):
@@ -57,8 +60,10 @@ class SidChecker(CheckerInterface):
         range_name = self._get_range_name(sid, SID_ALLOCATION)
         prefix = self._get_msg_prefix(msg)
 
-        if prefix not in SID_ALLOCATION.keys() and (
-            range_name is not None and range_name != "local"
+        if (
+            prefix not in SID_ALLOCATION.keys()
+            and range_name is not None
+            and range_name != "local"
         ):
             issues.append(
                 {
@@ -134,11 +139,13 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
         match = MSG_PREFIX_REGEX.match(msg)
         assert match is not None
 
-        parts = match.group(1).split(" ")
+        parts = match.group(1).strip().split(" ")
         prefix: str = ""
-        for i in list(reversed(range(len(parts))))[1:]:
-            prefix = " ".join(parts[:i])
-            if prefix in SID_ALLOCATION.keys():
+        for i in list(reversed(range(len(parts)))):
+            prefix = " ".join(parts[:i+1])
+            if prefix in SID_ALLOCATION.keys() or " " not in prefix:
                 break
+
+        assert len(prefix) > 0
 
         return prefix
