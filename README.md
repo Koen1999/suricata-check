@@ -183,6 +183,7 @@ To automatically fix some linting issues and check for remaining issues, run the
 ```bash
 black .
 ruff check . --fix
+pyright
 ```
 
 ### Pull requests
