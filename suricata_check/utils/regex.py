@@ -131,6 +131,9 @@ FLOW_STREAM_KEYWORDS: Sequence[str] = tuple(
 )
 
 STICKY_BUFFER_NAMING = {
+    "dce_iface": "dce.iface",
+    "dce_opnum": "dce.opnum",
+    "dce_stub_data": "dce.stub_data",
     "dns_query": "dns.query",
     "file_data": "file.data",
     "http_accept": "http.accept",
@@ -253,7 +256,9 @@ IP_SPECIFIC_KEYWORDS = (
 )
 
 TCP_SPECIFIC_KEYWORDS = (
+    "ack",
     "flags",  # This is a duplicate of tcp.flags
+    "seq",
     "tcp.flags",
     "tcp.hdr",
 )
@@ -261,8 +266,10 @@ TCP_SPECIFIC_KEYWORDS = (
 UDP_SPECIFIC_KEYWORDS = ("udp.hdr",)
 
 ICMP_SPECIFIC_KEYWORDS = (
+    "fragbits",
     "icode",
     "icmp_id",
+    "icmp_seq",
     "itype",
 )
 
@@ -335,6 +342,7 @@ DNS_SPECIFIC_KEYWORDS = (
 )
 
 TLS_SPECIFIC_KEYWORDS = (
+    "ssl_version",
     "ssl_state",
     "tls.cert_issuer",
     "tls.cert_serial",
@@ -355,6 +363,15 @@ JA3_JA4_KEYWORDS = (
     "ja3_hash",
     "ja3.string",
     "ja3s.hash",
+)
+
+DCERPC_SPECIFIC_KEYWORDS = (
+    "dce.iface",
+    "dce.opnum",
+    "dce.stub_data",
+    "dce_iface",
+    "dce_opnum",
+    "dce_stub_data",
 )
 
 APP_LAYER_KEYWORDS = (
@@ -439,6 +456,7 @@ METADATA_NON_DATE_KEYWORDS = (
     "deployment",
     "former_category",
     "former_sid",
+    "impact_flag",
     "malware_family",
     "mitre_tactic_id",
     "mitre_tactic_name",

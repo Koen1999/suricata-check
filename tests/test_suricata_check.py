@@ -127,7 +127,7 @@ def test_main_cli_integration_snort_community():
         (
             "--rules=tests/data/snort3-community.rules",
             "--out=tests/data/out",
-            "--log-level=WARNING",
+            "--log-level=DEBUG",
         ),
         catch_exceptions=False,
     )

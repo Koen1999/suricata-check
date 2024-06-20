@@ -99,6 +99,20 @@
             },
         },
         {
+            "name": "Pytest: ET OPEN v5 Integration",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["-k", "et_open", "-k", "v5", "-m", "slow or not slow"],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "subProcess": true,
+            "stopOnEntry": false,
+            "autoReload": {
+                "enable": false
+            },
+        },
+        {
             "name": "Pytest: ET OPEN v7 Integration",
             "type": "debugpy",
             "request": "launch",
