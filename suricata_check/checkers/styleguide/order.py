@@ -38,7 +38,13 @@ REGEX_S210 = regex_provider.compile(
     r"^\(.*content\s*:.*;\s*content\s*:.*;.*(depth|offset)\s*:.*\)$",
 )
 REGEX_S230 = regex_provider.compile(
-    rf"^\(((?!{get_options_regex(CONTENT_KEYWORDS).pattern}).*|{get_options_regex(BUFFER_KEYWORDS).pattern})(?!{get_options_regex(CONTENT_KEYWORDS).pattern}).*{get_options_regex(POINTER_MOVEMENT_KEYWORDS).pattern}.*{get_options_regex(CONTENT_KEYWORDS).pattern}.*\)$",
+    r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
+        get_options_regex(CONTENT_KEYWORDS).pattern,
+        get_options_regex(BUFFER_KEYWORDS).pattern,
+        get_options_regex(CONTENT_KEYWORDS).pattern,
+        get_options_regex(POINTER_MOVEMENT_KEYWORDS).pattern,
+        get_options_regex(CONTENT_KEYWORDS).pattern,
+    ),
 )
 REGEX_S231 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(

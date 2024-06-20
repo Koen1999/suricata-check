@@ -153,7 +153,7 @@ select = [
   "AIR",
   "RUF",
 ]
-ignore = ["F401", "N807", "D203", "D213", "D401", "COM812"]
+ignore = ["F401", "N807", "D203", "D213", "D401", "COM812", "UP032"]
 fixable = ["ALL"]
 
 [tool.ruff.format]

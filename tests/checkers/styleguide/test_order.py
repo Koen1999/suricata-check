@@ -526,6 +526,22 @@ sid:1; rev:1;)""",
 
         self.check_issue(rule, "S230", False)
 
+    def test_s230_good2(self):
+        rule = idstools.rule.parse(
+            """alert http $HOME_NET any -> $EXTERNAL_NET any (\
+msg:"HTTP Request"; \
+flow:established,to_server; \
+http.user_agent; \
+content:"Test"; \
+depth:4; \
+content:"Test"; \
+within:4; \
+fast_pattern; \
+sid:1; rev:1;)""",
+        )
+
+        self.check_issue(rule, "S230", False)
+
     def test_s231_bad(self):
         rule = idstools.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
