@@ -78,7 +78,9 @@ def test_main_cli_single_rule():
 def test_main_cli_integration_et_open(version, et_open_url):
     # Retrieve the latest ET Open rules if not present.
     if not os.path.exists(f"tests/data/emerging-all-{version}.rules"):
-        urllib.request.urlretrieve(et_open_url, f"tests/data/emerging-all-{version}.rules")
+        urllib.request.urlretrieve(
+            et_open_url, f"tests/data/emerging-all-{version}.rules"
+        )
 
     runner = CliRunner()
     result = runner.invoke(
@@ -86,7 +88,7 @@ def test_main_cli_integration_et_open(version, et_open_url):
         (
             f"--rules=tests/data/emerging-all-{version}.rules",
             "--out=tests/data/out",
-            "--log-level=WARNING",
+            "--log-level=DEBUG",
         ),
         catch_exceptions=False,
     )

@@ -105,19 +105,24 @@ CLASSTYPES = (
     "coin-mining",
     "command-and-control",
 )
+
 NON_FUNCTIONAL_KEYWORDS = (
-    "msg",
     "classtype",
-    "sid",
     "gid",
-    "rev",
     "metadata",
-    "reference",
-    "target",
+    "msg",
     "priority",
+    "reference",
+    "rev",
+    "sid",
+    "target",
 )
 
-FLOW_KEYWORDS = ("flow", "flow.age", "flowint")
+FLOW_KEYWORDS = (
+    "flow",
+    "flow.age",
+    "flowint",
+)
 
 STREAM_KEYWORDS = ("stream_size",)
 
@@ -126,48 +131,54 @@ FLOW_STREAM_KEYWORDS: Sequence[str] = tuple(
 )
 
 STICKY_BUFFER_NAMING = {
-    "http_header": "http.header",
-    "http_content_type": "http.content_type",
-    "file_data": "file.data",
     "dns_query": "dns.query",
-    "tls_sni": "tls.sni",
-    "tls_cert_issuer": "tls.cert_issuer",
+    "file_data": "file.data",
+    "http_accept": "http.accept",
+    "http_accept_enc": "http.accept_enc",
+    "http_accept_lang": "http.accept_lang",
+    "http_client_body": "http.request_body",
+    "http_connection": "http.connection",
+    "http_content_len": "http.content_len",
+    "http_content_type": "http.content_type",
+    "http_cookie": "http.cookie",
+    "http_header": "http.header",
+    "http_header_names": "http.header_names",
+    "http_host": "http.host",
+    "http_method": "http.method",
+    "http_protocol": "http.protocol",
+    "http_raw_header": "http.header.raw",
+    "http_raw_host": "http.host.raw",
+    "http_raw_uri": "http.uri.raw",
+    "http_referer": "http.referer",
+    "http_request_line": "http.request_line",
+    "http_response_line": "http.response_line",
+    "http_server_body": "http.response_body",
+    "http_start": "http.start",
+    "http_stat_code": "http.stat_code",
+    "http_stat_msg": "http.stat_msg",
+    "http_uri": "http.uri",
+    "http_user_agent": "http.user_agent",
     "ja3_hash": "ja3.hash",
+    "tls_cert_issuer": "tls.cert_issuer",
+    "tls_cert_serial": "tls.cert_serial",
+    "tls_cert_subject": "tls.cert_subject",
+    "tls_sni": "tls.sni",
 }
 
 BASE64_BUFFER_KEYWORDS = ("base64_data",)
 
 OTHER_BUFFERS = (
+    "http.location",
     "http.request_header",
     "http.response_header",
-    "http.header_names",
-    "http.header.raw",
-    "http.protocol",
-    "http.location",
-    "http.stat_msg",
-    "http.uri",
-    "http.uri.raw",
-    "http.host",
-    "http.host.raw",
-    "http.referer",
-    "http.user_agent",
-    "http.cookie",
-    "http.connection",
-    "http.accept",
-    "http.accept_lang",
-    "http.accept_enc",
     "http.server",
-    "http.method",
-    "http.request_line",
-    "http.request_body",
-    "http.response_line",
-    "http.response_body",
-    "http.start",
-    "tls.version",
-    "tls.certs",
-    "tls.cert_subject",
-    "tls.cert_serial",
     "ja3s.hash",
+    "tls.certs",
+    "tls.version",
+)
+
+assert set(OTHER_BUFFERS).isdisjoint(
+    set(STICKY_BUFFER_NAMING.keys()).union(STICKY_BUFFER_NAMING.values())
 )
 
 BUFFER_KEYWORDS: Sequence[str] = tuple(
@@ -185,19 +196,19 @@ SIZE_KEYWORDS = (
 )
 
 TRANSFORMATION_KEYWORDS = (
-    "dotprefix",
-    "strip_whitespace",
     "compress_whitespace",
+    "dotprefix",
+    "header_lowercase",
+    "pcrexform",
+    "strip_pseudo_headers",
+    "strip_whitespace",
     "to_lowercase",
     "to_md5",
-    "to_uppercase",
     "to_sha1",
     "to_sha256",
-    "pcrexform",
+    "to_uppercase",
     "url_decode",
     "xor",
-    "header_lowercase",
-    "strip_pseudo_headers",
 )
 
 BASE64_TRANSFORMATION_KEYWORDS = ("base64_decode",)
@@ -210,10 +221,10 @@ CONTENT_KEYWORDS = ("content", "pcre")
 
 POINTER_MOVEMENT_KEYWORDS = (
     "depth",
-    "offset",
     "distance",
-    "within",
+    "offset",
     "pkt_data",
+    "within",
 )
 
 COMPATIBILITY_MODIFIER_KEYWORDS = ("rawbytes",)
@@ -225,88 +236,131 @@ ALL_MODIFIER_KEYWORDS: Sequence[str] = tuple(
 )
 
 MATCH_LOCATION_KEYWORDS = (
-    "startswith",
     "endswith",
+    "startswith",
 )
 
 OTHER_PAYLOAD_KEYWORDS = (
-    "isdataat",
-    "byte_test",
     "byte_extract",
     "byte_jump",
+    "byte_test",
+    "isdataat",
 )
 
-IP_SPECIFIC_KEYWORDS = ("ttl", "ip_proto")
+IP_SPECIFIC_KEYWORDS = (
+    "ip_proto",
+    "ttl",
+)
 
 TCP_SPECIFIC_KEYWORDS = (
-    "tcp.hdr",
-    "tcp.flags",
     "flags",  # This is a duplicate of tcp.flags
+    "tcp.flags",
+    "tcp.hdr",
 )
 
 UDP_SPECIFIC_KEYWORDS = ("udp.hdr",)
 
 ICMP_SPECIFIC_KEYWORDS = (
-    "itype",
     "icode",
     "icmp_id",
+    "itype",
 )
 
 HTTP_SPECIFIC_KEYWORDS = (
-    "urilen",
-    "file_data",
     "file.data",
-    "http.request_header",
-    "http.response_header",
-    "http.header_names",
-    "http_header",
+    "file_data",
+    "http.accept",
+    "http.accept_enc",
+    "http.accept_lang",
+    "http.connection",
+    "http.content_len",
+    "http.content_len",
+    "http.content_type",
+    "http.cookie",
     "http.header",
+    "http.header_names",
     "http.header.raw",
-    "http.protocol",
+    "http.host",
+    "http.host.raw",
     "http.location",
+    "http.method",
+    "http.protocol",
+    "http.referer",
+    "http.request_body",
+    "http.request_header",
+    "http.request_line",
+    "http.response_body",
+    "http.response_header",
+    "http.response_line",
+    "http.server",
+    "http.start",
+    "http.stat_code",
+    "http.stat_code",
     "http.stat_msg",
     "http.uri",
     "http.uri.raw",
-    "http.host",
-    "http.host.raw",
-    "http.referer",
     "http.user_agent",
-    "http.cookie",
-    "http.connection",
-    "http.accept",
-    "http.accept_lang",
-    "http.accept_enc",
-    "http.server",
+    "http_accept",
+    "http_accept_enc",
+    "http_accept_lang",
+    "http_connection",
+    "http_content_len",
+    "http_content_len",
     "http_content_type",
-    "http.content_type",
-    "http.method",
-    "http.request_line",
-    "http.request_body",
-    "http.response_line",
-    "http.response_body",
-    "http.stat_code",
-    "http.content_len",
-    "http.start",
+    "http_cookie",
+    "http_header",
+    "http_header_names",
+    "http_host",
+    "http_location",
+    "http_method",
+    "http_protocol",
+    "http_raw_header",
+    "http_raw_host",
+    "http_raw_uri",
+    "http_referer",
+    "http_request_line",
+    "http_response_line",
+    "http_server_body",
+    "http_start",
+    "http_stat_code",
+    "http_stat_msg",
+    "http_uri",
+    "http_user_agent",
+    "urilen",
 )
 
-DNS_SPECIFIC_KEYWORDS = ("dns_query", "dns.query",)
+DNS_SPECIFIC_KEYWORDS = (
+    "dns.query",
+    "dns_query",
+)
 
 TLS_SPECIFIC_KEYWORDS = (
-    "tls_sni",
-    "tls.sni",
-    "tls.version",
-    "tls.certs",
-    "tls.cert_subject",
-    "tls_cert_issuer",
+    "ssl_state",
     "tls.cert_issuer",
     "tls.cert_serial",
+    "tls.cert_subject",
+    "tls.certs",
+    "tls.sni",
+    "tls.version",
+    "tls_cert_issuer",
+    "tls_cert_serial",
+    "tls_cert_subject",
+    "tls_sni",
 )
 
 SSH_SPECIFIC_KEYWORDS = ("ssh_proto",)
 
-JA3_JA4_KEYWORDS = ("ja3_hash", "ja3.hash", "ja3s.hash", "ja3.string")
+JA3_JA4_KEYWORDS = (
+    "ja3.hash",
+    "ja3_hash",
+    "ja3.string",
+    "ja3s.hash",
+)
 
-APP_LAYER_KEYWORDS = ("app-layer-protocol","app-layer-event")
+APP_LAYER_KEYWORDS = (
+    "app-layer-event",
+    "app-layer-protocol",
+)
 
 PROTOCOL_SPECIFIC_KEYWORDS = tuple(
     sorted(
@@ -345,9 +399,12 @@ ALL_DETECTION_KEYWORDS: Sequence[str] = tuple(
     ),
 )
 
-THRESHOLD_KEYWORDS = ("threshold", "detection_filter")
+THRESHOLD_KEYWORDS = (
+    "detection_filter",
+    "threshold",
+)
 
-STATEFUL_KEYWORDS = ("flowint", "flowbits", "xbits")
+STATEFUL_KEYWORDS = ("flowbits", "flowint", "xbits")
 
 OTHER_KEYWORDS = ("fast_pattern", "noalert", "tag")
 
@@ -369,30 +426,30 @@ ALL_KEYWORDS = tuple(
 
 METADATA_DATE_KEYWORDS = (
     "created_at",
-    "updated_at",
     "reviewed_at",
+    "updated_at",
 )
 
 METADATA_NON_DATE_KEYWORDS = (
-    "attack_target",
     "affected_product",
+    "attack_target",
     "confidence",
-    "signature_severity",
-    "performance_impact",
-    "deployment",
-    "malware_family",
     "cve",
-    "tag",
+    "deprecation_reason",
+    "deployment",
+    "former_category",
+    "former_sid",
+    "malware_family",
     "mitre_tactic_id",
     "mitre_tactic_name",
     "mitre_technique_id",
     "mitre_technique_name",
-    "former_sid",
-    "former_category",
-    "ruleset",
+    "performance_impact",
     "policy",
+    "ruleset",
+    "signature_severity",
+    "tag",
     "tls_state",
-    "deprecation_reason"
 )
 
 ALL_METADATA_KEYWORDS = tuple(
