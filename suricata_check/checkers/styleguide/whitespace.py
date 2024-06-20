@@ -40,10 +40,10 @@ REGEX_S110 = regex_provider.compile(
 )
 REGEX_S111 = regex_provider.compile(r'^".*\|.*[a-fA-F0-9]{4}.*\|.*"$')
 REGEX_S120 = regex_provider.compile(
-    r'^".*[\x3a\x3b\x20\x22\x27\x7b\x5c\x2f\x60\x24\x28\x29]+.*"$',
+    r'^"([^\|]*|(\|[\sa-zA-Z0-9]*\|))*(\\?[\x3a\x3b\x20\x27\x7b\x5c\x2f\x60\x24\x28\x29]+|\\[\x22\x7c]+)([^\|]*|(\|[\sa-zA-Z0-9]*\|))*"$',
 )
 REGEX_S121 = regex_provider.compile(
-    r'^"/.*(\\?[\x20]+|\\[\x3a\x3b\x22\x27\x7b\x5c\x7c\x2f\x60\x24\x28\x29]+).*/[ism]*"$',
+    r'^"/.*(\\?[\x3a\x3b\x20\x22\x27\x2f\x60]+|\\[\x7b\x5c\x7c\x24\x28\x29]+).*/[ism]*"$',
 )
 REGEX_S122 = regex_provider.compile(r'^".*\\.*"$')
 REGEX_S123 = regex_provider.compile(r'^".*\\(?!x).*"$')

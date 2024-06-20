@@ -169,6 +169,13 @@ class TestWhitespace(GenericChecker):
 
         self.check_issue(rule, "S120", False)
 
+    def test_s120_good3(self):
+        rule = idstools.rule.parse(
+            """alert ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1; content:"|7c 8a|";)""",
+        )
+
+        self.check_issue(rule, "S120", False)
+
     def test_s121_bad(self):
         rule = idstools.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1; pcre:"/ /";)""",
