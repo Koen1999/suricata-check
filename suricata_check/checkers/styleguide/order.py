@@ -13,16 +13,16 @@ from suricata_check.utils.checker import (
     is_rule_option_set,
 )
 from suricata_check.utils.regex import (
-    ALL_DETECTION_OPTIONS,
-    ALL_MODIFIER_OPTIONS,
-    BUFFER_OPTIONS,
-    CONTENT_OPTIONS,
-    FLOW_STREAM_OPTIONS,
-    MATCH_LOCATION_OPTIONS,
-    OTHER_PAYLOAD_OPTIONS,
-    POINTER_MOVEMENT_OPTIONS,
-    SIZE_OPTIONS,
-    TRANSFORMATION_OPTIONS,
+    ALL_DETECTION_KEYWORDS,
+    ALL_MODIFIER_KEYWORDS,
+    BUFFER_KEYWORDS,
+    CONTENT_KEYWORDS,
+    FLOW_STREAM_KEYWORDS,
+    MATCH_LOCATION_KEYWORDS,
+    OTHER_PAYLOAD_KEYWORDS,
+    POINTER_MOVEMENT_KEYWORDS,
+    SIZE_KEYWORDS,
+    TRANSFORMATION_KEYWORDS,
     get_options_regex,
     get_regex_provider,
     get_rule_body,
@@ -38,53 +38,53 @@ REGEX_S210 = regex_provider.compile(
     r"^\(.*content\s*:.*;\s*content\s*:.*;.*(depth|offset)\s*:.*\)$",
 )
 REGEX_S230 = regex_provider.compile(
-    rf"^\(((?!{get_options_regex(CONTENT_OPTIONS).pattern}).*|{get_options_regex(BUFFER_OPTIONS).pattern})(?!{get_options_regex(CONTENT_OPTIONS).pattern}).*{get_options_regex(POINTER_MOVEMENT_OPTIONS).pattern}.*{get_options_regex(CONTENT_OPTIONS).pattern}.*\)$",
+    rf"^\(((?!{get_options_regex(CONTENT_KEYWORDS).pattern}).*|{get_options_regex(BUFFER_KEYWORDS).pattern})(?!{get_options_regex(CONTENT_KEYWORDS).pattern}).*{get_options_regex(POINTER_MOVEMENT_KEYWORDS).pattern}.*{get_options_regex(CONTENT_KEYWORDS).pattern}.*\)$",
 )
 REGEX_S231 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
-        get_options_regex(CONTENT_OPTIONS).pattern,
-        get_options_regex(BUFFER_OPTIONS).pattern,
-        get_options_regex(CONTENT_OPTIONS).pattern,
+        get_options_regex(CONTENT_KEYWORDS).pattern,
+        get_options_regex(BUFFER_KEYWORDS).pattern,
+        get_options_regex(CONTENT_KEYWORDS).pattern,
         "fast_pattern",
         get_options_regex(
-            set(SIZE_OPTIONS)
-            .union(TRANSFORMATION_OPTIONS)
-            .union(CONTENT_OPTIONS)
-            .union(POINTER_MOVEMENT_OPTIONS),
+            set(SIZE_KEYWORDS)
+            .union(TRANSFORMATION_KEYWORDS)
+            .union(CONTENT_KEYWORDS)
+            .union(POINTER_MOVEMENT_KEYWORDS),
         ).pattern,
     ),
 )
 REGEX_S232 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
-        get_options_regex(CONTENT_OPTIONS).pattern,
-        get_options_regex(BUFFER_OPTIONS).pattern,
-        get_options_regex(CONTENT_OPTIONS).pattern,
+        get_options_regex(CONTENT_KEYWORDS).pattern,
+        get_options_regex(BUFFER_KEYWORDS).pattern,
+        get_options_regex(CONTENT_KEYWORDS).pattern,
         "nocase",
         get_options_regex(
-            set(SIZE_OPTIONS)
-            .union(TRANSFORMATION_OPTIONS)
-            .union(CONTENT_OPTIONS)
-            .union(POINTER_MOVEMENT_OPTIONS)
+            set(SIZE_KEYWORDS)
+            .union(TRANSFORMATION_KEYWORDS)
+            .union(CONTENT_KEYWORDS)
+            .union(POINTER_MOVEMENT_KEYWORDS)
             .union(("fast_pattern",)),
         ).pattern,
     ),
 )
 REGEX_S233 = regex_provider.compile(
-    rf"^\(((?!{get_options_regex(CONTENT_OPTIONS).pattern}).*|{get_options_regex(BUFFER_OPTIONS).pattern})(?!{get_options_regex(CONTENT_OPTIONS).pattern}).*{get_options_regex(ALL_MODIFIER_OPTIONS).pattern}.*{get_options_regex(CONTENT_OPTIONS).pattern}.*\)$",
+    rf"^\(((?!{get_options_regex(CONTENT_KEYWORDS).pattern}).*|{get_options_regex(BUFFER_KEYWORDS).pattern})(?!{get_options_regex(CONTENT_KEYWORDS).pattern}).*{get_options_regex(ALL_MODIFIER_KEYWORDS).pattern}.*{get_options_regex(CONTENT_KEYWORDS).pattern}.*\)$",
 )
 REGEX_S234 = regex_provider.compile(
     r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
-        get_options_regex(CONTENT_OPTIONS).pattern,
-        get_options_regex(BUFFER_OPTIONS).pattern,
-        get_options_regex(CONTENT_OPTIONS).pattern,
+        get_options_regex(CONTENT_KEYWORDS).pattern,
+        get_options_regex(BUFFER_KEYWORDS).pattern,
+        get_options_regex(CONTENT_KEYWORDS).pattern,
         get_options_regex(
-            set(MATCH_LOCATION_OPTIONS).union(OTHER_PAYLOAD_OPTIONS),
+            set(MATCH_LOCATION_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),
         ).pattern,
         get_options_regex(
-            set(SIZE_OPTIONS)
-            .union(TRANSFORMATION_OPTIONS)
-            .union(CONTENT_OPTIONS)
-            .union(POINTER_MOVEMENT_OPTIONS)
+            set(SIZE_KEYWORDS)
+            .union(TRANSFORMATION_KEYWORDS)
+            .union(CONTENT_KEYWORDS)
+            .union(POINTER_MOVEMENT_KEYWORDS)
             .union(("nocase", "fast_pattern")),
         ).pattern,
     ),
@@ -92,21 +92,21 @@ REGEX_S234 = regex_provider.compile(
 REGEX_S235 = regex_provider.compile(
     r"^\(.*{}(?!{}).*{}.*\)$".format(
         get_options_regex(
-            set(TRANSFORMATION_OPTIONS)
-            .union(CONTENT_OPTIONS)
-            .union(OTHER_PAYLOAD_OPTIONS),
+            set(TRANSFORMATION_KEYWORDS)
+            .union(CONTENT_KEYWORDS)
+            .union(OTHER_PAYLOAD_KEYWORDS),
         ).pattern,
-        get_options_regex(BUFFER_OPTIONS).pattern,
-        get_options_regex(SIZE_OPTIONS).pattern,
+        get_options_regex(BUFFER_KEYWORDS).pattern,
+        get_options_regex(SIZE_KEYWORDS).pattern,
     ),
 )
 REGEX_S236 = regex_provider.compile(
     r"^\(.*{}(?!{}).*{}.*\)$".format(
         get_options_regex(
-            set(CONTENT_OPTIONS).union(OTHER_PAYLOAD_OPTIONS),
+            set(CONTENT_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),
         ).pattern,
-        get_options_regex(BUFFER_OPTIONS).pattern,
-        get_options_regex(TRANSFORMATION_OPTIONS).pattern,
+        get_options_regex(BUFFER_KEYWORDS).pattern,
+        get_options_regex(TRANSFORMATION_KEYWORDS).pattern,
     ),
 )
 
@@ -296,7 +296,7 @@ Consider moving the flow option to directly after the msg option.""",
             is_rule_option_always_put_before(
                 rule,
                 "flow",
-                FLOW_STREAM_OPTIONS,
+                FLOW_STREAM_KEYWORDS,
             )
             is False
         ):
@@ -312,7 +312,7 @@ Consider moving the flow option to before the flow and/or stream keywords.""",
             are_rule_options_put_before(
                 rule,
                 ("content", "pcre"),
-                FLOW_STREAM_OPTIONS,
+                FLOW_STREAM_KEYWORDS,
             )
             is True
         ):
@@ -328,7 +328,7 @@ Consider moving the flow and/or stream keywords to before content buffers and de
             is_rule_option_put_before(
                 rule,
                 "urilen",
-                FLOW_STREAM_OPTIONS,
+                FLOW_STREAM_KEYWORDS,
             )
             is True
         ):
@@ -473,7 +473,7 @@ Consider moving the transformation options to after any content option or other 
             is_rule_option_put_before(
                 rule,
                 "threshold",
-                ALL_DETECTION_OPTIONS,
+                ALL_DETECTION_KEYWORDS,
             )
             is True
         ):

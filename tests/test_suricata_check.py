@@ -14,9 +14,11 @@ from click.testing import CliRunner
 
 regex_provider = suricata_check.utils.get_regex_provider()
 
-ET_OPEN_URL = (
-    "https://rules.emergingthreats.net/open-nogpl/suricata-5.0/emerging-all.rules"
-)
+ET_OPEN_URLS = {
+    "v4": "https://rules.emergingthreats.net/open-nogpl/suricata-4.0/emerging-all.rules",
+    "v5": "https://rules.emergingthreats.net/open-nogpl/suricata-5.0/emerging-all.rules",
+    "v7": "https://rules.emergingthreats.net/open-nogpl/suricata-7.0.3/emerging-all.rules",
+}
 SNORT_COMMUNITY_URL = (
     "https://www.snort.org/downloads/community/snort3-community-rules.tar.gz"
 )
@@ -72,16 +74,17 @@ def test_main_cli_single_rule():
 @pytest.mark.slow()
 @pytest.mark.serial()
 @pytest.hookimpl(trylast=True)
-def test_main_cli_integration_et_open():
+@pytest.mark.parametrize(("version", "et_open_url"), ET_OPEN_URLS.items())
+def test_main_cli_integration_et_open(version, et_open_url):
     # Retrieve the latest ET Open rules if not present.
-    if not os.path.exists("tests/data/emerging-all.rules"):
-        urllib.request.urlretrieve(ET_OPEN_URL, "tests/data/emerging-all.rules")
+    if not os.path.exists(f"tests/data/emerging-all-{version}.rules"):
+        urllib.request.urlretrieve(et_open_url, f"tests/data/emerging-all-{version}.rules")
 
     runner = CliRunner()
     result = runner.invoke(
         suricata_check.main,
         (
-            "--rules=tests/data/emerging-all.rules",
+            f"--rules=tests/data/emerging-all-{version}.rules",
             "--out=tests/data/out",
             "--log-level=WARNING",
         ),

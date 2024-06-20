@@ -105,8 +105,7 @@ CLASSTYPES = (
     "coin-mining",
     "command-and-control",
 )
-# TODO: The things below are called keywords (for options); should rename
-NON_FUNCTIONAL_OPTIONS = (
+NON_FUNCTIONAL_KEYWORDS = (
     "msg",
     "classtype",
     "sid",
@@ -118,12 +117,12 @@ NON_FUNCTIONAL_OPTIONS = (
     "priority",
 )
 
-FLOW_OPTIONS = ("flow", "flow.age", "flowint")
+FLOW_KEYWORDS = ("flow", "flow.age", "flowint")
 
-STREAM_OPTIONS = ("stream_size",)
+STREAM_KEYWORDS = ("stream_size",)
 
-FLOW_STREAM_OPTIONS: Sequence[str] = tuple(
-    sorted(set(FLOW_OPTIONS).union(STREAM_OPTIONS)),
+FLOW_STREAM_KEYWORDS: Sequence[str] = tuple(
+    sorted(set(FLOW_KEYWORDS).union(STREAM_KEYWORDS)),
 )
 
 STICKY_BUFFER_NAMING = {
@@ -160,7 +159,7 @@ OTHER_BUFFERS = (
     "tls.cert_issuer",
 )
 
-BUFFER_OPTIONS: Sequence[str] = tuple(
+BUFFER_KEYWORDS: Sequence[str] = tuple(
     sorted(
         set(STICKY_BUFFER_NAMING.keys())
         .union(STICKY_BUFFER_NAMING.values())
@@ -168,12 +167,12 @@ BUFFER_OPTIONS: Sequence[str] = tuple(
     ),
 )
 
-SIZE_OPTIONS = (
+SIZE_KEYWORDS = (
     "bsize",
     "dsize",
 )
 
-TRANSFORMATION_OPTIONS = (
+TRANSFORMATION_KEYWORDS = (
     "dotprefix",
     "strip_whitespace",
     "compress_whitespace",
@@ -188,52 +187,53 @@ TRANSFORMATION_OPTIONS = (
     "strip_pseudo_headers",
 )
 
-CONTENT_OPTIONS = ("content", "pcre")
+CONTENT_KEYWORDS = ("content", "pcre")
 
-POINTER_MOVEMENT_OPTIONS = (
+POINTER_MOVEMENT_KEYWORDS = (
     "depth",
     "offset",
     "distance",
     "within",
+    "pkt_data",
 )
 
-COMPATIBILITY_MODIFIER_OPTIONS = ("rawbytes",)
+COMPATIBILITY_MODIFIER_KEYWORDS = ("rawbytes",)
 
-MODIFIER_OPTIONS = ("nocase",)
+MODIFIER_KEYWORDS = ("nocase",)
 
-ALL_MODIFIER_OPTIONS: Sequence[str] = tuple(
-    sorted(set(COMPATIBILITY_MODIFIER_OPTIONS).union(MODIFIER_OPTIONS)),
+ALL_MODIFIER_KEYWORDS: Sequence[str] = tuple(
+    sorted(set(COMPATIBILITY_MODIFIER_KEYWORDS).union(MODIFIER_KEYWORDS)),
 )
 
-MATCH_LOCATION_OPTIONS = (
+MATCH_LOCATION_KEYWORDS = (
     "startswith",
     "endswith",
 )
 
-OTHER_PAYLOAD_OPTIONS = (
+OTHER_PAYLOAD_KEYWORDS = (
     "isdataat",
     "byte_test",
     "byte_extract",
     "byte_jump",
 )
 
-IP_SPECIFIC_OPTIONS = ("ttl", "ip_proto")
+IP_SPECIFIC_KEYWORDS = ("ttl", "ip_proto")
 
-TCP_SPECIFIC_OPTIONS = (
+TCP_SPECIFIC_KEYWORDS = (
     "tcp.hdr",
     "tcp.flags",
     "flags",  # This is a duplicate of tcp.flags
 )
 
-UDP_SPECIFIC_OPTIONS = ("udp.hdr",)
+UDP_SPECIFIC_KEYWORDS = ("udp.hdr",)
 
-ICMP_SPECIFIC_OPTIONS = (
+ICMP_SPECIFIC_KEYWORDS = (
     "itype",
     "icode",
     "icmp_id",
 )
 
-HTTP_SPECIFIC_OPTIONS = (
+HTTP_SPECIFIC_KEYWORDS = (
     "urilen",
     "http.header_names",
     "http.header.raw",
@@ -259,84 +259,87 @@ HTTP_SPECIFIC_OPTIONS = (
     "http.start",
 )
 
-DNS_SPECIFIC_OPTIONS = ("dns.query",)
+DNS_SPECIFIC_KEYWORDS = ("dns.query",)
 
-TLS_SPECIFIC_OPTIONS = (
+TLS_SPECIFIC_KEYWORDS = (
     "tls.sni",
     "tls.certs",
     "tls.cert_subject",
     "tls.cert_issuer",
 )
 
-SSH_SPECIFIC_OPTIONS = ("ssh_proto",)
+SSH_SPECIFIC_KEYWORDS = ("ssh_proto",)
 
-JA3_JA4_OPTIONS = ("ja3_hash", "ja3.hash", "ja3.string")
+JA3_JA4_KEYWORDS = ("ja3_hash", "ja3.hash", "ja3.string")
 
-PROTOCOL_SPECIFIC_OPTIONS = tuple(
+APP_LAYER_KEYWORDS = ("app-layer-protocol",)
+
+PROTOCOL_SPECIFIC_KEYWORDS = tuple(
     sorted(
         set().union(
             *(
-                IP_SPECIFIC_OPTIONS,
-                TCP_SPECIFIC_OPTIONS,
-                UDP_SPECIFIC_OPTIONS,
-                ICMP_SPECIFIC_OPTIONS,
-                HTTP_SPECIFIC_OPTIONS,
-                DNS_SPECIFIC_OPTIONS,
-                TLS_SPECIFIC_OPTIONS,
-                SSH_SPECIFIC_OPTIONS,
-                JA3_JA4_OPTIONS,
+                IP_SPECIFIC_KEYWORDS,
+                TCP_SPECIFIC_KEYWORDS,
+                UDP_SPECIFIC_KEYWORDS,
+                ICMP_SPECIFIC_KEYWORDS,
+                HTTP_SPECIFIC_KEYWORDS,
+                DNS_SPECIFIC_KEYWORDS,
+                TLS_SPECIFIC_KEYWORDS,
+                SSH_SPECIFIC_KEYWORDS,
+                JA3_JA4_KEYWORDS,
+                APP_LAYER_KEYWORDS,
             ),
         ),
     ),
 )
 
-ALL_DETECTION_OPTIONS: Sequence[str] = tuple(
+ALL_DETECTION_KEYWORDS: Sequence[str] = tuple(
     sorted(
         set().union(
             *(
-                BUFFER_OPTIONS,
-                SIZE_OPTIONS,
-                TRANSFORMATION_OPTIONS,
-                CONTENT_OPTIONS,
-                POINTER_MOVEMENT_OPTIONS,
-                ALL_MODIFIER_OPTIONS,
-                MATCH_LOCATION_OPTIONS,
-                OTHER_PAYLOAD_OPTIONS,
-                PROTOCOL_SPECIFIC_OPTIONS,
+                BUFFER_KEYWORDS,
+                SIZE_KEYWORDS,
+                TRANSFORMATION_KEYWORDS,
+                CONTENT_KEYWORDS,
+                POINTER_MOVEMENT_KEYWORDS,
+                ALL_MODIFIER_KEYWORDS,
+                MATCH_LOCATION_KEYWORDS,
+                OTHER_PAYLOAD_KEYWORDS,
+                PROTOCOL_SPECIFIC_KEYWORDS,
             ),
         ),
     ),
 )
 
-THRESHOLD_OPTIONS = ("threshold", "detection_filter")
+THRESHOLD_KEYWORDS = ("threshold", "detection_filter")
 
-STATEFUL_OPTIONS = ("flowint", "flowbits", "xbits")
+STATEFUL_KEYWORDS = ("flowint", "flowbits", "xbits")
 
-OTHER_OPTIONS = ("fast_pattern", "noalert", "tag")
+OTHER_KEYWORDS = ("fast_pattern", "noalert", "tag")
 
-ALL_OPTIONS = tuple(
+ALL_KEYWORDS = tuple(
     sorted(
         set().union(
             *(
-                NON_FUNCTIONAL_OPTIONS,
-                FLOW_OPTIONS,
-                STREAM_OPTIONS,
-                ALL_DETECTION_OPTIONS,
-                THRESHOLD_OPTIONS,
-                STATEFUL_OPTIONS,
-                OTHER_OPTIONS,
+                NON_FUNCTIONAL_KEYWORDS,
+                FLOW_KEYWORDS,
+                STREAM_KEYWORDS,
+                ALL_DETECTION_KEYWORDS,
+                THRESHOLD_KEYWORDS,
+                STATEFUL_KEYWORDS,
+                OTHER_KEYWORDS,
             ),
         ),
     ),
 )
 
-METADATA_DATE_OPTIONS = (
+METADATA_DATE_KEYWORDS = (
     "created_at",
     "updated_at",
     "reviewed_at",
 )
 
-METADATA_NON_DATE_OPTIONS = (
+METADATA_NON_DATE_KEYWORDS = (
     "attack_target",
     "affected_product",
     "confidence",
@@ -357,8 +360,8 @@ METADATA_NON_DATE_OPTIONS = (
     "tls_state",
 )
 
-ALL_METADATA_OPTIONS = tuple(
-    sorted(set(METADATA_DATE_OPTIONS).union(METADATA_NON_DATE_OPTIONS)),
+ALL_METADATA_KEYWORDS = tuple(
+    sorted(set(METADATA_DATE_KEYWORDS).union(METADATA_NON_DATE_KEYWORDS)),
 )
 
 IP_ADDRESS_REGEX = regex_provider.compile(r"^.*\d+\.\d+\.\d+\.\d+.*$")

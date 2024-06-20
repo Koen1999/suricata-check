@@ -8,8 +8,8 @@ from typing import Optional, Union
 import idstools.rule
 
 from suricata_check.utils.regex import (
-    ALL_METADATA_OPTIONS,
-    ALL_OPTIONS,
+    ALL_KEYWORDS,
+    ALL_METADATA_KEYWORDS,
     STICKY_BUFFER_NAMING,
     get_variable_groups,
     regex_provider,
@@ -28,7 +28,7 @@ def check_rule_option_recognition(rule: idstools.rule.Rule) -> None:
     """
     for option in rule["options"]:
         name = option["name"]
-        if name not in ALL_OPTIONS:
+        if name not in ALL_KEYWORDS:
             logger.warning(
                 "Option %s from rule %i is not recognized.",
                 name,
@@ -37,7 +37,7 @@ def check_rule_option_recognition(rule: idstools.rule.Rule) -> None:
 
     for option in rule["metadata"]:
         name = regex_provider.split(r"\s+", option)[0]
-        if name not in ALL_METADATA_OPTIONS:
+        if name not in ALL_METADATA_KEYWORDS:
             logger.warning(
                 "Metadata option %s from rule %i is not recognized.",
                 name,
@@ -68,6 +68,9 @@ def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
         "dest_addr",
         "dest_port",
     ):
+        if name not in ALL_KEYWORDS:
+            logger.warning("Requested a non-recognized keyword: %s", name)
+
         for option in rule["options"]:
             if option["name"] == name:
                 return True
@@ -128,6 +131,9 @@ def _count_rule_options(
         "dest_addr",
         "dest_port",
     ):
+        if name not in ALL_KEYWORDS:
+            logger.warning("Requested a non-recognized keyword: %s", name)
+
         for option in rule["options"]:
             if option["name"] == name:
                 count += 1
@@ -154,26 +160,19 @@ def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
         Optional[str]: The value of the option or None if it was not set.
 
     """
-    if name not in (
-        "action",
-        "proto",
-        "source_addr",
-        "source_port",
-        "direction",
-        "dest_addr",
-        "dest_port",
-    ):
-        for option in rule["options"]:
-            if option["name"] == name:
-                return option["value"]
+    options = get_rule_options(rule, name)
 
-    if name in rule:
-        return rule[name]
+    if len(options) == 0:
+        msg = f"Option {name} not found in rule."
+        logger.debug(msg)
+        return None
 
-    msg = f"Option {name} not found in rule {rule}."
-    logger.debug(msg)
+    if len(options) == 0:
+        msg = f"Cannot unambiguously determine the value of {name} because it is set multiple times."
+        logger.warning(msg)
+        return None
 
-    return None
+    return options[0]
 
 
 def get_rule_options(
@@ -201,12 +200,13 @@ def get_rule_options(
 def _get_rule_options(
     rule: idstools.rule.Rule,
     name: Union[str, Iterable[str]],
+    warn_not_found: bool = True,
 ) -> Sequence[str]:
     values = []
 
     if not isinstance(name, str):
         for single_name in name:
-            values.extend(_get_rule_options(rule, single_name))
+            values.extend(_get_rule_options(rule, single_name, warn_not_found=False))
         return values
 
     if name not in (
@@ -218,13 +218,16 @@ def _get_rule_options(
         "dest_addr",
         "dest_port",
     ):
+        if name not in ALL_KEYWORDS:
+            logger.warning("Requested a non-recognized keyword: %s", name)
+
         for option in rule["options"]:
             if option["name"] == name:
                 values.append(option["value"])
     elif name in rule:
         values.append(rule[name])
 
-    if len(values) == 0:
+    if warn_not_found and len(values) == 0:
         msg = f"Option {name} not found in rule {rule}."
         logger.debug(msg)
 
@@ -250,8 +253,11 @@ def is_rule_option_equal_to(rule: idstools.rule.Rule, name: str, value: str) -> 
     if not is_rule_option_set(rule, name):
         return False
 
-    if get_rule_option(rule, name) == value:
-        return True
+    values = get_rule_options(rule, name)
+
+    for val in values:
+        if val == value:
+            return True
 
     return False
 

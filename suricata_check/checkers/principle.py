@@ -12,11 +12,11 @@ from suricata_check.utils.checker import (
     is_rule_option_set,
 )
 from suricata_check.utils.regex import (
-    ALL_DETECTION_OPTIONS,
-    CONTENT_OPTIONS,
+    ALL_DETECTION_KEYWORDS,
+    CONTENT_KEYWORDS,
     IP_ADDRESS_REGEX,
-    OTHER_PAYLOAD_OPTIONS,
-    SIZE_OPTIONS,
+    OTHER_PAYLOAD_KEYWORDS,
+    SIZE_KEYWORDS,
     get_regex_provider,
     get_rule_body,
 )
@@ -72,7 +72,7 @@ class PrincipleChecker(CheckerInterface):
     ) -> ISSUES_TYPE:
         issues = []
 
-        if count_rule_options(rule, ALL_DETECTION_OPTIONS) == 0:
+        if count_rule_options(rule, ALL_DETECTION_KEYWORDS) == 0:
             issues.append(
                 {
                     "code": "P000",
@@ -120,7 +120,9 @@ Consider identifying common benign traffic on which the rule may trigger and add
             count_rule_options(rule, "content") == 0
             and not count_rule_options(
                 rule,
-                set(SIZE_OPTIONS).union(CONTENT_OPTIONS).union(OTHER_PAYLOAD_OPTIONS),
+                set(SIZE_KEYWORDS)
+                .union(CONTENT_KEYWORDS)
+                .union(OTHER_PAYLOAD_KEYWORDS),
             )
             > 1
         ):
@@ -147,7 +149,7 @@ the rule does detect the characteristic in a fixed position that and is unlikely
     def _is_rule_initiated_internally(
         rule: idstools.rule.Rule,
     ) -> Optional[bool]:
-        if get_rule_option(rule, "protocol") in ("ip",):
+        if get_rule_option(rule, "proto") in ("ip",):
             return None
 
         flow_options = get_flow_options(rule)
@@ -181,7 +183,7 @@ the rule does detect the characteristic in a fixed position that and is unlikely
     def _does_rule_account_for_server_response(
         rule: idstools.rule.Rule,
     ) -> Optional[bool]:
-        if get_rule_option(rule, "protocol") in ("ip",):
+        if get_rule_option(rule, "proto") in ("ip",):
             return None
 
         flow_options = get_flow_options(rule)
@@ -220,7 +222,7 @@ the rule does detect the characteristic in a fixed position that and is unlikely
             or is_rule_option_equal_to_regex(rule, "xbits", BITS_ISSET_REGEX)
         ):
             return True
-        
+
         # flowbits.isnotset is used to reduce false positives as well, so it does not neccesarily indicate a stateful rule.
         if (
             is_rule_option_equal_to_regex(rule, "flowbits", BITS_ISNOTSET_REGEX)
@@ -252,7 +254,7 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         positive_matches = 0
         negative_matches = 0
 
-        for option_value in get_rule_options(rule, CONTENT_OPTIONS):
+        for option_value in get_rule_options(rule, CONTENT_KEYWORDS):
             if option_value.startswith("!"):
                 negative_matches += 1
             else:

@@ -319,11 +319,11 @@ def process_rules_file(
                 checkers=checkers,
             )
             dict_out["line"] = number
-            output["rules"].append(dict_out) # type: ignore reportAttributeAccessIssue
+            output["rules"].append(dict_out)  # type: ignore reportAttributeAccessIssue
 
     logger.info("Completed processing rule file: %s", rules)
 
-    output["summary"] = __summarize_output(output) # type: ignore reportArgumentType
+    output["summary"] = __summarize_output(output)  # type: ignore reportArgumentType
 
     return output
 

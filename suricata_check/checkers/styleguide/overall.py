@@ -84,11 +84,12 @@ Consider setting dest_addr to any.""",
                 },
             )
 
-        if is_rule_option_set(rule, "packet_data"):
+        # In the suricata style guide, this is mentioned as `packet_data`
+        if is_rule_option_set(rule, "pkt_data"):
             issues.append(
                 {
                     "code": "S010",
-                    "message": """The rule uses the packet_data option, \
+                    "message": """The rule uses the pkt_data option, \
 which resets the inspection pointer resulting in confusing and disjoint logic.
 Consider replacing the detection logic.""",
                 },
