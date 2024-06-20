@@ -41,12 +41,6 @@ LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
 
 logger = logging.getLogger(__name__)
 
-# TODO:
-# - Implement checkers based on the Suricata Style Guide.
-# - Implement checkers based on Ruling the Unruly.
-# - Implement sid allocation checkers using rule msg prefixes
-# - Add support in regex.py for all Suricata options used in the Snort and ET OPEN rulesets.
-
 
 @click.command()
 @click.option(

@@ -26,6 +26,10 @@ from .interface import CheckerInterface
 
 regex_provider = get_regex_provider()
 
+BITS_ISSET_REGEX = regex_provider.compile(r"^\s*isset\s*,.*$")
+BITS_ISNOTSET_REGEX = regex_provider.compile(r"^\s*isnotset\s*,.*$")
+FLOWINT_ISSET_REGEX = regex_provider.compile(r"^.*,\s*isset\s*,.*$")
+FLOWINT_ISNOTSET_REGEX = regex_provider.compile(r"^.*,\s*isnotset\s*,.*$")
 THRESHOLD_LIMITED_REGEX = regex_provider.compile(r"^.*type\s+(limit|both).*$")
 FLOWBITS_ISNOTSET_REGEX = regex_provider.compile(r"^\s*isnotset.*$")
 HTTP_URI_QUERY_PARAMETER_REGEX = regex_provider.compile(
@@ -209,12 +213,19 @@ the rule does detect the characteristic in a fixed position that and is unlikely
     @staticmethod
     def _is_rule_stateful(
         rule: idstools.rule.Rule,
-    ) -> bool:
-        # TODO: Does not account for row["parsed.flowint"]
-        # flowbits.isnotset is used to reduce false positives as well
-        if is_rule_option_set(rule, "flowbits.isset") or is_rule_option_set(
-            rule,
-            "xbits.isset",
+    ) -> Optional[bool]:
+        if (
+            is_rule_option_equal_to_regex(rule, "flowbits", BITS_ISSET_REGEX)
+            or is_rule_option_equal_to_regex(rule, "flowint", FLOWINT_ISSET_REGEX)
+            or is_rule_option_equal_to_regex(rule, "xbits", BITS_ISSET_REGEX)
+        ):
+            return True
+        
+        # flowbits.isnotset is used to reduce false positives as well, so it does not neccesarily indicate a stateful rule.
+        if (
+            is_rule_option_equal_to_regex(rule, "flowbits", BITS_ISNOTSET_REGEX)
+            or is_rule_option_equal_to_regex(rule, "flowint", FLOWINT_ISNOTSET_REGEX)
+            or is_rule_option_equal_to_regex(rule, "xbits", BITS_ISNOTSET_REGEX)
         ):
             return True
 
