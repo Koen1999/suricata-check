@@ -1,10 +1,10 @@
 # noqa: D100
-from collections.abc import Mapping, Sequence
 
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
-from suricata_check.utils import is_rule_option_set
+from suricata_check.utils.checker import is_rule_option_set
+from suricata_check.utils.typing import ISSUES_TYPE
 
 
 class MandatoryChecker(CheckerInterface):
@@ -21,7 +21,7 @@ class MandatoryChecker(CheckerInterface):
     def check_rule(  # noqa: D102
         self: "MandatoryChecker",
         rule: idstools.rule.Rule,
-    ) -> Sequence[Mapping]:
+    ) -> ISSUES_TYPE:
         issues = []
 
         if not is_rule_option_set(rule, "msg"):

@@ -5,9 +5,9 @@ from typing import Optional
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
-from suricata_check.utils import is_rule_option_set
 from suricata_check.utils.checker import get_rule_option
 from suricata_check.utils.regex import get_regex_provider
+from suricata_check.utils.typing import ISSUES_TYPE
 
 SID_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
     "local": [(1000000, 1999999)],
@@ -44,7 +44,7 @@ class SidChecker(CheckerInterface):
     def check_rule(  # noqa: D102
         self: "SidChecker",
         rule: idstools.rule.Rule,
-    ) -> Sequence[Mapping]:
+    ) -> ISSUES_TYPE:
         issues = []
 
         sid = get_rule_option(rule, "sid")

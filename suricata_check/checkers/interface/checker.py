@@ -4,9 +4,11 @@ Implementation of the `CheckerInterface` is neccessary for checker auto-discover
 """
 
 import abc
-from collections.abc import Iterable, Mapping, MutableMapping, Sequence
+from collections.abc import Iterable
 
 import idstools.rule
+
+from suricata_check.utils.typing import ISSUES_TYPE
 
 
 class CheckerInterface:
@@ -32,7 +34,7 @@ class CheckerInterface:
     def check_rule(
         self: "CheckerInterface",
         rule: idstools.rule.Rule,
-    ) -> Sequence[Mapping]:
+    ) -> ISSUES_TYPE:
         """Checks a rule and returns a list of issues found.
 
         Args:
@@ -47,8 +49,8 @@ class CheckerInterface:
 
     def _add_checker_metadata(
         self: "CheckerInterface",
-        issues: list[MutableMapping],
-    ) -> Sequence[Mapping]:
+        issues: ISSUES_TYPE,
+    ) -> ISSUES_TYPE:
         """Given a list of issues, return the same list with metadata from the checker."""
         name = self.__class__.__name__
 

@@ -1,24 +1,26 @@
 # noqa: D100
-from collections.abc import Mapping, Sequence
 from typing import Optional
 
 import idstools.rule
 
-from suricata_check.utils import (
-    ALL_DETECTION_OPTIONS,
-    CONTENT_OPTIONS,
-    IP_ADDRESS_REGEX,
-    OTHER_PAYLOAD_OPTIONS,
-    SIZE_OPTIONS,
+from suricata_check.utils.checker import (
     count_rule_options,
     get_flow_options,
-    get_regex_provider,
     get_rule_option,
     get_rule_options,
     is_rule_option_equal_to_regex,
     is_rule_option_set,
 )
-from suricata_check.utils.regex import get_rule_body
+from suricata_check.utils.regex import (
+    ALL_DETECTION_OPTIONS,
+    CONTENT_OPTIONS,
+    IP_ADDRESS_REGEX,
+    OTHER_PAYLOAD_OPTIONS,
+    SIZE_OPTIONS,
+    get_regex_provider,
+    get_rule_body,
+)
+from suricata_check.utils.typing import ISSUES_TYPE
 
 from .interface import CheckerInterface
 
@@ -63,7 +65,7 @@ class PrincipleChecker(CheckerInterface):
     def check_rule(  # noqa: D102
         self: "PrincipleChecker",
         rule: idstools.rule.Rule,
-    ) -> Sequence[Mapping]:
+    ) -> ISSUES_TYPE:
         issues = []
 
         if count_rule_options(rule, ALL_DETECTION_OPTIONS) == 0:

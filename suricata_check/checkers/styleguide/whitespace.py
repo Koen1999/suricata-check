@@ -1,14 +1,16 @@
 # noqa: D100
-from collections.abc import Mapping, Sequence
 
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
-from suricata_check.utils import (
-    HEADER_REGEX,
-    get_regex_provider,
+from suricata_check.utils.checker import (
     is_rule_option_equal_to_regex,
 )
+from suricata_check.utils.regex import (
+    HEADER_REGEX,
+    get_regex_provider,
+)
+from suricata_check.utils.typing import ISSUES_TYPE
 
 regex_provider = get_regex_provider()
 
@@ -74,7 +76,7 @@ class WhitespaceChecker(CheckerInterface):
     def check_rule(  # noqa: C901, PLR0912, D102
         self: "WhitespaceChecker",
         rule: idstools.rule.Rule,
-    ) -> Sequence[Mapping]:
+    ) -> ISSUES_TYPE:
         issues = []
 
         if (

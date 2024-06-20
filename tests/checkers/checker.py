@@ -1,9 +1,8 @@
 import os
 import sys
 import warnings
-from collections.abc import Mapping, Sequence
 from functools import lru_cache
-from typing import Optional, Union
+from typing import Optional
 
 import idstools.rule
 import pytest
@@ -18,7 +17,10 @@ class GenericChecker:
     checker: suricata_check.checkers.interface.CheckerInterface
 
     @lru_cache(maxsize=1)
-    def _check_rule(self, rule: idstools.rule.Rule) -> Sequence[Mapping]:
+    def _check_rule(
+        self,
+        rule: idstools.rule.Rule,
+    ) -> suricata_check.utils.typing.ISSUES_TYPE:
         return self.checker.check_rule(rule)
 
     def check_issue(
@@ -31,9 +33,9 @@ class GenericChecker:
         if rule is None:
             pytest.fail("Rule is None")
 
-        issues = self._check_rule(rule)
+        issues: suricata_check.utils.typing.ISSUES_TYPE = self._check_rule(rule)
         correct: Optional[bool] = None
-        issue: Optional[Mapping] = None
+        issue: Optional[suricata_check.utils.typing.ISSUE_TYPE] = None
 
         if raised:
             correct = False
@@ -69,13 +71,11 @@ class GenericChecker:
         )
 
         codes = set()
-        rules: Sequence[
-            Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]
-        ] = output[
+        rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output[
             "rules"
         ]  # type: ignore reportAssignmentType
         for rule in rules:
-            issues: Sequence[Mapping] = rule["issues"]  # type: ignore reportAssignmentType
+            issues: suricata_check.utils.typing.ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
             for issue in issues:
                 codes.add(issue["code"])
 
@@ -98,13 +98,11 @@ class GenericChecker:
             checkers=[self.checker],
         )
 
-        rules: Sequence[
-            Mapping[str, Union[idstools.rule.Rule, Sequence[Mapping], Mapping, int]]
-        ] = output[
+        rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output[
             "rules"
         ]  # type: ignore reportAssignmentType
         for rule in rules:
-            issues: list[Mapping] = rule["issues"]  # type: ignore reportAssignmentType
+            issues: suricata_check.utils.typing.ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
             for issue in issues:
                 if "checker" not in issue:
                     pytest.fail(str(issue))

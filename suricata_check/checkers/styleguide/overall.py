@@ -1,15 +1,10 @@
 # noqa: D100
-from collections.abc import Mapping, Sequence
-
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
-from suricata_check.utils import (
-    ALL_VARIABLES,
-    CLASSTYPES,
+from suricata_check.utils.checker import (
     count_rule_options,
     get_all_variable_groups,
-    get_regex_provider,
     get_rule_option,
     get_rule_sticky_buffer_naming,
     is_rule_option_equal_to,
@@ -17,6 +12,12 @@ from suricata_check.utils import (
     is_rule_option_one_of,
     is_rule_option_set,
 )
+from suricata_check.utils.regex import (
+    ALL_VARIABLES,
+    CLASSTYPES,
+    get_regex_provider,
+)
+from suricata_check.utils.typing import ISSUES_TYPE
 
 regex_provider = get_regex_provider()
 
@@ -54,7 +55,7 @@ class OverallChecker(CheckerInterface):
     def check_rule(  # noqa: C901, D102
         self: "OverallChecker",
         rule: idstools.rule.Rule,
-    ) -> Sequence[Mapping]:
+    ) -> ISSUES_TYPE:
         issues = []
 
         if is_rule_option_equal_to(rule, "direction", "<->") or (

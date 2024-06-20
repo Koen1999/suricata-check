@@ -1,10 +1,18 @@
 # noqa: D100
-from collections.abc import Mapping, Sequence
-
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
-from suricata_check.utils import (
+from suricata_check.utils.checker import (
+    are_rule_options_put_before,
+    count_rule_options,
+    get_rule_option_position,
+    is_rule_option_always_put_before,
+    is_rule_option_first,
+    is_rule_option_last,
+    is_rule_option_put_before,
+    is_rule_option_set,
+)
+from suricata_check.utils.regex import (
     ALL_DETECTION_OPTIONS,
     ALL_MODIFIER_OPTIONS,
     BUFFER_OPTIONS,
@@ -15,18 +23,11 @@ from suricata_check.utils import (
     POINTER_MOVEMENT_OPTIONS,
     SIZE_OPTIONS,
     TRANSFORMATION_OPTIONS,
-    are_rule_options_put_before,
-    count_rule_options,
     get_options_regex,
     get_regex_provider,
     get_rule_body,
-    get_rule_option_position,
-    is_rule_option_always_put_before,
-    is_rule_option_first,
-    is_rule_option_last,
-    is_rule_option_put_before,
-    is_rule_option_set,
 )
+from suricata_check.utils.typing import ISSUES_TYPE
 
 regex_provider = get_regex_provider()
 
@@ -160,7 +161,7 @@ class OrderChecker(CheckerInterface):
     def check_rule(  # noqa: C901, PLR0912, D102, PLR0915
         self: "OrderChecker",
         rule: idstools.rule.Rule,
-    ) -> Sequence[Mapping]:
+    ) -> ISSUES_TYPE:
         issues = []
 
         body = get_rule_body(rule)
