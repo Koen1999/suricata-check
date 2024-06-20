@@ -15,6 +15,7 @@ from suricata_check.utils.checker import (
 from suricata_check.utils.regex import (
     ALL_DETECTION_KEYWORDS,
     ALL_MODIFIER_KEYWORDS,
+    ALL_TRANSFORMATION_KEYWORDS,
     BUFFER_KEYWORDS,
     CONTENT_KEYWORDS,
     FLOW_STREAM_KEYWORDS,
@@ -22,7 +23,6 @@ from suricata_check.utils.regex import (
     OTHER_PAYLOAD_KEYWORDS,
     POINTER_MOVEMENT_KEYWORDS,
     SIZE_KEYWORDS,
-    TRANSFORMATION_KEYWORDS,
     get_options_regex,
     get_regex_provider,
     get_rule_body,
@@ -48,7 +48,7 @@ REGEX_S231 = regex_provider.compile(
         "fast_pattern",
         get_options_regex(
             set(SIZE_KEYWORDS)
-            .union(TRANSFORMATION_KEYWORDS)
+            .union(ALL_TRANSFORMATION_KEYWORDS)
             .union(CONTENT_KEYWORDS)
             .union(POINTER_MOVEMENT_KEYWORDS),
         ).pattern,
@@ -62,7 +62,7 @@ REGEX_S232 = regex_provider.compile(
         "nocase",
         get_options_regex(
             set(SIZE_KEYWORDS)
-            .union(TRANSFORMATION_KEYWORDS)
+            .union(ALL_TRANSFORMATION_KEYWORDS)
             .union(CONTENT_KEYWORDS)
             .union(POINTER_MOVEMENT_KEYWORDS)
             .union(("fast_pattern",)),
@@ -82,7 +82,7 @@ REGEX_S234 = regex_provider.compile(
         ).pattern,
         get_options_regex(
             set(SIZE_KEYWORDS)
-            .union(TRANSFORMATION_KEYWORDS)
+            .union(ALL_TRANSFORMATION_KEYWORDS)
             .union(CONTENT_KEYWORDS)
             .union(POINTER_MOVEMENT_KEYWORDS)
             .union(("nocase", "fast_pattern")),
@@ -92,7 +92,7 @@ REGEX_S234 = regex_provider.compile(
 REGEX_S235 = regex_provider.compile(
     r"^\(.*{}(?!{}).*{}.*\)$".format(
         get_options_regex(
-            set(TRANSFORMATION_KEYWORDS)
+            set(ALL_TRANSFORMATION_KEYWORDS)
             .union(CONTENT_KEYWORDS)
             .union(OTHER_PAYLOAD_KEYWORDS),
         ).pattern,
@@ -106,7 +106,7 @@ REGEX_S236 = regex_provider.compile(
             set(CONTENT_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),
         ).pattern,
         get_options_regex(BUFFER_KEYWORDS).pattern,
-        get_options_regex(TRANSFORMATION_KEYWORDS).pattern,
+        get_options_regex(ALL_TRANSFORMATION_KEYWORDS).pattern,
     ),
 )
 

@@ -127,42 +127,54 @@ FLOW_STREAM_KEYWORDS: Sequence[str] = tuple(
 
 STICKY_BUFFER_NAMING = {
     "http_header": "http.header",
+    "http_content_type": "http.content_type",
     "file_data": "file.data",
     "dns_query": "dns.query",
+    "tls_sni": "tls.sni",
+    "tls_cert_issuer": "tls.cert_issuer",
     "ja3_hash": "ja3.hash",
 }
 
+BASE64_BUFFER_KEYWORDS = ("base64_data",)
+
 OTHER_BUFFERS = (
+    "http.request_header",
+    "http.response_header",
     "http.header_names",
     "http.header.raw",
-    "http.protocolhttp.location",
+    "http.protocol",
+    "http.location",
     "http.stat_msg",
     "http.uri",
     "http.uri.raw",
     "http.host",
+    "http.host.raw",
     "http.referer",
     "http.user_agent",
     "http.cookie",
     "http.connection",
     "http.accept",
     "http.accept_lang",
+    "http.accept_enc",
     "http.server",
-    "http.content_type",
     "http.method",
     "http.request_line",
     "http.request_body",
+    "http.response_line",
     "http.response_body",
     "http.start",
-    "tls.sni",
+    "tls.version",
     "tls.certs",
     "tls.cert_subject",
-    "tls.cert_issuer",
+    "tls.cert_serial",
+    "ja3s.hash",
 )
 
 BUFFER_KEYWORDS: Sequence[str] = tuple(
     sorted(
         set(STICKY_BUFFER_NAMING.keys())
         .union(STICKY_BUFFER_NAMING.values())
+        .union(BASE64_BUFFER_KEYWORDS)
         .union(OTHER_BUFFERS),
     ),
 )
@@ -181,10 +193,17 @@ TRANSFORMATION_KEYWORDS = (
     "to_uppercase",
     "to_sha1",
     "to_sha256",
-    "pcrexformurl_decode",
+    "pcrexform",
+    "url_decode",
     "xor",
     "header_lowercase",
     "strip_pseudo_headers",
+)
+
+BASE64_TRANSFORMATION_KEYWORDS = ("base64_decode",)
+
+ALL_TRANSFORMATION_KEYWORDS: Sequence[str] = tuple(
+    sorted(set(TRANSFORMATION_KEYWORDS).union(BASE64_TRANSFORMATION_KEYWORDS)),
 )
 
 CONTENT_KEYWORDS = ("content", "pcre")
@@ -235,44 +254,59 @@ ICMP_SPECIFIC_KEYWORDS = (
 
 HTTP_SPECIFIC_KEYWORDS = (
     "urilen",
+    "file_data",
+    "file.data",
+    "http.request_header",
+    "http.response_header",
     "http.header_names",
+    "http_header",
+    "http.header",
     "http.header.raw",
-    "http.protocolhttp.location",
+    "http.protocol",
+    "http.location",
     "http.stat_msg",
     "http.uri",
     "http.uri.raw",
     "http.host",
+    "http.host.raw",
     "http.referer",
     "http.user_agent",
     "http.cookie",
     "http.connection",
     "http.accept",
     "http.accept_lang",
+    "http.accept_enc",
     "http.server",
+    "http_content_type",
     "http.content_type",
     "http.method",
     "http.request_line",
     "http.request_body",
+    "http.response_line",
     "http.response_body",
     "http.stat_code",
     "http.content_len",
     "http.start",
 )
 
-DNS_SPECIFIC_KEYWORDS = ("dns.query",)
+DNS_SPECIFIC_KEYWORDS = ("dns_query", "dns.query",)
 
 TLS_SPECIFIC_KEYWORDS = (
+    "tls_sni",
     "tls.sni",
+    "tls.version",
     "tls.certs",
     "tls.cert_subject",
+    "tls_cert_issuer",
     "tls.cert_issuer",
+    "tls.cert_serial",
 )
 
 SSH_SPECIFIC_KEYWORDS = ("ssh_proto",)
 
-JA3_JA4_KEYWORDS = ("ja3_hash", "ja3.hash", "ja3.string")
+JA3_JA4_KEYWORDS = ("ja3_hash", "ja3.hash", "ja3s.hash", "ja3.string")
 
-APP_LAYER_KEYWORDS = ("app-layer-protocol",)
+APP_LAYER_KEYWORDS = ("app-layer-protocol","app-layer-event")
 
 PROTOCOL_SPECIFIC_KEYWORDS = tuple(
     sorted(
@@ -299,7 +333,7 @@ ALL_DETECTION_KEYWORDS: Sequence[str] = tuple(
             *(
                 BUFFER_KEYWORDS,
                 SIZE_KEYWORDS,
-                TRANSFORMATION_KEYWORDS,
+                ALL_TRANSFORMATION_KEYWORDS,
                 CONTENT_KEYWORDS,
                 POINTER_MOVEMENT_KEYWORDS,
                 ALL_MODIFIER_KEYWORDS,
@@ -358,6 +392,7 @@ METADATA_NON_DATE_KEYWORDS = (
     "ruleset",
     "policy",
     "tls_state",
+    "deprecation_reason"
 )
 
 ALL_METADATA_KEYWORDS = tuple(
