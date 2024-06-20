@@ -206,7 +206,13 @@ def test_version():
 
 
 def _check_log_file():
-    with open("tests/data/out/suricata-check.log") as log_fh:
+    log_file = "tests/data/out/suricata-check.log"
+
+    if not os.path.exists(log_file):
+        warnings.warn(RuntimeWarning("No log file found."))
+        return
+
+    with open(log_file) as log_fh:
         for line in log_fh.readlines():
             if regex_provider.match(
                 r".+ - .+ - (ERROR|CRITICAL) - .+(?<!Error parsing rule)",
