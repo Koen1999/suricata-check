@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     name: Test Release
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     strategy:
       fail-fast: true
@@ -38,7 +38,7 @@ jobs:
 
   release-build:
     name: Build Release
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - test
 
@@ -70,7 +70,7 @@ jobs:
 
   pypi-publish:
     name: Publish to PyPI
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - release-build
     permissions:
