@@ -136,7 +136,7 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
 
         parts = match.group(1).split(" ")
         prefix: str = ""
-        for i in reversed(range(len(parts))):
+        for i in list(reversed(range(len(parts))))[1:]:
             prefix = " ".join(parts[:i])
             if prefix in SID_ALLOCATION.keys():
                 break
