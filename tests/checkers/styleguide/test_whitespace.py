@@ -239,6 +239,13 @@ class TestWhitespace(GenericChecker):
 
         self.check_issue(rule, "S123", False)
 
+    def test_s123_good2(self):
+        rule = idstools.rule.parse(
+            """alert ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1; pcre:"\\x7c\\n";)""",
+        )
+
+        self.check_issue(rule, "S123", False)
+
 
 def __main__():
     pytest.main()

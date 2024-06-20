@@ -43,10 +43,12 @@ REGEX_S120 = regex_provider.compile(
     r'^"([^\|]*|(\|[\sa-zA-Z0-9]*\|))*(\\?[\x3a\x3b\x20\x27\x7b\x5c\x2f\x60\x24\x28\x29]+|\\[\x22\x7c]+)([^\|]*|(\|[\sa-zA-Z0-9]*\|))*"$',
 )
 REGEX_S121 = regex_provider.compile(
-    r'^"/.*(\\?[\x3a\x3b\x20\x22\x27\x2f\x60]+|\\[\x7b\x5c\x7c\x24\x28\x29]+).*/[ism]*"$',
+    r"^\"/.*(\\?[\x3a\x3b\x20\x22\x27\x2f\x60]+|\\[\x7b\x5c\x7c\x24\x28\x29]+).*/[ism]*\"$",
 )
 REGEX_S122 = regex_provider.compile(r'^".*\\.*"$')
-REGEX_S123 = regex_provider.compile(r'^".*\\(?!x).*"$')
+REGEX_S123 = regex_provider.compile(
+    r'^".*(?!\\(a|c[0-127]|e|f|n|r|t|0[0-9]{2}|[0-9]{3}|0\{[0-9]{3}\}|x[0-9a-f]{2}|x[0-9a-f]{3}|u[0-9a-f]{4}|d|D|h|H|s|S|v|V|w|W))(\\.).*"$'
+)
 
 
 class WhitespaceChecker(CheckerInterface):
@@ -235,7 +237,7 @@ Consider using hex encoding instead.""",
             issues.append(
                 {
                     "code": "S122",
-                    "message": """The rule escaped special characters in content using a blackslash (\\) in a content field.
+                    "message": """The rule escaped special characters using a blackslash (\\) in a content field.
 Consider using hex encoding instead.""",
                 },
             )
@@ -244,7 +246,7 @@ Consider using hex encoding instead.""",
             issues.append(
                 {
                     "code": "S123",
-                    "message": """The rule escaped special characters in content using a blackslash (\\) in a pcre field.
+                    "message": """The rule escaped special characters using a blackslash (\\) in a pcre field.
 Consider using hex encoding instead.""",
                 },
             )
