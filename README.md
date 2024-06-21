@@ -148,11 +148,11 @@ If you would like to contribute, below you can find some helpful suggestions and
 
 ### Reporting bugs
 
-To report a bug you encountered, please open an issue in the [issues](https://github.com/Koen1999/suricata-check/issues) section. You are requested to fill in the entire issue template and to include a minimal example of when the bug occurs, such that we can reproduce the issue.
+To report a bug you encountered, please open an issue in the [issues](https://github.com/Koen1999/suricata-check/issues/new?assignees=Koen1999&labels=bug&projects=&template=%F0%9F%90%9B-bug-report.md&title=%5BBUG%5D) section. You are requested to fill in the entire issue template and to include a minimal example of when the bug occurs, such that we can reproduce the issue.
 
 ### Proposing new rule issues
 
-To propose new rule issue, or issue group, we strongly suggest you open a issue in the [issues](https://github.com/Koen1999/suricata-check/issues) section first to discuss whether the rule issue should be implemented and how. Please be sure to fill in the entire issue template as it also contributes to the documentation around the proposed rule issue. Importantly, new rule issues should always have test cases describing rules where the issue is present and a similar variant where the issue is mitigated.
+To propose new rule issue, or issue group, we strongly suggest you open a issue in the [issues](https://github.com/Koen1999/suricata-check/issues/new?assignees=&labels=enhancement&projects=&template=%F0%9F%92%A1-new-rule-issue.md&title=%5BNEW+RULE+ISSUE%5D) section first to discuss whether the rule issue should be implemented and how. Please be sure to fill in the entire issue template as it also contributes to the documentation around the proposed rule issue. Importantly, new rule issues should always have test cases describing rules where the issue is present and a similar variant where the issue is mitigated.
 
 ### Preparing the development environment
 
