@@ -94,7 +94,9 @@ addopts = """
     --color=yes
     --cov=suricata_check
     --cov-report term
-    --cov-report xml:cov.xml
+    --cov-report xml
+    --cov-report lcov
+    --cov-report html
     --cov-fail-under=80
     --cov-branch
 """
