@@ -111,7 +111,7 @@ For details regarding specific issues, we recommend you check the message of the
 
 ### Overview
 
-| Issue identifier format | Column 2                                                    |
+| Issue identifier format | Description                                                 |
 | ----------------------- | ----------------------------------------------------------- |
 | M000                    | Rules pertaining to the detection of valid Suricata syntax. |
 | S000                    | Rules derived from the Suricata Style Guide.                |
