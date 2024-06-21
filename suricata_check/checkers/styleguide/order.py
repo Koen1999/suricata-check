@@ -164,7 +164,7 @@ class OrderChecker(CheckerInterface):
         "S241",
     )
 
-    def check_rule(  # noqa: C901, PLR0912, D102, PLR0915
+    def _check_rule(  # noqa: C901, PLR0912, PLR0915
         self: "OrderChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:

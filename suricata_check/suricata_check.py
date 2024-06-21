@@ -153,7 +153,7 @@ def main(
 
         rule_report = analyze_rule(rule, checkers=checkers)
 
-        _write_output(OutputReport(_rules=[rule_report]), out)
+        _write_output(OutputReport(rules=[rule_report]), out)
 
         # Return here so no rules file is processed.
         return

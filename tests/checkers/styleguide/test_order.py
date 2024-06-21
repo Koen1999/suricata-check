@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -13,6 +14,7 @@ import suricata_check
 class TestOrder(GenericChecker):
     @pytest.fixture(autouse=True)
     def _run_around_tests(self):
+        logging.basicConfig(level=logging.DEBUG)
         self.checker = suricata_check.checkers.OrderChecker()
 
     def test_s200_bad(self):

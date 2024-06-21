@@ -43,7 +43,7 @@ class RuleReport:
         """Adds an issue to the report."""
         self._issues.append(issue)
 
-    def add_issues(self: "RuleReport", issues: Iterable[Issue]) -> None:
+    def add_issues(self: "RuleReport", issues: ISSUES_TYPE) -> None:
         """Adds an issue to the report."""
         for issue in issues:
             self._issues.append(issue)
@@ -65,8 +65,16 @@ class OutputSummary:
 class OutputReport:
     """The `OutputSummary` dataclass represent the `suricata_check`, consisting of rule reports and summaries."""
 
-    _rules: RULE_REPORTS_TYPE = field(default_factory=list)
+    _rules: RULE_REPORTS_TYPE = field(default_factory=list, init=False)
     summary: Optional[OutputSummary] = None
+
+    def __init__(self: "OutputReport", rules:RULE_REPORTS_TYPE=[], summary: Optional[OutputSummary]=None) -> None:
+        """Initialized the `OutputReport`, optionally with a list of rules and/or a summary."""
+        self._rules = []
+        for rule in rules:
+            self.add_rule(rule)
+        self.summary = summary
+        super().__init__()
 
     @property
     def rules(self: "OutputReport") -> RULE_REPORTS_TYPE:

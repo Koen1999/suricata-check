@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import warnings
@@ -15,6 +16,10 @@ regex_provider = suricata_check.utils.get_regex_provider()
 
 class GenericChecker:
     checker: suricata_check.checkers.interface.CheckerInterface
+
+    @pytest.fixture(autouse=True)
+    def _run_around_tests(self):
+        logging.basicConfig(level=logging.DEBUG)
 
     @lru_cache(maxsize=1)
     def _check_rule(
@@ -64,6 +69,8 @@ class GenericChecker:
 
     def test_no_undeclared_codes(self):
         """Asserts the checker emits no undeclared codes."""
+        assert self.checker is not None
+
         output = suricata_check.process_rules_file(
             "tests/data/test.rules",
             False,

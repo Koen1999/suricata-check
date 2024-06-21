@@ -75,7 +75,7 @@ class WhitespaceChecker(CheckerInterface):
         "S123",
     )
 
-    def check_rule(  # noqa: C901, PLR0912, D102
+    def _check_rule(  # noqa: C901, PLR0912
         self: "WhitespaceChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:

@@ -44,7 +44,7 @@ class SidChecker(CheckerInterface):
         "S303",
     )
 
-    def check_rule(  # noqa: D102
+    def _check_rule(
         self: "SidChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:

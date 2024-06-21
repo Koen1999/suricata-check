@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -69,6 +70,7 @@ sid:2103999;)""": {
 class TestSid(GenericChecker):
     @pytest.fixture(autouse=True)
     def _run_around_tests(self):
+        logging.basicConfig(level=logging.DEBUG)
         self.checker = CHECKER_CLASS()
 
     @pytest.mark.parametrize(

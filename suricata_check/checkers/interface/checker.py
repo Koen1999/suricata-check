@@ -4,11 +4,16 @@ Implementation of the `CheckerInterface` is neccessary for checker auto-discover
 """
 
 import abc
+import logging
 from collections.abc import Iterable
+from typing import Optional
 
 import idstools.rule
 
+from suricata_check.utils.checker import get_rule_option, is_rule_option_set
 from suricata_check.utils.typing import ISSUES_TYPE
+
+logger = logging.getLogger(__name__)
 
 
 class CheckerInterface:
@@ -30,7 +35,6 @@ class CheckerInterface:
 
     codes: Iterable[str]
 
-    @abc.abstractmethod
     def check_rule(
         self: "CheckerInterface",
         rule: idstools.rule.Rule,
@@ -46,6 +50,37 @@ class CheckerInterface:
         ISSUES_TYPE: A sequence of issues found in the rule.
 
         """
+        self._log_rule_processing(rule)
+        return self._check_rule(rule)
+
+    @abc.abstractmethod
+    def _check_rule(
+        self: "CheckerInterface",
+        rule: idstools.rule.Rule,
+    ) -> ISSUES_TYPE:
+        """Checks a rule and returns a list of issues found.
+
+        Args:
+        ----
+        rule (idstool.rule.Rule): The rule to be checked.
+
+        Returns:
+        -------
+        ISSUES_TYPE: A sequence of issues found in the rule.
+
+        """
+
+    def _log_rule_processing(
+        self: "CheckerInterface",
+        rule: idstools.rule.Rule,
+    ) -> None:
+        sid: Optional[int] = None
+        if is_rule_option_set(rule, "sid"):
+            sid_str = get_rule_option(rule, "sid")
+            assert sid_str is not None
+            sid = int(sid_str)
+
+        logger.debug("Running %s on rule %i", self.__class__.__name__, sid)
 
     def _add_checker_metadata(
         self: "CheckerInterface",

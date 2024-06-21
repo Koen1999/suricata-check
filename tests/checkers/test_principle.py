@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -139,6 +140,7 @@ http.header_names; content:!"Referer"; nocase;)""": {
 class TestPrinciple(GenericChecker):
     @pytest.fixture(autouse=True)
     def _run_around_tests(self):
+        logging.basicConfig(level=logging.DEBUG)
         self.checker = CHECKER_CLASS()
 
     @pytest.mark.parametrize(
