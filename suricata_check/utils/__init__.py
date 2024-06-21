@@ -56,11 +56,11 @@ from .regex import (
 from .typing import (
     EXTENSIVE_SUMMARY_TYPE,
     ISSUES_TYPE,
-    OUTPUT_REPORT_TYPE,
-    OUTPUT_SUMMARY_TYPE,
-    RULE_REPORT_TYPE,
     RULE_REPORTS_TYPE,
     RULE_SUMMARY_TYPE,
     SIMPLE_SUMMARY_TYPE,
     Issue,
+    OutputReport,
+    OutputSummary,
+    RuleReport,
 )

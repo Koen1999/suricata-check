@@ -1,10 +1,9 @@
 """The `suricata_check.typing` module contains all types used by the `suricata-check` package."""
 
-from collections.abc import MutableMapping, MutableSequence
-from dataclasses import dataclass
+from collections.abc import Iterable, MutableMapping, MutableSequence
+from dataclasses import dataclass, field
 from typing import (
     Optional,
-    Union,
 )
 
 import idstools.rule
@@ -23,19 +22,57 @@ ISSUES_TYPE = MutableSequence[Issue]
 SIMPLE_SUMMARY_TYPE = MutableMapping[str, int]
 RULE_SUMMARY_TYPE = SIMPLE_SUMMARY_TYPE
 EXTENSIVE_SUMMARY_TYPE = MutableMapping[str, SIMPLE_SUMMARY_TYPE]
-RULE_REPORT_TYPE = MutableMapping[
-    str,
-    Union[idstools.rule.Rule, ISSUES_TYPE, RULE_SUMMARY_TYPE, int],
-]
-RULE_REPORTS_TYPE = MutableSequence[RULE_REPORT_TYPE]
-OUTPUT_SUMMARY_TYPE = MutableMapping[
-    str,
-    Union[SIMPLE_SUMMARY_TYPE, EXTENSIVE_SUMMARY_TYPE],
-]
-OUTPUT_REPORT_TYPE = MutableMapping[
-    str,
-    Union[
-        RULE_REPORTS_TYPE,
-        OUTPUT_SUMMARY_TYPE,
-    ],
-]
+
+
+@dataclass
+class RuleReport:
+    """The `RuleReport` dataclass represents a rule, together with information on its location and detected issues."""
+
+    rule: idstools.rule.Rule
+    summary: Optional[RULE_SUMMARY_TYPE] = None
+    line: Optional[int] = None
+
+    _issues: ISSUES_TYPE = field(default_factory=list, init=False)
+
+    @property
+    def issues(self: "RuleReport") -> ISSUES_TYPE:
+        """List of issues found in the rule."""
+        return self._issues
+
+    def add_issue(self: "RuleReport", issue: Issue) -> None:
+        """Adds an issue to the report."""
+        self._issues.append(issue)
+
+    def add_issues(self: "RuleReport", issues: Iterable[Issue]) -> None:
+        """Adds an issue to the report."""
+        for issue in issues:
+            self._issues.append(issue)
+
+
+RULE_REPORTS_TYPE = MutableSequence[RuleReport]
+
+
+@dataclass
+class OutputSummary:
+    """The `OutputSummary` dataclass represent a collection of summaries on the output of `suricata_check`."""
+
+    overall_summary: SIMPLE_SUMMARY_TYPE
+    issues_by_group: SIMPLE_SUMMARY_TYPE
+    issues_by_type: EXTENSIVE_SUMMARY_TYPE
+
+
+@dataclass
+class OutputReport:
+    """The `OutputSummary` dataclass represent the `suricata_check`, consisting of rule reports and summaries."""
+
+    _rules: RULE_REPORTS_TYPE = field(default_factory=list)
+    summary: Optional[OutputSummary] = None
+
+    @property
+    def rules(self: "OutputReport") -> RULE_REPORTS_TYPE:
+        """List of rules contained in the report."""
+        return self._rules
+
+    def add_rule(self: "OutputReport", rule_report: RuleReport) -> None:
+        """Adds an rule to the report."""
+        self._rules.append(rule_report)

@@ -26,12 +26,12 @@ from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
 from suricata_check.utils import (  # noqa: E402
     EXTENSIVE_SUMMARY_TYPE,
     ISSUES_TYPE,
-    OUTPUT_REPORT_TYPE,
-    OUTPUT_SUMMARY_TYPE,
-    RULE_REPORT_TYPE,
     RULE_REPORTS_TYPE,
     RULE_SUMMARY_TYPE,
     SIMPLE_SUMMARY_TYPE,
+    OutputReport,
+    OutputSummary,
+    RuleReport,
     check_rule_option_recognition,
     find_rules_file,
 )
@@ -151,9 +151,9 @@ def main(
 
         check_rule_option_recognition(rule)
 
-        rule_dict = analyze_rule(rule, checkers=checkers)
+        rule_report = analyze_rule(rule, checkers=checkers)
 
-        _write_output({"rules": [rule_dict]}, out)
+        _write_output(OutputReport(_rules=[rule_report]), out)
 
         # Return here so no rules file is processed.
         return
@@ -167,7 +167,7 @@ def main(
 
 
 def _write_output(
-    output: OUTPUT_REPORT_TYPE,
+    output: OutputReport,
     out: str,
 ) -> None:
     logger.info(
@@ -186,13 +186,13 @@ def _write_output(
             buffering=io.DEFAULT_BUFFER_SIZE,
         ) as fast_fh,
     ):
-        rules: RULE_REPORTS_TYPE = output["rules"]  # type: ignore reportAssignmentType
+        rules: RULE_REPORTS_TYPE = output.rules
         jsonl_fh.write("\n".join([str(rule) for rule in rules]))
 
-        for rule_dict in rules:
-            rule: idstools.rule.Rule = rule_dict["rule"]  # type: ignore reportAssignmentType
-            line: Optional[int] = rule_dict["line"] if "line" in rule_dict else None  # type: ignore reportAssignmentType
-            issues: ISSUES_TYPE = rule_dict["issues"]  # type: ignore reportAssignmentType
+        for rule_report in rules:
+            rule: idstools.rule.Rule = rule_report.rule
+            line: Optional[int] = rule_report.line
+            issues: ISSUES_TYPE = rule_report.issues
             for issue in issues:
                 code = issue.code
                 issue_msg = issue.message.replace("\n", " ")
@@ -201,15 +201,15 @@ def _write_output(
                 fast_fh.write(msg + "\n")
                 click.echo(msg)
 
-    if "summary" in output:
+    if output.summary is not None:
         with open(
             os.path.join(out, "suricata-check-stats.log"),
             "w",
             buffering=io.DEFAULT_BUFFER_SIZE,
         ) as stats_fh:
-            summary: OUTPUT_SUMMARY_TYPE = output["summary"]  # type: ignore reportAssignmentType
+            summary: OutputSummary = output.summary
 
-            overall_summary: SIMPLE_SUMMARY_TYPE = summary["overall_summary"]  # type: ignore reportAssignmentType
+            overall_summary: SIMPLE_SUMMARY_TYPE = summary.overall_summary
 
             stats_fh.write(
                 tabulate.tabulate(
@@ -224,7 +224,7 @@ def _write_output(
                 f"Rules with Issues found: {overall_summary['Rules with Issues']}",
             )
 
-            issues_by_group: SIMPLE_SUMMARY_TYPE = summary["issues_by_group"]  # type: ignore reportAssignmentType
+            issues_by_group: SIMPLE_SUMMARY_TYPE = summary.issues_by_group
 
             stats_fh.write(
                 tabulate.tabulate(
@@ -234,7 +234,7 @@ def _write_output(
                 + "\n\n",
             )
 
-            issues_by_type: EXTENSIVE_SUMMARY_TYPE = summary["issues_by_type"]  # type: ignore reportAssignmentType
+            issues_by_type: EXTENSIVE_SUMMARY_TYPE = summary.issues_by_type
             for checker, checker_issues_by_type in issues_by_type.items():
                 stats_fh.write(" " + checker + " " + "\n")
                 stats_fh.write("-" * (len(checker) + 2) + "\n")
@@ -251,7 +251,7 @@ def process_rules_file(
     rules: str,
     evaluate_disabled: bool,
     checkers: Optional[Sequence[CheckerInterface]] = None,
-) -> OUTPUT_REPORT_TYPE:
+) -> OutputReport:
     """Processes a rule file and returns a list of rules and their issues.
 
     Args:
@@ -272,7 +272,7 @@ def process_rules_file(
     if checkers is None:
         checkers = get_checkers()
 
-    output: OUTPUT_REPORT_TYPE = {"rules": []}
+    output = OutputReport()
 
     with (
         open(
@@ -314,16 +314,16 @@ def process_rules_file(
 
             check_rule_option_recognition(rule)
 
-            dict_out: RULE_REPORT_TYPE = analyze_rule(
+            rule_report: RuleReport = analyze_rule(
                 rule,
                 checkers=checkers,
             )
-            dict_out["line"] = number
-            output["rules"].append(dict_out)  # type: ignore reportAttributeAccessIssue
+            rule_report.line = number
+            output.rules.append(rule_report)
 
     logger.info("Completed processing rule file: %s", rules)
 
-    output["summary"] = __summarize_output(output)  # type: ignore reportArgumentType
+    output.summary = __summarize_output(output)
 
     return output
 
@@ -361,7 +361,7 @@ def get_checkers() -> Sequence[CheckerInterface]:
 def analyze_rule(
     rule: idstools.rule.Rule,
     checkers: Optional[Sequence[CheckerInterface]] = None,
-) -> RULE_REPORT_TYPE:
+) -> RuleReport:
     """Checks a rule and returns a dictionary containing the rule and a list of issues found.
 
     Args:
@@ -378,23 +378,18 @@ def analyze_rule(
     if checkers is None:
         checkers = get_checkers()
 
-    dict_out: RULE_REPORT_TYPE = {
-        "rule": rule,
-    }
+    rule_report: RuleReport = RuleReport(rule=rule)
 
-    issues: ISSUES_TYPE = []
     for checker in checkers:
-        issues += checker.check_rule(rule)
+        rule_report.add_issues(checker.check_rule(rule))
 
-    dict_out["issues"] = issues
+    rule_report.summary = __summarize_rule(rule_report)
 
-    dict_out["summary"] = __summarize_rule(dict_out)
-
-    return dict_out
+    return rule_report
 
 
 def __summarize_rule(
-    rule: RULE_REPORT_TYPE,
+    rule: RuleReport,
 ) -> RULE_SUMMARY_TYPE:
     """Summarizes the issues found in a rule.
 
@@ -409,7 +404,7 @@ def __summarize_rule(
     """
     summary = {}
 
-    issues: ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
+    issues: ISSUES_TYPE = rule.issues
     summary["total_issues"] = len(issues)
     summary["issues_by_group"] = defaultdict(int)
     for issue in issues:
@@ -428,8 +423,8 @@ def __summarize_rule(
 
 
 def __summarize_output(
-    output: OUTPUT_SUMMARY_TYPE,
-) -> OUTPUT_SUMMARY_TYPE:
+    output: OutputReport,
+) -> OutputSummary:
     """Summarizes the issues found in a rules file.
 
     Args:
@@ -441,17 +436,15 @@ def __summarize_output(
     A dictionary containing a summary of all issues found in the rules file.
 
     """
-    summary: OUTPUT_SUMMARY_TYPE = {}
-
-    summary["overall_summary"] = __get_overall_summary(output)
-    summary["issues_by_group"] = __get_issues_by_group(output)
-    summary["issues_by_type"] = __get_issues_by_type(output)
-
-    return summary
+    return OutputSummary(
+        overall_summary=__get_overall_summary(output),
+        issues_by_group=__get_issues_by_group(output),
+        issues_by_type=__get_issues_by_type(output),
+    )
 
 
 def __get_overall_summary(
-    output: OUTPUT_SUMMARY_TYPE,
+    output: OutputReport,
 ) -> SIMPLE_SUMMARY_TYPE:
     overall_summary = {
         "Total Issues": 0,
@@ -459,9 +452,9 @@ def __get_overall_summary(
         "Rules without Issues": 0,
     }
 
-    rules: RULE_REPORTS_TYPE = output["rules"]  # type: ignore reportAssignmentType
+    rules: RULE_REPORTS_TYPE = output.rules
     for rule in rules:
-        issues: ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
+        issues: ISSUES_TYPE = rule.issues
         overall_summary["Total Issues"] += len(issues)
 
         if len(issues) == 0:
@@ -473,7 +466,7 @@ def __get_overall_summary(
 
 
 def __get_issues_by_group(
-    output: OUTPUT_SUMMARY_TYPE,
+    output: OutputReport,
 ) -> SIMPLE_SUMMARY_TYPE:
     issues_by_group = defaultdict(int)
 
@@ -481,9 +474,9 @@ def __get_issues_by_group(
     for checker in get_checkers():
         issues_by_group[checker.__class__.__name__] = 0
 
-    rules: RULE_REPORTS_TYPE = output["rules"]  # type: ignore reportAssignmentType
+    rules: RULE_REPORTS_TYPE = output.rules
     for rule in rules:
-        issues: ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
+        issues: ISSUES_TYPE = rule.issues
 
         for issue in issues:
             checker = issue.checker
@@ -494,7 +487,7 @@ def __get_issues_by_group(
 
 
 def __get_issues_by_type(
-    output: OUTPUT_SUMMARY_TYPE,
+    output: OutputReport,
 ) -> EXTENSIVE_SUMMARY_TYPE:
     issues_by_type: EXTENSIVE_SUMMARY_TYPE = defaultdict(lambda: defaultdict(int))
 
@@ -503,9 +496,9 @@ def __get_issues_by_type(
         for code in checker.codes:
             issues_by_type[checker.__class__.__name__][code] = 0
 
-    rules: RULE_REPORTS_TYPE = output["rules"]  # type: ignore reportAssignmentType
+    rules: RULE_REPORTS_TYPE = output.rules
     for rule in rules:
-        issues: ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
+        issues: ISSUES_TYPE = rule.issues
 
         checker_codes = defaultdict(lambda: defaultdict(int))
         for issue in issues:

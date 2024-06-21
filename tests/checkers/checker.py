@@ -71,11 +71,9 @@ class GenericChecker:
         )
 
         codes = set()
-        rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output[
-            "rules"
-        ]  # type: ignore reportAssignmentType
+        rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output.rules
         for rule in rules:
-            issues: suricata_check.utils.typing.ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
+            issues: suricata_check.utils.typing.ISSUES_TYPE = rule.issues
             for issue in issues:
                 codes.add(issue.code)
 
@@ -98,11 +96,9 @@ class GenericChecker:
             checkers=[self.checker],
         )
 
-        rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output[
-            "rules"
-        ]  # type: ignore reportAssignmentType
+        rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output.rules
         for rule in rules:
-            issues: suricata_check.utils.typing.ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
+            issues: suricata_check.utils.typing.ISSUES_TYPE = rule.issues
             for issue in issues:
                 if not hasattr(issue, "checker"):
                     pytest.fail(str(issue))
