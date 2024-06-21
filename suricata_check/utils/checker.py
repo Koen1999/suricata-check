@@ -8,8 +8,10 @@ from typing import Optional, Union
 import idstools.rule
 
 from suricata_check.utils.regex import (
+    ALL_DETECTION_KEYWORDS,
     ALL_KEYWORDS,
     ALL_METADATA_KEYWORDS,
+    BUFFER_KEYWORDS,
     STICKY_BUFFER_NAMING,
     get_variable_groups,
     regex_provider,
@@ -385,15 +387,25 @@ def get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
 
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
-def get_rule_option_positions(rule: idstools.rule.Rule, name: str) -> Sequence[int]:
-    """Finds the positions of an option in the rule body."""
+def get_rule_option_positions(
+    rule: idstools.rule.Rule, name: str, sequence: Optional[tuple[str]] = None
+) -> Sequence[int]:
+    """Finds the positions of an option in the rule body.
+
+    Optionally takes a sequence of options to use instead of `rule['options']`.
+    """
+    provided_sequence = True
+    if sequence is None:
+        sequence = [option["name"] for option in rule["options"]]
+        provided_sequence = False
+
     positions = []
-    for i, option in enumerate(rule["options"]):
-        if option["name"] == name:
+    for i, option in enumerate(sequence):
+        if option == name:
             positions.append(i)
 
-    if len(positions) == 0 and is_rule_option_set(rule, name):
-        msg = f"Cannot determine position of {name} option since it is not part of the rule body."
+    if not provided_sequence and len(positions) == 0 and is_rule_option_set(rule, name):
+        msg = f"Cannot determine position of {name} option since it is not part of the sequence of detection keywords."
         logger.critical(msg)
         raise ValueError(msg)
 
@@ -456,20 +468,22 @@ def is_rule_option_last(rule: idstools.rule.Rule, name: str) -> Optional[bool]:
 def get_rule_options_positions(
     rule: idstools.rule.Rule,
     names: Iterable[str],
+    sequence: Optional[tuple[str]] = None,
 ) -> Iterable[int]:
     """Finds the positions of several options in the rule body."""
-    return _get_rule_options_positions(rule, tuple(sorted(names)))
+    return _get_rule_options_positions(rule, tuple(sorted(names)), sequence=sequence)
 
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
 def _get_rule_options_positions(
     rule: idstools.rule.Rule,
     names: Iterable[str],
+    sequence: Optional[tuple[str]] = None,
 ) -> Iterable[int]:
     positions = []
 
     for name in names:
-        positions.extend(get_rule_option_positions(rule, name))
+        positions.extend(get_rule_option_positions(rule, name, sequence=sequence))
 
     return tuple(sorted(positions))
 
@@ -478,9 +492,12 @@ def is_rule_option_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
+    sequence: Optional[tuple[str]] = None,
 ) -> Optional[bool]:
     """Checks whether a rule option is placed before one or more other options."""
-    return _is_rule_option_put_before(rule, name, tuple(sorted(other_names)))
+    return _is_rule_option_put_before(
+        rule, name, tuple(sorted(other_names)), sequence=sequence
+    )
 
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
@@ -488,6 +505,7 @@ def _is_rule_option_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
+    sequence: Optional[tuple[str]] = None,
 ) -> Optional[bool]:
     if len(other_names) == 0:
         logger.debug(
@@ -496,13 +514,13 @@ def _is_rule_option_put_before(
         )
         return None
 
-    positions = get_rule_option_positions(rule, name)
+    positions = get_rule_option_positions(rule, name, sequence=sequence)
 
     if name in other_names:
         logger.debug("Excluding name %s from other_names because of overlap.", name)
         other_names = set(other_names).difference({name})
 
-    other_positions = get_rule_options_positions(rule, other_names)
+    other_positions = get_rule_options_positions(rule, other_names, sequence=sequence)
 
     for other_position in other_positions:
         for position in positions:
@@ -511,13 +529,25 @@ def _is_rule_option_put_before(
     return False
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
 def is_rule_option_always_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
+    sequence: Optional[tuple[str]] = None,
 ) -> Optional[bool]:
     """Checks whether a rule option is placed before one or more other options."""
+    return _is_rule_option_always_put_before(
+        rule, name, tuple(sorted(other_names)), sequence=sequence
+    )
+
+
+@lru_cache(maxsize=LRU_CACHE_SIZE)
+def _is_rule_option_always_put_before(
+    rule: idstools.rule.Rule,
+    name: str,
+    other_names: Union[Sequence[str], set[str]],
+    sequence: Optional[tuple[str]] = None,
+) -> Optional[bool]:
     if len(other_names) == 0:
         logger.debug(
             "Cannot unambiguously determine if option %s is put before empty Iterable of other options.",
@@ -525,13 +555,13 @@ def is_rule_option_always_put_before(
         )
         return None
 
-    positions = get_rule_option_positions(rule, name)
+    positions = get_rule_option_positions(rule, name, sequence=sequence)
 
     if name in other_names:
         logger.debug("Excluding name %s from other_names because of overlap.", name)
         other_names = set(other_names).difference({name})
 
-    other_positions = get_rule_options_positions(rule, other_names)
+    other_positions = get_rule_options_positions(rule, other_names, sequence=sequence)
 
     for other_position in other_positions:
         for position in positions:
@@ -544,6 +574,7 @@ def are_rule_options_put_before(
     rule: idstools.rule.Rule,
     names: Union[Sequence[str], set[str]],
     other_names: Union[Sequence[str], set[str]],
+    sequence: Optional[tuple[str]] = None,
 ) -> Optional[bool]:
     """Checks whether rule options are placed before one or more other options."""
     if len(other_names) == 0:
@@ -560,7 +591,7 @@ def are_rule_options_put_before(
         return None
 
     for name in names:
-        if is_rule_option_put_before(rule, name, other_names):
+        if is_rule_option_put_before(rule, name, other_names, sequence=sequence):
             return True
     return False
 
@@ -569,6 +600,7 @@ def are_rule_options_always_put_before(
     rule: idstools.rule.Rule,
     names: Iterable[str],
     other_names: Sequence[str],
+    sequence: Optional[tuple[str]] = None,
 ) -> Optional[bool]:
     """Checks whether rule options are placed before one or more other options."""
     if len(other_names) == 0:
@@ -585,7 +617,7 @@ def are_rule_options_always_put_before(
         return None
 
     for name in names:
-        if not is_rule_option_put_before(rule, name, other_names):
+        if not is_rule_option_put_before(rule, name, other_names, sequence=sequence):
             return False
     return True
 
@@ -618,3 +650,45 @@ def get_flow_options(rule: idstools.rule.Rule) -> Sequence[str]:
         flow_options = [option.strip() for option in flow_option.split(",")]
 
     return flow_options
+
+
+def get_rule_detection_keyword_sequences(
+    rule: idstools.rule.Rule, seperator_keywords: Iterable[str] = BUFFER_KEYWORDS
+) -> Sequence[tuple[str]]:
+    """Returns a sequence of sequences of detection options in a rule."""
+    sequences: list[list[str]] = [[]]
+
+    # Relies on the assumption that the order of options in the rule is preserved while parsing
+    sequence_i = 0
+    first_found = False
+    for option in rule["options"]:
+        name = option["name"]
+        if name in seperator_keywords and first_found:
+            sequence_i += 1
+            sequences.append([])
+        elif name in seperator_keywords:
+            first_found = True
+        if name in ALL_DETECTION_KEYWORDS:
+            sequences[sequence_i].append(name)
+
+    if len(sequences) <= 1 and len(sequences[0]) == 0:
+        logger.debug(
+            "No sequences found seperated by %s in rule %s",
+            seperator_keywords,
+            rule["raw"],
+        )
+        return ()
+
+    for sequence in sequences:
+        assert len(sequence) > 0
+
+    result = tuple(tuple(sequence) for sequence in sequences)
+
+    logger.debug(
+        "Detected sequences %s seperated by %s in rule %s",
+        result,
+        seperator_keywords,
+        rule["raw"],
+    )
+
+    return result  # type: ignore reportArgumentType

@@ -11,6 +11,7 @@ import suricata_check
 regex_provider = suricata_check.utils.get_regex_provider()
 
 
+@pytest.hookimpl(tryfirst=True)
 def test_rule_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
@@ -42,6 +43,7 @@ def test_rule_regex():
                     pytest.fail(raw)
 
 
+@pytest.hookimpl(tryfirst=True)
 def test_header_regex():
     regex = regex_provider.compile(r"(\s*#)?\s*([^\(\)]*)\(.*\)")
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
@@ -70,6 +72,7 @@ def test_header_regex():
                     pytest.fail(extracted)
 
 
+@pytest.hookimpl(tryfirst=True)
 def test_body_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         regex = regex_provider.compile(r"^[#a-zA-Z0-9:\$_\.\-<>\s]+(\(.*\))\s*(#.*)?$")
@@ -102,6 +105,7 @@ def test_body_regex():
                     pytest.fail(extracted)
 
 
+@pytest.hookimpl(tryfirst=True)
 def test_action_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
@@ -121,6 +125,7 @@ def test_action_regex():
                 pytest.fail(raw)
 
 
+@pytest.hookimpl(tryfirst=True)
 def test_direction_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
@@ -140,6 +145,7 @@ def test_direction_regex():
                 pytest.fail(raw)
 
 
+@pytest.hookimpl(tryfirst=True)
 def test_addr_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
@@ -159,6 +165,7 @@ def test_addr_regex():
                     pytest.fail(raw)
 
 
+@pytest.hookimpl(tryfirst=True)
 def test_port_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
@@ -178,6 +185,7 @@ def test_port_regex():
                     pytest.fail(raw)
 
 
+@pytest.hookimpl(tryfirst=True)
 def test_option_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():

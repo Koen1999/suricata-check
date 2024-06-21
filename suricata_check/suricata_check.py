@@ -121,6 +121,7 @@ def main(
             ),
             logging.StreamHandler(stream=click.get_text_stream("stdout")),
         ),
+        force=os.environ.get("SURICATA_CHECK_FORCE_LOGGING", False) == "TRUE",
     )
 
     # Log the arguments:

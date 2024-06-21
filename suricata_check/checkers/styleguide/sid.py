@@ -87,9 +87,7 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION["local"]}.
             )
 
         if prefix in SID_ALLOCATION.keys() and (
-            range_name is not None
-            and not prefix.startswith(range_name)
-            and not range_name.startswith(prefix)
+            range_name is not None and not (prefix + " ").startswith(range_name + " ")
         ):
             issues.append(
                 Issue(
@@ -130,8 +128,8 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
         for range_name, sid_range in ranges.items():
             for start, end in sid_range:
                 if start <= sid <= end:
+                    logger.debug("Detected sid from range: %s", range_name)
                     return range_name
-
         return None
 
     @staticmethod
@@ -147,5 +145,7 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
                 break
 
         assert len(prefix) > 0
+
+        logger.debug("Detected prefix: %s", prefix)
 
         return prefix

@@ -3,8 +3,10 @@ import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
+    are_rule_options_always_put_before,
     are_rule_options_put_before,
     count_rule_options,
+    get_rule_detection_keyword_sequences,
     get_rule_option_position,
     is_rule_option_always_put_before,
     is_rule_option_first,
@@ -20,9 +22,11 @@ from suricata_check.utils.regex import (
     CONTENT_KEYWORDS,
     FLOW_STREAM_KEYWORDS,
     MATCH_LOCATION_KEYWORDS,
+    MODIFIER_KEYWORDS,
     OTHER_PAYLOAD_KEYWORDS,
     POINTER_MOVEMENT_KEYWORDS,
     SIZE_KEYWORDS,
+    TRANSFORMATION_KEYWORDS,
     get_options_regex,
     get_regex_provider,
     get_rule_body,
@@ -36,84 +40,6 @@ regex_provider = get_regex_provider()
 # This has a significant impact on the performance.
 REGEX_S210 = regex_provider.compile(
     r"^\(.*content\s*:.*;\s*content\s*:.*;.*(depth|offset)\s*:.*\)$",
-)
-REGEX_S230 = regex_provider.compile(
-    r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
-        get_options_regex(CONTENT_KEYWORDS).pattern,
-        get_options_regex(BUFFER_KEYWORDS).pattern,
-        get_options_regex(CONTENT_KEYWORDS).pattern,
-        get_options_regex(POINTER_MOVEMENT_KEYWORDS).pattern,
-        get_options_regex(CONTENT_KEYWORDS).pattern,
-    ),
-)
-REGEX_S231 = regex_provider.compile(
-    r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
-        get_options_regex(CONTENT_KEYWORDS).pattern,
-        get_options_regex(BUFFER_KEYWORDS).pattern,
-        get_options_regex(CONTENT_KEYWORDS).pattern,
-        "fast_pattern",
-        get_options_regex(
-            set(SIZE_KEYWORDS)
-            .union(ALL_TRANSFORMATION_KEYWORDS)
-            .union(CONTENT_KEYWORDS)
-            .union(POINTER_MOVEMENT_KEYWORDS),
-        ).pattern,
-    ),
-)
-REGEX_S232 = regex_provider.compile(
-    r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
-        get_options_regex(CONTENT_KEYWORDS).pattern,
-        get_options_regex(BUFFER_KEYWORDS).pattern,
-        get_options_regex(CONTENT_KEYWORDS).pattern,
-        "nocase",
-        get_options_regex(
-            set(SIZE_KEYWORDS)
-            .union(ALL_TRANSFORMATION_KEYWORDS)
-            .union(CONTENT_KEYWORDS)
-            .union(POINTER_MOVEMENT_KEYWORDS)
-            .union(("fast_pattern",)),
-        ).pattern,
-    ),
-)
-REGEX_S233 = regex_provider.compile(
-    rf"^\(((?!{get_options_regex(CONTENT_KEYWORDS).pattern}).*|{get_options_regex(BUFFER_KEYWORDS).pattern})(?!{get_options_regex(CONTENT_KEYWORDS).pattern}).*{get_options_regex(ALL_MODIFIER_KEYWORDS).pattern}.*{get_options_regex(CONTENT_KEYWORDS).pattern}.*\)$",
-)
-REGEX_S234 = regex_provider.compile(
-    r"^\(((?!{}).*|{})(?!{}).*{}.*{}.*\)$".format(
-        get_options_regex(CONTENT_KEYWORDS).pattern,
-        get_options_regex(BUFFER_KEYWORDS).pattern,
-        get_options_regex(CONTENT_KEYWORDS).pattern,
-        get_options_regex(
-            set(MATCH_LOCATION_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),
-        ).pattern,
-        get_options_regex(
-            set(SIZE_KEYWORDS)
-            .union(ALL_TRANSFORMATION_KEYWORDS)
-            .union(CONTENT_KEYWORDS)
-            .union(POINTER_MOVEMENT_KEYWORDS)
-            .union(("nocase", "fast_pattern")),
-        ).pattern,
-    ),
-)
-REGEX_S235 = regex_provider.compile(
-    r"^\(.*{}(?!{}).*{}.*\)$".format(
-        get_options_regex(
-            set(ALL_TRANSFORMATION_KEYWORDS)
-            .union(CONTENT_KEYWORDS)
-            .union(OTHER_PAYLOAD_KEYWORDS),
-        ).pattern,
-        get_options_regex(BUFFER_KEYWORDS).pattern,
-        get_options_regex(SIZE_KEYWORDS).pattern,
-    ),
-)
-REGEX_S236 = regex_provider.compile(
-    r"^\(.*{}(?!{}).*{}.*\)$".format(
-        get_options_regex(
-            set(CONTENT_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),
-        ).pattern,
-        get_options_regex(BUFFER_KEYWORDS).pattern,
-        get_options_regex(ALL_TRANSFORMATION_KEYWORDS).pattern,
-    ),
 )
 
 
@@ -160,6 +86,7 @@ class OrderChecker(CheckerInterface):
         "S233",
         "S234",
         "S235",
+        "S236",
         "S240",
         "S241",
     )
@@ -262,7 +189,7 @@ Consider making metadata the last option.""",
             issues.append(
                 Issue(
                     code="S210",
-                    message="""The rule body contains a content matched modified by depth or offset \
+                    message="""The rule body contains a content matches modified by depth or offset \
 that is not the first content match.
 Consider moving the modified content match to the beginning of the detection options.""",
                 )
@@ -363,117 +290,151 @@ Consider moving the urilen option to before content buffers and detection option
             )
 
         # Detects pointer movement before any content or buffer option or between a buffer and a content option.
-        if (
-            REGEX_S230.match(
-                get_rule_body(rule),
-            )
-            is not None
-        ):
-            issues.append(
-                Issue(
-                    code="S230",
-                    message="""The rule contains pointer movement before the content option.
-Consider moving the pointer movement options to after the content option.""",
+        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+            if (
+                are_rule_options_put_before(
+                    rule,
+                    POINTER_MOVEMENT_KEYWORDS,
+                    set(CONTENT_KEYWORDS).union(BUFFER_KEYWORDS),
+                    sequence=sequence,
                 )
-            )
+                is True
+            ):
+                issues.append(
+                    Issue(
+                        code="S230",
+                        message="""The rule contains pointer movement before the content option in sequence {}.
+Consider moving the pointer movement options to after the content option.""".format(
+                            sequence
+                        ),
+                    )
+                )
 
         # Detects fast_pattern before any content or buffer option or between a buffer and a content option.
-        if (
-            REGEX_S231.match(
-                get_rule_body(rule),
-            )
-            is not None
-        ):
-            issues.append(
-                Issue(
-                    code="S231",
-                    message="""The rule contains the fast_pattern option before \
-size options, transformation options, the content option or pointer movement options.
-Consider moving the fast_pattern option to after \
-size options, transformation options, the content option or pointer movement options.""",
+        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+            if (
+                is_rule_option_put_before(
+                    rule,
+                    "fast_pattern",
+                    set(CONTENT_KEYWORDS).union(BUFFER_KEYWORDS),
+                    sequence=sequence,
                 )
-            )
+                is True
+            ):
+                issues.append(
+                    Issue(
+                        code="S231",
+                        message="""The rule contains the fast_pattern option before \
+size options, transformation options, the content option or pointer movement options in sequence {}.
+Consider moving the fast_pattern option to after \
+size options, transformation options, the content option or pointer movement options.""".format(
+                            sequence
+                        ),
+                    )
+                )
 
         # Detects no_case before any content or buffer option or between a buffer and a content option.
-        if (
-            REGEX_S232.match(
-                get_rule_body(rule),
-            )
-            is not None
-        ):
-            issues.append(
-                Issue(
-                    code="S232",
-                    message="""The rule contains the nocase option before \
-size options, transformation options, the content option, pointer movement options, or fast_pattern option.
-Consider moving the nocase option to after \
-size options, transformation options, the content option, pointer movement options, or fast_pattern option.""",
+        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+            if (
+                is_rule_option_put_before(
+                    rule,
+                    "nocase",
+                    set(CONTENT_KEYWORDS).union(BUFFER_KEYWORDS),
+                    sequence=sequence,
                 )
-            )
+                is True
+            ):
+                issues.append(
+                    Issue(
+                        code="S232",
+                        message="""The rule contains the nocase option before \
+size options, transformation options, the content option, pointer movement options, or fast_pattern option in sequence {}.
+Consider moving the nocase option to after \
+size options, transformation options, the content option, pointer movement options, or fast_pattern option.""".format(
+                            sequence
+                        ),
+                    )
+                )
 
         # Detects modifier options before any content or buffer option or between a buffer and a content option.
-        if (
-            REGEX_S233.match(
-                get_rule_body(rule),
-            )
-            is not None
-        ):
-            issues.append(
-                Issue(
-                    code="S233",
-                    message="""The rule contains modifier options before the content option.
-Consider moving the modifier options to after the content option.""",
+        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+            if (
+                are_rule_options_put_before(
+                    rule,
+                    MODIFIER_KEYWORDS,
+                    set(CONTENT_KEYWORDS).union(BUFFER_KEYWORDS),
+                    sequence=sequence,
                 )
-            )
+                is True
+            ):
+                issues.append(
+                    Issue(
+                        code="S233",
+                        message="""The rule contains modifier options before the content option.
+Consider moving the modifier options to after the content option.""",
+                    )
+                )
 
         # Detects other detection options before any content or buffer option or between a buffer and a content option.
-        if (
-            REGEX_S234.match(
-                get_rule_body(rule),
-            )
-            is not None
-        ):
-            issues.append(
-                Issue(
-                    code="S234",
-                    message="""The rule contains other detection options before \
+        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+            if (
+                are_rule_options_put_before(
+                    rule,
+                    OTHER_PAYLOAD_KEYWORDS,
+                    set(CONTENT_KEYWORDS).union(BUFFER_KEYWORDS),
+                    sequence=sequence,
+                )
+                is True
+            ):
+                issues.append(
+                    Issue(
+                        code="S234",
+                        message="""The rule contains other detection options before \
 size options, transformation options, the content option, pointer movement options, nocase option, or fast_pattern option.
 Consider moving the other detection options to after \
 size options, transformation options,  the content option, pointer movement options, nocase option, or fast_pattern option.""",
+                    )
                 )
-            )
 
         # Detects size options after any transformation options, content option or other detection options.
-        if (
-            REGEX_S235.match(
-                get_rule_body(rule),
-            )
-            is not None
-        ):
-            issues.append(
-                Issue(
-                    code="S235",
-                    message="""The rule contains other size options after \
+        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+            if (
+                are_rule_options_put_before(
+                    rule,
+                    set(TRANSFORMATION_KEYWORDS).union(CONTENT_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),  # type: ignore reportArgumentType
+                    SIZE_KEYWORDS,
+                    sequence=sequence,
+                )
+                is True
+            ):
+                issues.append(
+                    Issue(
+                        code="S235",
+                        message="""The rule contains other size options after \
 any transformation options, content option or other detection options.
 Consider moving the size options to after any transformation options, content option or other detection options""",
+                    )
                 )
-            )
 
         # Detects transformation options after any content option or other detection options.
-        if (
-            REGEX_S236.match(
-                get_rule_body(rule),
-            )
-            is not None
-        ):
-            issues.append(
-                Issue(
-                    code="S236",
-                    message="""The rule contains other transformation options after \
+        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+            if (
+                are_rule_options_put_before(
+                    rule,
+                    set(CONTENT_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),  # type: ignore reportArgumentType
+                    TRANSFORMATION_KEYWORDS,
+                    sequence=sequence,
+                )
+                is True
+            ):
+                issues.append(
+                    Issue(
+                        code="S236",
+                        message="""The rule contains other transformation options after \
 any content option or other detection options.
 Consider moving the transformation options to after any content option or other detection options""",
+                    )
                 )
-            )
 
         if (
             is_rule_option_put_before(

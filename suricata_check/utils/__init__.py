@@ -9,6 +9,7 @@ from suricata_check.utils.checker import (
     count_rule_options,
     get_all_variable_groups,
     get_flow_options,
+    get_rule_detection_keyword_sequences,
     get_rule_option,
     get_rule_option_position,
     get_rule_option_positions,

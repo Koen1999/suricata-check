@@ -39,6 +39,7 @@ def _run_around_tests():
 
 @pytest.mark.serial()
 def test_main_cli():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
         suricata_check.main,
@@ -54,6 +55,7 @@ def test_main_cli():
 
 @pytest.mark.serial()
 def test_main_cli_single_rule():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
         suricata_check.main,
@@ -76,6 +78,7 @@ def test_main_cli_single_rule():
 @pytest.hookimpl(trylast=True)
 @pytest.mark.parametrize(("version", "et_open_url"), ET_OPEN_URLS.items())
 def test_main_cli_integration_et_open(version, et_open_url):
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     # Retrieve the latest ET Open rules if not present.
     if not os.path.exists(f"tests/data/emerging-all-{version}.rules"):
         urllib.request.urlretrieve(
@@ -140,6 +143,7 @@ def test_main_cli_integration_snort_community():
 
 @pytest.mark.serial()
 def test_main():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     with pytest.raises(SystemExit) as excinfo:
         suricata_check.main(
             (
@@ -156,6 +160,7 @@ def test_main():
 
 @pytest.mark.serial()
 def test_main_single_rule():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     with pytest.raises(SystemExit) as excinfo:
         suricata_check.main(
             (
@@ -204,6 +209,7 @@ def test_version():
     if not hasattr(suricata_check, "__version__"):
         pytest.fail("suricata_check has no attribute __version__")
     from suricata_check._version import __version__
+
     if __version__ == "unknown":
         warnings.warn(RuntimeWarning("Version is unknown."))
 

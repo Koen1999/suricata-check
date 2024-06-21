@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 import suricata_check
 
 
+@pytest.hookimpl(tryfirst=True)
 @pytest.mark.serial()
 def test_find_rules_file():
     full_path = os.path.abspath("tests/data/temp/test.rules")

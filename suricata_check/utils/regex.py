@@ -398,6 +398,8 @@ PROTOCOL_SPECIFIC_KEYWORDS = tuple(
     ),
 )
 
+PERFORMANCE_DETECTION_OPTIONS = ("fast_pattern",)
+
 ALL_DETECTION_KEYWORDS: Sequence[str] = tuple(
     sorted(
         set().union(
@@ -411,6 +413,7 @@ ALL_DETECTION_KEYWORDS: Sequence[str] = tuple(
                 MATCH_LOCATION_KEYWORDS,
                 OTHER_PAYLOAD_KEYWORDS,
                 PROTOCOL_SPECIFIC_KEYWORDS,
+                PERFORMANCE_DETECTION_OPTIONS,
             ),
         ),
     ),
@@ -423,7 +426,7 @@ THRESHOLD_KEYWORDS = (
 
 STATEFUL_KEYWORDS = ("flowbits", "flowint", "xbits")
 
-OTHER_KEYWORDS = ("fast_pattern", "noalert", "tag")
+OTHER_KEYWORDS = ("noalert", "tag")
 
 ALL_KEYWORDS = tuple(
     sorted(

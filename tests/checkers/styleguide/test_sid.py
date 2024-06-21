@@ -31,7 +31,7 @@ sid:1000000;)""": {
     },
     # Is ETPRO range but should be ET OPEN
     """alert ip any any -> any any (\
-msg:"ETPRO Test rule"; \
+msg:"ET OPEN Test rule"; \
 sid:2800000;)""": {
         "should_raise": ["S302"],
         "should_not_raise": ["S300", "S301", "S303"],
@@ -89,8 +89,7 @@ class TestSid(GenericChecker):
 
         rule = idstools.rule.parse(raw_rule)
 
-        # fail is false, so we do permit False Negatives
-        self.check_issue(rule, code, expected, fail=False)
+        self.check_issue(rule, code, expected)
 
     @pytest.mark.parametrize(
         ("code", "expected", "raw_rule"),
@@ -105,7 +104,7 @@ class TestSid(GenericChecker):
         rule = idstools.rule.parse(raw_rule)
 
         # fail is true, so we do not permit False Positives
-        self.check_issue(rule, code, expected, fail=True)
+        self.check_issue(rule, code, expected)
 
 
 def __main__():
