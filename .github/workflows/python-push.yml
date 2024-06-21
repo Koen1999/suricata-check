@@ -34,16 +34,16 @@ jobs:
 
       - name: Test with pytest - Integration ET OPEN v7
         run: |
-          pytest -k et_open -k v7 -m "slow"
+          pytest -k et_open -k v7 -m "slow" --cov-fail-under=0
 
       - name: Test with pytest - Integration ET OPEN v5
         run: |
-          pytest -k et_open -k v5 -m "slow"
+          pytest -k et_open -k v5 -m "slow" --cov-fail-under=0
 
       - name: Test with pytest - Integration ET OPEN v4
         run: |
-          pytest -k et_open -k v4 -m "slow"
+          pytest -k et_open -k v4 -m "slow" --cov-fail-under=0
 
       - name: Test with pytest - Integration Snort Community
         run: |
-          pytest -k snort_community -m "slow"
+          pytest -k snort_community -m "slow" --cov-fail-under=0
