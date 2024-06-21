@@ -10,62 +10,34 @@ from ..checker import GenericChecker
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import suricata_check
 
-CHECKER_CLASS = suricata_check.checkers.SidChecker
+CHECKER_CLASS = suricata_check.checkers.MsgChecker
 
 RULES = {
-    # Is ET OPEN range but should be local
+    # S400, bad
     """alert ip any any -> any any (\
-msg:"LOCAL Test rule"; \
+msg:"ET rule"; \
 sid:2400000;)""": {
-        "should_raise": ["S300"],
-        "should_not_raise": ["S301", "S302", "S303"],
+        "should_raise": ["S400"],
+        "should_not_raise": [],
     },
-    # Is local range but should be ET OPEN
+    # S400, good
     """alert ip any any -> any any (\
-msg:"ET OPEN Test rule"; \
-sid:1000000;)""": {
-        "should_raise": ["S302"],
-        "should_not_raise": ["S300", "S301", "S303"],
-    },
-    # Is ETPRO range but should be ET OPEN
-    """alert ip any any -> any any (\
-msg:"ET OPEN Test rule"; \
-sid:2800000;)""": {
-        "should_raise": ["S302"],
-        "should_not_raise": ["S300", "S301", "S303"],
-    },
-    # Is unallocated range but should be ET OPEN
-    """alert ip any any -> any any (\
-msg:"ET OPEN Test rule"; \
-sid:900000000;)""": {
-        "should_raise": ["S303"],
-        "should_not_raise": ["S300", "S301", "S302"],
-    },
-    # Is unallocated range but should be local
-    """alert ip any any -> any any (\
-msg:"LOCAL Test rule"; \
-sid:900000000;)""": {
-        "should_raise": ["S301"],
-        "should_not_raise": ["S300", "S302", "S303"],
-    },
-    # Good, local
-    """alert ip any any -> any any (\
-msg:"LOCAL Test rule"; \
-sid:1000000;)""": {
+msg:"ET MALWARE rule"; \
+sid:2400000;)""": {
         "should_raise": [],
-        "should_not_raise": ["S300", "S301", "S302", "S303"],
+        "should_not_raise": ["S400"],
     },
-    # Good, ET OPEN
+    # S400, good
     """alert ip any any -> any any (\
-msg:"ET OPEN Test rule"; \
-sid:2103999;)""": {
+msg:"ET MALWARE rule description"; \
+sid:2400000;)""": {
         "should_raise": [],
-        "should_not_raise": ["S300", "S301", "S302", "S303"],
+        "should_not_raise": ["S400"],
     },
 }
 
 
-class TestSid(GenericChecker):
+class TestMsg(GenericChecker):
     @pytest.fixture(autouse=True)
     def _run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)
@@ -101,7 +73,6 @@ class TestSid(GenericChecker):
     def test_rule_good_new(self, code, expected, raw_rule):
         rule = idstools.rule.parse(raw_rule)
 
-        # fail is true, so we do not permit False Positives
         self.check_issue(rule, code, expected)
 
 

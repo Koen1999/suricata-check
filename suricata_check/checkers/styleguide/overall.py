@@ -188,7 +188,7 @@ Consider asserting this in the head instead using {} {} {} {} {} {} {}""".format
                 )
             )
 
-        return self._add_checker_metadata(issues)
+        return issues
 
     @staticmethod
     def _get_invented_variable_groups(rule: idstools.rule.Rule) -> list[str]:

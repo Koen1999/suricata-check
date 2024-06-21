@@ -251,4 +251,4 @@ Consider using hex encoding instead.""",
                 ),
             )
 
-        return self._add_checker_metadata(issues)
+        return issues

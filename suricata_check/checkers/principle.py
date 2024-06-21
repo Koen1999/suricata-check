@@ -143,7 +143,7 @@ the rule does detect the characteristic in a fixed position that and is unlikely
                 ),
             )
 
-        return self._add_checker_metadata(issues)
+        return issues
 
     @staticmethod
     def _is_rule_initiated_internally(

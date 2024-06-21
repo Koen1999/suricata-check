@@ -112,7 +112,7 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
                 ),
             )
 
-        return self._add_checker_metadata(issues)
+        return issues
 
     @staticmethod
     def _in_range(sid: int, sid_range: Sequence[tuple[int, int]]) -> bool:

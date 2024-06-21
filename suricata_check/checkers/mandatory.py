@@ -40,4 +40,4 @@ class MandatoryChecker(CheckerInterface):
                 )
             )
 
-        return self._add_checker_metadata(issues)
+        return issues

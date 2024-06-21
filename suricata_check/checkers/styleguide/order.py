@@ -468,4 +468,4 @@ Consider moving the threshold option to before the reference and sid options."""
                 )
             )
 
-        return self._add_checker_metadata(issues)
+        return issues

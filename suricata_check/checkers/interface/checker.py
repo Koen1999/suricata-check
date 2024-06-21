@@ -51,7 +51,7 @@ class CheckerInterface:
 
         """
         self._log_rule_processing(rule)
-        return self._check_rule(rule)
+        return self._add_checker_metadata(self._check_rule(rule))
 
     @abc.abstractmethod
     def _check_rule(
