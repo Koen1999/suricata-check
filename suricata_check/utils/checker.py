@@ -1,7 +1,7 @@
 """The `suricata_check.utils.checker` module contains several utilities for developing rule checkers."""
 
 import logging
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from functools import lru_cache
 from typing import Optional, Union
 
@@ -89,6 +89,48 @@ def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
         return False
 
     return True
+
+
+def get_suboptions(rule: idstools.rule.Rule, name: str) -> Mapping[str, Optional[str]]:
+    """Returns a list of suboptions set in a rule."""
+    value = get_rule_option(rule, name)
+    valid_suboptions: list[tuple[str, Optional[str]]] = []
+    if value is not None:
+        values = value.split(",")
+        suboptions: list[Optional[tuple[str, Optional[str]]]] = [
+            _split_suboption(suboption) for suboption in values
+        ]
+        # Filter out suboptions that could not be parsed
+        valid_suboptions = [
+            suboption for suboption in suboptions if suboption is not None
+        ]
+
+    return dict(valid_suboptions)
+
+
+def _split_suboption(suboption: str) -> Optional[tuple[str, Optional[str]]]:
+    suboption = suboption.strip()
+
+    splitted = suboption.split(" ")
+    splitted = [s.strip() for s in splitted]
+
+    if len(splitted) == 1:
+        return (splitted[0], None)
+    if len(splitted) == 2:  # noqa: PLR2004
+        return tuple(splitted)  # type: ignore reportReturnType
+
+    logger.warning("Failed to split suboption: %s", suboption)
+    return None
+
+
+def is_rule_suboption_set(rule: idstools.rule.Rule, name: str, sub_name: str) -> bool:
+    """Checks if a suboption within an option is set."""
+    suboptions = get_suboptions(rule, name)
+
+    if sub_name in suboptions.keys():
+        return True
+
+    return False
 
 
 def count_rule_options(
@@ -388,7 +430,7 @@ def get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
 def get_rule_option_positions(
-    rule: idstools.rule.Rule, name: str, sequence: Optional[tuple[str]] = None
+    rule: idstools.rule.Rule, name: str, sequence: Optional[tuple[str, ...]] = None
 ) -> Sequence[int]:
     """Finds the positions of an option in the rule body.
 
@@ -468,7 +510,7 @@ def is_rule_option_last(rule: idstools.rule.Rule, name: str) -> Optional[bool]:
 def get_rule_options_positions(
     rule: idstools.rule.Rule,
     names: Iterable[str],
-    sequence: Optional[tuple[str]] = None,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Iterable[int]:
     """Finds the positions of several options in the rule body."""
     return _get_rule_options_positions(rule, tuple(sorted(names)), sequence=sequence)
@@ -478,7 +520,7 @@ def get_rule_options_positions(
 def _get_rule_options_positions(
     rule: idstools.rule.Rule,
     names: Iterable[str],
-    sequence: Optional[tuple[str]] = None,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Iterable[int]:
     positions = []
 
@@ -492,7 +534,7 @@ def is_rule_option_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
-    sequence: Optional[tuple[str]] = None,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     """Checks whether a rule option is placed before one or more other options."""
     return _is_rule_option_put_before(
@@ -505,7 +547,7 @@ def _is_rule_option_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
-    sequence: Optional[tuple[str]] = None,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     if len(other_names) == 0:
         logger.debug(
@@ -533,7 +575,7 @@ def is_rule_option_always_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
-    sequence: Optional[tuple[str]] = None,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     """Checks whether a rule option is placed before one or more other options."""
     return _is_rule_option_always_put_before(
@@ -546,7 +588,7 @@ def _is_rule_option_always_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
-    sequence: Optional[tuple[str]] = None,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     if len(other_names) == 0:
         logger.debug(
@@ -574,7 +616,7 @@ def are_rule_options_put_before(
     rule: idstools.rule.Rule,
     names: Union[Sequence[str], set[str]],
     other_names: Union[Sequence[str], set[str]],
-    sequence: Optional[tuple[str]] = None,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     """Checks whether rule options are placed before one or more other options."""
     if len(other_names) == 0:
@@ -600,7 +642,7 @@ def are_rule_options_always_put_before(
     rule: idstools.rule.Rule,
     names: Iterable[str],
     other_names: Sequence[str],
-    sequence: Optional[tuple[str]] = None,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     """Checks whether rule options are placed before one or more other options."""
     if len(other_names) == 0:
@@ -638,23 +680,9 @@ def select_rule_options_by_regex(
     return tuple(sorted(options))
 
 
-def get_flow_options(rule: idstools.rule.Rule) -> Sequence[str]:
-    """Returns a list of flow options set in a rule.
-
-    Notably ignores `flow.*` options, but only looks at `flow:.*`
-    """
-    flow_option = get_rule_option(rule, "flow")
-    if flow_option is None:
-        flow_options = []
-    else:
-        flow_options = [option.strip() for option in flow_option.split(",")]
-
-    return flow_options
-
-
 def get_rule_detection_keyword_sequences(
     rule: idstools.rule.Rule, seperator_keywords: Iterable[str] = BUFFER_KEYWORDS
-) -> Sequence[tuple[str]]:
+) -> Sequence[tuple[str, ...]]:
     """Returns a sequence of sequences of detection options in a rule."""
     sequences: list[list[str]] = [[]]
 
@@ -691,4 +719,4 @@ def get_rule_detection_keyword_sequences(
         rule["raw"],
     )
 
-    return result  # type: ignore reportArgumentType
+    return result

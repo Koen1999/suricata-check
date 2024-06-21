@@ -8,7 +8,6 @@ from suricata_check.utils.checker import (
     check_rule_option_recognition,
     count_rule_options,
     get_all_variable_groups,
-    get_flow_options,
     get_rule_detection_keyword_sequences,
     get_rule_option,
     get_rule_option_position,
@@ -16,6 +15,7 @@ from suricata_check.utils.checker import (
     get_rule_options,
     get_rule_options_positions,
     get_rule_sticky_buffer_naming,
+    get_suboptions,
     is_rule_option_always_put_before,
     is_rule_option_equal_to,
     is_rule_option_equal_to_regex,
@@ -24,6 +24,7 @@ from suricata_check.utils.checker import (
     is_rule_option_one_of,
     is_rule_option_put_before,
     is_rule_option_set,
+    is_rule_suboption_set,
     select_rule_options_by_regex,
 )
 

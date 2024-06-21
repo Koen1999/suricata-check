@@ -10,5 +10,6 @@
         "build",
         "**\\venv",
         "**\\AppData"
-    ]
+    ],
+    "python.analysis.typeCheckingMode": "standard"
 }

@@ -170,6 +170,7 @@ pythonPlatform = "All"
 root = ['suricata_check']
 include = ["suricata_check", "tests"]
 exclude = ["**/__pycache__"]
+typeCheckingMode = "standard"
 reportDuplicateImport = "warning"
 reportPrivateUsage = "warning"
 reportDeprecated = "warning"

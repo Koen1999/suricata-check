@@ -34,6 +34,20 @@ sid:2400000;)""": {
         "should_raise": [],
         "should_not_raise": ["S400"],
     },
+    # S401, bad
+    """alert ip any any -> any any (\
+msg:"ET MALWARE test"; \
+sid:2400000;)""": {
+        "should_raise": [],
+        "should_not_raise": ["S400"],
+    },
+    # S401, good
+    """alert ip any any -> any any (\
+msg:"ET MALWARE ELF/Mirai test"; \
+sid:2400000;)""": {
+        "should_raise": [],
+        "should_not_raise": ["S400"],
+    },
 }
 
 

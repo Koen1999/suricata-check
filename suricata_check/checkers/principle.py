@@ -5,11 +5,11 @@ import idstools.rule
 
 from suricata_check.utils.checker import (
     count_rule_options,
-    get_flow_options,
     get_rule_option,
     get_rule_options,
     is_rule_option_equal_to_regex,
     is_rule_option_set,
+    is_rule_suboption_set,
 )
 from suricata_check.utils.regex import (
     ALL_DETECTION_KEYWORDS,
@@ -152,15 +152,15 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         if get_rule_option(rule, "proto") in ("ip",):
             return None
 
-        flow_options = get_flow_options(rule)
-
         dest_addr = get_rule_option(rule, "dest_addr")
         assert dest_addr is not None
         if (
             dest_addr not in ("any", "$EXTERNAL_NET")
             and IP_ADDRESS_REGEX.match(dest_addr) is None
         ):
-            if "from_server" in flow_options or "to_client" in flow_options:
+            if is_rule_suboption_set(
+                rule, "flow", "from_server"
+            ) or is_rule_suboption_set(rule, "flow", "to_client"):
                 return True
 
         source_addr = get_rule_option(rule, "source_addr")
@@ -169,7 +169,9 @@ the rule does detect the characteristic in a fixed position that and is unlikely
             source_addr not in ("any", "$EXTERNAL_NET")
             and IP_ADDRESS_REGEX.match(source_addr) is None
         ):
-            if "to_server" in flow_options or "from_client" in flow_options:
+            if is_rule_suboption_set(
+                rule, "flow", "to_server"
+            ) or is_rule_suboption_set(rule, "flow", "from_client"):
                 return True
             if is_rule_option_set(rule, "dns.query") or is_rule_option_set(
                 rule,
@@ -186,9 +188,9 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         if get_rule_option(rule, "proto") in ("ip",):
             return None
 
-        flow_options = get_flow_options(rule)
-
-        if "from_server" in flow_options or "to_client" in flow_options:
+        if is_rule_suboption_set(rule, "flow", "from_server") or is_rule_suboption_set(
+            rule, "flow", "to_client"
+        ):
             return True
 
         msg = get_rule_option(rule, "msg")
