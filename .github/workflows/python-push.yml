@@ -28,6 +28,22 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel build
           pip install -r requirements.txt
 
-      - name: Test with pytest
+      - name: Test with pytest - Fast
         run: |
-          pytest -m "slow or not slow"
+          pytest -m "not slow"
+
+      - name: Test with pytest - Integration ET OPEN v7
+        run: |
+          pytest -k et_open -k v7 -m "slow"
+
+      - name: Test with pytest - Integration ET OPEN v5
+        run: |
+          pytest -k et_open -k v5 -m "slow"
+
+      - name: Test with pytest - Integration ET OPEN v4
+        run: |
+          pytest -k et_open -k v4 -m "slow"
+
+      - name: Test with pytest - Integration Snort Community
+        run: |
+          pytest -k snort_community -m "slow"
