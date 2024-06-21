@@ -10,7 +10,7 @@ from suricata_check.utils.regex import (
     HEADER_REGEX,
     get_regex_provider,
 )
-from suricata_check.utils.typing import ISSUES_TYPE
+from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 regex_provider = get_regex_provider()
 
@@ -79,7 +79,7 @@ class WhitespaceChecker(CheckerInterface):
         self: "WhitespaceChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:
-        issues = []
+        issues: ISSUES_TYPE = []
 
         if (
             REGEX_S100.match(
@@ -88,11 +88,11 @@ class WhitespaceChecker(CheckerInterface):
             is not None
         ):
             issues.append(
-                {
-                    "code": "S100",
-                    "message": """The rule contains unneccessary whitespace after opening the rule body with.
+                Issue(
+                    code="S100",
+                    message="""The rule contains unneccessary whitespace after opening the rule body with.
 Consider removing the unneccessary whitespace.""",
-                },
+                ),
             )
 
         if (
@@ -102,11 +102,11 @@ Consider removing the unneccessary whitespace.""",
             is not None
         ):
             issues.append(
-                {
-                    "code": "S101",
-                    "message": """The rule contains unneccessary whitespace before closing the rule body with.
+                Issue(
+                    code="S101",
+                    message="""The rule contains unneccessary whitespace before closing the rule body with.
 Consider removing the unneccessary whitespace.""",
-                },
+                ),
             )
 
         if (
@@ -116,11 +116,11 @@ Consider removing the unneccessary whitespace.""",
             is not None
         ):
             issues.append(
-                {
-                    "code": "S102",
-                    "message": """The rule contains unneccessary whitespace before the colon (:) after an option name.
+                Issue(
+                    code="S102",
+                    message="""The rule contains unneccessary whitespace before the colon (:) after an option name.
 Consider removing the unneccessary whitespace.""",
-                },
+                ),
             )
 
         if (
@@ -130,11 +130,11 @@ Consider removing the unneccessary whitespace.""",
             is not None
         ):
             issues.append(
-                {
-                    "code": "S103",
-                    "message": """The rule contains unneccessary whitespace before the colon (:) after an option name.
+                Issue(
+                    code="S103",
+                    message="""The rule contains unneccessary whitespace before the colon (:) after an option name.
 Consider removing the unneccessary whitespace.""",
-                },
+                ),
             )
 
         if (
@@ -144,11 +144,11 @@ Consider removing the unneccessary whitespace.""",
             is not None
         ):
             issues.append(
-                {
-                    "code": "S104",
-                    "message": """The rule contains unneccessary whitespace before the semicolon (;) after an option value.
+                Issue(
+                    code="S104",
+                    message="""The rule contains unneccessary whitespace before the semicolon (;) after an option value.
 Consider removing the unneccessary whitespace.""",
-                },
+                ),
             )
 
         if (
@@ -158,11 +158,11 @@ Consider removing the unneccessary whitespace.""",
             is not None
         ):
             issues.append(
-                {
-                    "code": "S105",
-                    "message": """The rule contains more than one space between options after an option value.
+                Issue(
+                    code="S105",
+                    message="""The rule contains more than one space between options after an option value.
 Consider replacing the unneccessary whitespace by a single space.""",
-                },
+                ),
             )
 
         if is_rule_option_equal_to_regex(
@@ -171,11 +171,11 @@ Consider replacing the unneccessary whitespace by a single space.""",
             REGEX_S106,
         ):
             issues.append(
-                {
-                    "code": "S106",
-                    "message": """The rule contains more than one space between bytes in content.
+                Issue(
+                    code="S106",
+                    message="""The rule contains more than one space between bytes in content.
 Consider replacing the unneccessary whitespace by a single space.""",
-                },
+                ),
             )
 
         if (
@@ -185,11 +185,11 @@ Consider replacing the unneccessary whitespace by a single space.""",
             is not None
         ):
             issues.append(
-                {
-                    "code": "S110",
-                    "message": """The rule does not contain a space between the end of after an option value.
+                Issue(
+                    code="S110",
+                    message="""The rule does not contain a space between the end of after an option value.
 Consider adding a single space.""",
-                },
+                ),
             )
 
         if is_rule_option_equal_to_regex(
@@ -198,11 +198,11 @@ Consider adding a single space.""",
             REGEX_S111,
         ):
             issues.append(
-                {
-                    "code": "S111",
-                    "message": """The rule contains more than no spaces between bytes in content.
+                Issue(
+                    code="S111",
+                    message="""The rule contains more than no spaces between bytes in content.
 Consider replacing adding a single space.""",
-                },
+                ),
             )
 
         if is_rule_option_equal_to_regex(
@@ -211,12 +211,12 @@ Consider replacing adding a single space.""",
             REGEX_S120,
         ):
             issues.append(
-                {
-                    "code": "S120",
-                    "message": """The rule did not escape \
+                Issue(
+                    code="S120",
+                    message="""The rule did not escape \
 (\\x3a\\x3b\\x20\\x22\\x27\\x7b\\x7c\\x5c\\x2f\\x60\\x24\\x28\\x29) in a content field.
 Consider using hex encoding instead.""",
-                },
+                ),
             )
 
         if is_rule_option_equal_to_regex(
@@ -225,30 +225,30 @@ Consider using hex encoding instead.""",
             REGEX_S121,
         ):
             issues.append(
-                {
-                    "code": "S121",
-                    "message": """The rule did escape \
+                Issue(
+                    code="S121",
+                    message="""The rule did escape \
 (\\x3a\\x3b\\x20\\x22\\x27\\x7b\\x7c\\x5c\\x2f\\x60\\x24\\x28\\x29) in a pcre field.
 Consider using hex encoding instead.""",
-                },
+                ),
             )
 
         if is_rule_option_equal_to_regex(rule, "content", REGEX_S122):
             issues.append(
-                {
-                    "code": "S122",
-                    "message": """The rule escaped special characters using a blackslash (\\) in a content field.
+                Issue(
+                    code="S122",
+                    message="""The rule escaped special characters using a blackslash (\\) in a content field.
 Consider using hex encoding instead.""",
-                },
+                ),
             )
 
         if is_rule_option_equal_to_regex(rule, "pcre", REGEX_S123):
             issues.append(
-                {
-                    "code": "S123",
-                    "message": """The rule escaped special characters using a blackslash (\\) in a pcre field.
+                Issue(
+                    code="S123",
+                    message="""The rule escaped special characters using a blackslash (\\) in a pcre field.
 Consider using hex encoding instead.""",
-                },
+                ),
             )
 
         return self._add_checker_metadata(issues)

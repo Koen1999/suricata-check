@@ -20,7 +20,7 @@ from suricata_check.utils.regex import (
     get_regex_provider,
     get_rule_body,
 )
-from suricata_check.utils.typing import ISSUES_TYPE
+from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 from .interface import CheckerInterface
 
@@ -70,15 +70,15 @@ class PrincipleChecker(CheckerInterface):
         self: "PrincipleChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:
-        issues = []
+        issues: ISSUES_TYPE = []
 
         if count_rule_options(rule, ALL_DETECTION_KEYWORDS) == 0:
             issues.append(
-                {
-                    "code": "P000",
-                    "message": """No Limited Proxy, \
+                Issue(
+                    code="P000",
+                    message="""No Limited Proxy, \
 the rule does not detect a characteristic that relates directly to a malicious action, making it potentially noisy.""",
-                },
+                ),
             )
 
         if (
@@ -88,32 +88,32 @@ the rule does not detect a characteristic that relates directly to a malicious a
             and self._is_rule_stateful(rule) is False
         ):
             issues.append(
-                {
-                    "code": "P001",
-                    "message": """No Successful Malicious Action, \
+                Issue(
+                    code="P001",
+                    message="""No Successful Malicious Action, \
 the rule does not distinguish between successful and unsuccessful malicious actions, making it potentially noisy.""",
-                },
+                ),
             )
 
         if not self._is_rule_threshold_limited(rule):
             issues.append(
-                {
-                    "code": "P002",
-                    "message": """No Alert Throttling, \
+                Issue(
+                    code="P002",
+                    message="""No Alert Throttling, \
 the rule does not utilize the threshold limit option` to prevent alert flooding, making it potentially noisy.\n
 Consider setting a threshold limit to prevent alert flooding.\n
 Using track by_both is considered to be safe if unsure which to use.""",
-                },
+                ),
             )
 
         if not self._does_rule_have_exceptions(rule):
             issues.append(
-                {
-                    "code": "P003",
-                    "message": """No Exceptions, \
+                Issue(
+                    code="P003",
+                    message="""No Exceptions, \
 the rule does not include any exceptions for commom benign traffic, making it potentially noisy.\n
 Consider identifying common benign traffic on which the rule may trigger and add exceptions to the rule.""",
-                },
+                ),
             )
 
         if (
@@ -127,20 +127,20 @@ Consider identifying common benign traffic on which the rule may trigger and add
             > 1
         ):
             issues.append(
-                {
-                    "code": "P004",
-                    "message": """No Generalized Characteristic, \
+                Issue(
+                    code="P004",
+                    message="""No Generalized Characteristic, \
 the rule does detect a characteristic that is so specific that it is unlikely generalize.""",
-                },
+                ),
             )
 
         if self._has_fixed_http_uri_query_parameter_location(rule):
             issues.append(
-                {
-                    "code": "P005",
-                    "message": """No Generalized Position, \
+                Issue(
+                    code="P005",
+                    message="""No Generalized Position, \
 the rule does detect the characteristic in a fixed position that and is unlikely to generalize as a result.""",
-                },
+                ),
             )
 
         return self._add_checker_metadata(issues)

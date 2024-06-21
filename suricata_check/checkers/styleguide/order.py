@@ -27,7 +27,7 @@ from suricata_check.utils.regex import (
     get_regex_provider,
     get_rule_body,
 )
-from suricata_check.utils.typing import ISSUES_TYPE
+from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 regex_provider = get_regex_provider()
 
@@ -168,89 +168,89 @@ class OrderChecker(CheckerInterface):
         self: "OrderChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:
-        issues = []
+        issues: ISSUES_TYPE = []
 
         body = get_rule_body(rule)
 
         if is_rule_option_first(rule, "msg") is not True:
             issues.append(
-                {
-                    "code": "S200",
-                    "message": """The rule body does not have msg as the first option.
+                Issue(
+                    code="S200",
+                    message="""The rule body does not have msg as the first option.
 Consider reording to make msg the first option.""",
-                },
+                )
             )
 
         if is_rule_option_put_before(rule, "reference", ("content", "pcre")) is True:
             issues.append(
-                {
-                    "code": "S201",
-                    "message": """The rule body contains the reference option before the detection logic.
+                Issue(
+                    code="S201",
+                    message="""The rule body contains the reference option before the detection logic.
 Consider reording to put the detection logic directly after the msg option.""",
-                },
+                )
             )
 
         if is_rule_option_put_before(rule, "classtype", ("reference",)) is True:
             issues.append(
-                {
-                    "code": "S202",
-                    "message": """The rule body contains the classtype option before the reference option.
+                Issue(
+                    code="S202",
+                    message="""The rule body contains the classtype option before the reference option.
 Consider reording to put the classtype option directly after the reference option.""",
-                },
+                )
             )
 
         if is_rule_option_put_before(rule, "classtype", ("content", "pcre")) is True:
             issues.append(
-                {
-                    "code": "S203",
-                    "message": """The rule body contains the classtype option before the detection logic.
+                Issue(
+                    code="S203",
+                    message="""The rule body contains the classtype option before the detection logic.
 Consider reording to put the classtype option directly after the detection logic.""",
-                },
+                )
             )
 
         if is_rule_option_put_before(rule, "sid", ("classtype",)) is True:
             issues.append(
-                {
-                    "code": "S204",
-                    "message": """The rule body contains the sid option before the classtype option.
+                Issue(
+                    code="S204",
+                    message="""The rule body contains the sid option before the classtype option.
 Consider reording to put the sid option directly after the classtype option.""",
-                },
+                )
             )
 
         if is_rule_option_put_before(rule, "sid", ("reference",)) is True:
             issues.append(
-                {
-                    "code": "S205",
-                    "message": """The rule body contains the sid option before the reference option.
+                Issue(
+                    code="S205",
+                    message="""The rule body contains the sid option before the reference option.
 Consider reording to put the sid option directly after the reference option.""",
-                },
+                )
             )
 
         if is_rule_option_put_before(rule, "sid", ("content", "pcre")) is True:
             issues.append(
-                {
-                    "code": "S206",
-                    "message": """The rule body contains the sid option before the detection logic.
+                Issue(
+                    code="S206",
+                    message="""The rule body contains the sid option before the detection logic.
 Consider reording to put the sid option directly after the detection logic.""",
-                },
+                )
             )
 
         if is_rule_option_put_before(rule, "rev", ("sid",)) is True:
             issues.append(
-                {
-                    "code": "S207",
-                    "message": """The rule body contains the rev option before the sid option.
+                Issue(
+                    code="S207",
+                    message="""The rule body contains the rev option before the sid option.
 Consider reording to put the rev option directly after the sid option.""",
-                },
+                )
             )
 
         if is_rule_option_last(rule, "metadata") is False:
             issues.append(
-                {
-                    "code": "S208",
-                    "message": """The rule body contains does not have the metadata option as the last option.
+                Issue(
+                    code="S208",
+                    message="""The rule body contains does not have the metadata option as the last option.
 Consider making metadata the last option.""",
-                },
+                )
             )
 
         if (
@@ -260,30 +260,30 @@ Consider making metadata the last option.""",
             is not None
         ):
             issues.append(
-                {
-                    "code": "S210",
-                    "message": """The rule body contains a content matched modified by depth or offset \
+                Issue(
+                    code="S210",
+                    message="""The rule body contains a content matched modified by depth or offset \
 that is not the first content match.
 Consider moving the modified content match to the beginning of the detection options.""",
-                },
+                )
             )
 
         if count_rule_options(rule, "depth") > 1:
             issues.append(
-                {
-                    "code": "S211",
-                    "message": """The rule body contains more than one content matche modified by depth.
+                Issue(
+                    code="S211",
+                    message="""The rule body contains more than one content matche modified by depth.
 Consider making the second content match relative to the first using the within option.""",
-                },
+                )
             )
 
         if count_rule_options(rule, "offset") > 1:
             issues.append(
-                {
-                    "code": "S212",
-                    "message": """The rule body contains more than one content matche modified by offset.
+                Issue(
+                    code="S212",
+                    message="""The rule body contains more than one content matche modified by offset.
 Consider making the second content match relative to the first using the distance option.""",
-                },
+                )
             )
 
         if (
@@ -291,11 +291,11 @@ Consider making the second content match relative to the first using the distanc
             and get_rule_option_position(rule, "flow") != 1
         ):
             issues.append(
-                {
-                    "code": "S220",
-                    "message": """The rule flow option is set but not directly following the msg option.
+                Issue(
+                    code="S220",
+                    message="""The rule flow option is set but not directly following the msg option.
 Consider moving the flow option to directly after the msg option.""",
-                },
+                )
             )
 
         if (
@@ -307,11 +307,11 @@ Consider moving the flow option to directly after the msg option.""",
             is False
         ):
             issues.append(
-                {
-                    "code": "S221",
-                    "message": """The rule contains flow or stream keywords before the flow option in the rule body.
+                Issue(
+                    code="S221",
+                    message="""The rule contains flow or stream keywords before the flow option in the rule body.
 Consider moving the flow option to before the flow and/or stream keywords.""",
-                },
+                )
             )
 
         if (
@@ -323,11 +323,11 @@ Consider moving the flow option to before the flow and/or stream keywords.""",
             is True
         ):
             issues.append(
-                {
-                    "code": "S222",
-                    "message": """The rule contains flow or stream keywords after content buffers or detection logic.
+                Issue(
+                    code="S222",
+                    message="""The rule contains flow or stream keywords after content buffers or detection logic.
 Consider moving the flow and/or stream keywords to before content buffers and detection options.""",
-                },
+                )
             )
 
         if (
@@ -339,11 +339,11 @@ Consider moving the flow and/or stream keywords to before content buffers and de
             is True
         ):
             issues.append(
-                {
-                    "code": "S223",
-                    "message": """The rule contains the urilen option before the flow or stream keywords in the rule body.
+                Issue(
+                    code="S223",
+                    message="""The rule contains the urilen option before the flow or stream keywords in the rule body.
 Consider moving the urilen option to after the flow and/or stream keywords.""",
-                },
+                )
             )
 
         if (
@@ -355,11 +355,11 @@ Consider moving the urilen option to after the flow and/or stream keywords.""",
             is False
         ):
             issues.append(
-                {
-                    "code": "S224",
-                    "message": """The rule contains the urilen option after content buffers or detection logic.
+                Issue(
+                    code="S224",
+                    message="""The rule contains the urilen option after content buffers or detection logic.
 Consider moving the urilen option to before content buffers and detection options.""",
-                },
+                )
             )
 
         # Detects pointer movement before any content or buffer option or between a buffer and a content option.
@@ -370,11 +370,11 @@ Consider moving the urilen option to before content buffers and detection option
             is not None
         ):
             issues.append(
-                {
-                    "code": "S230",
-                    "message": """The rule contains pointer movement before the content option.
+                Issue(
+                    code="S230",
+                    message="""The rule contains pointer movement before the content option.
 Consider moving the pointer movement options to after the content option.""",
-                },
+                )
             )
 
         # Detects fast_pattern before any content or buffer option or between a buffer and a content option.
@@ -385,13 +385,13 @@ Consider moving the pointer movement options to after the content option.""",
             is not None
         ):
             issues.append(
-                {
-                    "code": "S231",
-                    "message": """The rule contains the fast_pattern option before \
+                Issue(
+                    code="S231",
+                    message="""The rule contains the fast_pattern option before \
 size options, transformation options, the content option or pointer movement options.
 Consider moving the fast_pattern option to after \
 size options, transformation options, the content option or pointer movement options.""",
-                },
+                )
             )
 
         # Detects no_case before any content or buffer option or between a buffer and a content option.
@@ -402,13 +402,13 @@ size options, transformation options, the content option or pointer movement opt
             is not None
         ):
             issues.append(
-                {
-                    "code": "S232",
-                    "message": """The rule contains the nocase option before \
+                Issue(
+                    code="S232",
+                    message="""The rule contains the nocase option before \
 size options, transformation options, the content option, pointer movement options, or fast_pattern option.
 Consider moving the nocase option to after \
 size options, transformation options, the content option, pointer movement options, or fast_pattern option.""",
-                },
+                )
             )
 
         # Detects modifier options before any content or buffer option or between a buffer and a content option.
@@ -419,11 +419,11 @@ size options, transformation options, the content option, pointer movement optio
             is not None
         ):
             issues.append(
-                {
-                    "code": "S233",
-                    "message": """The rule contains modifier options before the content option.
+                Issue(
+                    code="S233",
+                    message="""The rule contains modifier options before the content option.
 Consider moving the modifier options to after the content option.""",
-                },
+                )
             )
 
         # Detects other detection options before any content or buffer option or between a buffer and a content option.
@@ -434,13 +434,13 @@ Consider moving the modifier options to after the content option.""",
             is not None
         ):
             issues.append(
-                {
-                    "code": "S234",
-                    "message": """The rule contains other detection options before \
+                Issue(
+                    code="S234",
+                    message="""The rule contains other detection options before \
 size options, transformation options, the content option, pointer movement options, nocase option, or fast_pattern option.
 Consider moving the other detection options to after \
 size options, transformation options,  the content option, pointer movement options, nocase option, or fast_pattern option.""",
-                },
+                )
             )
 
         # Detects size options after any transformation options, content option or other detection options.
@@ -451,12 +451,12 @@ size options, transformation options,  the content option, pointer movement opti
             is not None
         ):
             issues.append(
-                {
-                    "code": "S235",
-                    "message": """The rule contains other size options after \
+                Issue(
+                    code="S235",
+                    message="""The rule contains other size options after \
 any transformation options, content option or other detection options.
 Consider moving the size options to after any transformation options, content option or other detection options""",
-                },
+                )
             )
 
         # Detects transformation options after any content option or other detection options.
@@ -467,12 +467,12 @@ Consider moving the size options to after any transformation options, content op
             is not None
         ):
             issues.append(
-                {
-                    "code": "S236",
-                    "message": """The rule contains other transformation options after \
+                Issue(
+                    code="S236",
+                    message="""The rule contains other transformation options after \
 any content option or other detection options.
 Consider moving the transformation options to after any content option or other detection options""",
-                },
+                )
             )
 
         if (
@@ -484,11 +484,11 @@ Consider moving the transformation options to after any content option or other 
             is True
         ):
             issues.append(
-                {
-                    "code": "S240",
-                    "message": """The rule contains the threshold option before some detection option.
+                Issue(
+                    code="S240",
+                    message="""The rule contains the threshold option before some detection option.
 Consider moving the threshold option to after the detection options.""",
-                },
+                )
             )
 
         if (
@@ -500,11 +500,11 @@ Consider moving the threshold option to after the detection options.""",
             is False
         ):
             issues.append(
-                {
-                    "code": "S241",
-                    "message": """The rule contains the threshold option after the reference and/or sid option.
+                Issue(
+                    code="S241",
+                    message="""The rule contains the threshold option after the reference and/or sid option.
 Consider moving the threshold option to before the reference and sid options.""",
-                },
+                )
             )
 
         return self._add_checker_metadata(issues)

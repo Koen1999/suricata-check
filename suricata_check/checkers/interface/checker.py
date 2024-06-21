@@ -43,7 +43,7 @@ class CheckerInterface:
 
         Returns:
         -------
-        list[dict]: A list of issues found in the rule. Each issue is typed as a `dict`.
+        ISSUES_TYPE: A sequence of issues found in the rule.
 
         """
 
@@ -55,6 +55,6 @@ class CheckerInterface:
         name = self.__class__.__name__
 
         for issue in issues:
-            issue["checker"] = name
+            issue.checker = name
 
         return issues

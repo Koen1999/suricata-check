@@ -6,6 +6,7 @@
     "python.testing.pytestEnabled": true,
     "pythonTestExplorer.testFramework": null,
     "python.analysis.exclude": [
+        ".vscode",
         "build",
         "**\\venv",
         "**\\AppData"

@@ -17,7 +17,7 @@ from suricata_check.utils.regex import (
     CLASSTYPES,
     get_regex_provider,
 )
-from suricata_check.utils.typing import ISSUES_TYPE
+from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 regex_provider = get_regex_provider()
 
@@ -56,18 +56,18 @@ class OverallChecker(CheckerInterface):
         self: "OverallChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:
-        issues = []
+        issues: ISSUES_TYPE = []
 
         if is_rule_option_equal_to(rule, "direction", "<->") or (
             is_rule_option_equal_to(rule, "source_addr", "any")
             and is_rule_option_equal_to(rule, "dest_addr", "any")
         ):
             issues.append(
-                {
-                    "code": "S000",
-                    "message": """The rule did not specificy an inbound or outbound direction.
+                Issue(
+                    code="S000",
+                    message="""The rule did not specificy an inbound or outbound direction.
 Consider constraining the rule to a specific direction such as INBOUND or OUTBOUND traffic.""",
-                },
+                )
             )
 
         if is_rule_option_set(rule, "dns.query") and not is_rule_option_equal_to(
@@ -76,71 +76,71 @@ Consider constraining the rule to a specific direction such as INBOUND or OUTBOU
             "any",
         ):
             issues.append(
-                {
-                    "code": "S001",
-                    "message": """The rule detects certain dns queries and has dest_addr not set to any \
+                Issue(
+                    code="S001",
+                    message="""The rule detects certain dns queries and has dest_addr not set to any \
 causing the rule to be specific to either local or external resolvers.
 Consider setting dest_addr to any.""",
-                },
+                )
             )
 
         # In the suricata style guide, this is mentioned as `packet_data`
         if is_rule_option_set(rule, "pkt_data"):
             issues.append(
-                {
-                    "code": "S010",
-                    "message": """The rule uses the pkt_data option, \
+                Issue(
+                    code="S010",
+                    message="""The rule uses the pkt_data option, \
 which resets the inspection pointer resulting in confusing and disjoint logic.
 Consider replacing the detection logic.""",
-                },
+                )
             )
 
         if is_rule_option_set(rule, "priority"):
             issues.append(
-                {
-                    "code": "S011",
-                    "message": """The rule uses priority option, which overrides operator tuning via classification.conf.
+                Issue(
+                    code="S011",
+                    message="""The rule uses priority option, which overrides operator tuning via classification.conf.
 Consider removing the option.""",
-                },
+                )
             )
 
         for sticky_buffer, modifier_alternative in get_rule_sticky_buffer_naming(rule):
             issues.append(
-                {
-                    "code": "S012",
-                    "message": f"""The rule uses sticky buffer naming in the {sticky_buffer} option, which is complicated.
+                Issue(
+                    code="S012",
+                    message=f"""The rule uses sticky buffer naming in the {sticky_buffer} option, which is complicated.
 Consider using the {modifier_alternative} option instead.""",
-                },
+                )
             )
 
         for variable_group in self._get_invented_variable_groups(rule):
             issues.append(
-                {
-                    "code": "S013",
-                    "message": f"""The rule uses a self-invented variable group ({variable_group}), \
+                Issue(
+                    code="S013",
+                    message=f"""The rule uses a self-invented variable group ({variable_group}), \
 which may be undefined in many environments.
 Consider using the a standard variable group instead.""",
-                },
+                )
             )
 
         if not is_rule_option_one_of(rule, "classtype", CLASSTYPES):
             issues.append(
-                {
-                    "code": "S014",
-                    "message": f"""The rule uses a self-invented classtype ({get_rule_option(rule, 'classtype')}), \
+                Issue(
+                    code="S014",
+                    message=f"""The rule uses a self-invented classtype ({get_rule_option(rule, 'classtype')}), \
 which may be undefined in many environments.
 Consider using the a standard classtype instead.""",
-                },
+                )
             )
 
         if not is_rule_option_set(rule, "content"):
             issues.append(
-                {
-                    "code": "S020",
-                    "message": """The detection logic does not use the content option, \
+                Issue(
+                    code="S020",
+                    message="""The detection logic does not use the content option, \
 which is can cause significant runtime overhead.
 Consider adding a content match.""",
-                },
+                )
             )
 
         if (
@@ -148,11 +148,11 @@ Consider adding a content match.""",
             and count_rule_options(rule, "content") > 1
         ):
             issues.append(
-                {
-                    "code": "S021",
-                    "message": """The rule has multiple content matches but does not use fast_pattern.
+                Issue(
+                    code="S021",
+                    message="""The rule has multiple content matches but does not use fast_pattern.
 Consider assigning fast_pattern to the most unique content match.""",
-                },
+                )
             )
 
         if is_rule_option_equal_to_regex(
@@ -161,9 +161,9 @@ Consider assigning fast_pattern to the most unique content match.""",
             REGEX_S030,
         ):
             issues.append(
-                {
-                    "code": "S030",
-                    "message": """The rule uses app-layer-protocol to assert the protocol.
+                Issue(
+                    code="S030",
+                    message="""The rule uses app-layer-protocol to assert the protocol.
 Consider asserting this in the head instead using {} {} {} {} {} {} {}""".format(
                         get_rule_option(rule, "action"),
                         get_rule_option(rule, "app-layer-protocol"),
@@ -173,7 +173,7 @@ Consider asserting this in the head instead using {} {} {} {} {} {} {}""".format
                         get_rule_option(rule, "dest_addr"),
                         get_rule_option(rule, "dest_port"),
                     ),
-                },
+                )
             )
 
         if is_rule_option_equal_to_regex(
@@ -182,10 +182,10 @@ Consider asserting this in the head instead using {} {} {} {} {} {} {}""".format
             REGEX_S031,
         ):
             issues.append(
-                {
-                    "code": "S031",
-                    "message": "The rule uses uppercase A-F in a hex content match.\nConsider using lowercase a-f instead.",
-                },
+                Issue(
+                    code="S031",
+                    message="The rule uses uppercase A-F in a hex content match.\nConsider using lowercase a-f instead.",
+                )
             )
 
         return self._add_checker_metadata(issues)

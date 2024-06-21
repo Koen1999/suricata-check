@@ -35,19 +35,19 @@ class GenericChecker:
 
         issues: suricata_check.utils.typing.ISSUES_TYPE = self._check_rule(rule)
         correct: Optional[bool] = None
-        issue: Optional[suricata_check.utils.typing.ISSUE_TYPE] = None
+        issue: Optional[suricata_check.utils.typing.Issue] = None
 
         if raised:
             correct = False
             for issue in issues:
-                if issue["code"] == code:
+                if issue.code == code:
                     correct = True
                     break
             issue = None
         elif not raised:
             correct = True
             for issue in issues:
-                if issue["code"] == code:
+                if issue.code == code:
                     correct = False
                     break
 
@@ -77,7 +77,7 @@ class GenericChecker:
         for rule in rules:
             issues: suricata_check.utils.typing.ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
             for issue in issues:
-                codes.add(issue["code"])
+                codes.add(issue.code)
 
         for code in codes:
             if code not in self.checker.codes:
@@ -104,5 +104,5 @@ class GenericChecker:
         for rule in rules:
             issues: suricata_check.utils.typing.ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
             for issue in issues:
-                if "checker" not in issue:
+                if not hasattr(issue, "checker"):
                     pytest.fail(str(issue))

@@ -1,14 +1,25 @@
 """The `suricata_check.typing` module contains all types used by the `suricata-check` package."""
 
 from collections.abc import MutableMapping, MutableSequence
+from dataclasses import dataclass
 from typing import (
+    Optional,
     Union,
 )
 
 import idstools.rule
 
-ISSUE_TYPE = MutableMapping[str, str]
-ISSUES_TYPE = MutableSequence[ISSUE_TYPE]
+
+@dataclass
+class Issue:
+    """The `Issue` dataclass represents a single issue found in a rule."""
+
+    code: str
+    message: str
+    checker: Optional[str] = None
+
+
+ISSUES_TYPE = MutableSequence[Issue]
 SIMPLE_SUMMARY_TYPE = MutableMapping[str, int]
 RULE_SUMMARY_TYPE = SIMPLE_SUMMARY_TYPE
 EXTENSIVE_SUMMARY_TYPE = MutableMapping[str, SIMPLE_SUMMARY_TYPE]

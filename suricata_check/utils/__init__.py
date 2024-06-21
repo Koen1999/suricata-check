@@ -55,7 +55,6 @@ from .regex import (
 )
 from .typing import (
     EXTENSIVE_SUMMARY_TYPE,
-    ISSUE_TYPE,
     ISSUES_TYPE,
     OUTPUT_REPORT_TYPE,
     OUTPUT_SUMMARY_TYPE,
@@ -63,4 +62,5 @@ from .typing import (
     RULE_REPORTS_TYPE,
     RULE_SUMMARY_TYPE,
     SIMPLE_SUMMARY_TYPE,
+    Issue,
 )

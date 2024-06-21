@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from functools import lru_cache
 from typing import (
     Literal,
@@ -194,8 +194,8 @@ def _write_output(
             line: Optional[int] = rule_dict["line"] if "line" in rule_dict else None  # type: ignore reportAssignmentType
             issues: ISSUES_TYPE = rule_dict["issues"]  # type: ignore reportAssignmentType
             for issue in issues:
-                code = issue["code"]
-                issue_msg = issue["message"].replace("\n", " ")
+                code = issue.code
+                issue_msg = issue.message.replace("\n", " ")
 
                 msg = f"[{code}] Line {line}, sid {rule['sid']}: {issue_msg}"
                 fast_fh.write(msg + "\n")
@@ -413,7 +413,7 @@ def __summarize_rule(
     summary["total_issues"] = len(issues)
     summary["issues_by_group"] = defaultdict(int)
     for issue in issues:
-        checker = issue["checker"]
+        checker = issue.checker
         summary["issues_by_group"][checker] += 1
 
     # Ensure also checkers without issues are included in the report.
@@ -422,10 +422,7 @@ def __summarize_rule(
             summary["issues_by_group"][checker.__class__.__name__] = 0
 
     # Sort dictionaries for deterministic output
-    summary["issues_by_group"] = {
-        key: summary["issues_by_group"][key]
-        for key in sorted(summary["issues_by_group"].keys())
-    }
+    summary["issues_by_group"] = __sort_mapping(summary["issues_by_group"])
 
     return summary
 
@@ -446,58 +443,89 @@ def __summarize_output(
     """
     summary: OUTPUT_SUMMARY_TYPE = {}
 
-    summary["overall_summary"] = {
+    summary["overall_summary"] = __get_overall_summary(output)
+    summary["issues_by_group"] = __get_issues_by_group(output)
+    summary["issues_by_type"] = __get_issues_by_type(output)
+
+    return summary
+
+
+def __get_overall_summary(
+    output: OUTPUT_SUMMARY_TYPE,
+) -> SIMPLE_SUMMARY_TYPE:
+    overall_summary = {
         "Total Issues": 0,
         "Rules with Issues": 0,
         "Rules without Issues": 0,
     }
-    summary["issues_by_group"] = defaultdict(int)
-    summary["issues_by_type"] = defaultdict(lambda: defaultdict(int))
 
     rules: RULE_REPORTS_TYPE = output["rules"]  # type: ignore reportAssignmentType
     for rule in rules:
         issues: ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
-        summary["overall_summary"]["Total Issues"] += len(issues)
+        overall_summary["Total Issues"] += len(issues)
 
         if len(issues) == 0:
-            summary["overall_summary"]["Rules without Issues"] += 1
+            overall_summary["Rules without Issues"] += 1
         else:
-            summary["overall_summary"]["Rules with Issues"] += 1
+            overall_summary["Rules with Issues"] += 1
 
-        checker_codes = defaultdict(lambda: defaultdict(int))
-        for issue in issues:
-            checker = issue["checker"]
-            code = issue["code"]
-            summary["issues_by_group"][checker] += 1
-            checker_codes[checker][code] += 1
+    return overall_summary
 
-        for checker, codes in checker_codes.items():
-            for code, count in codes.items():
-                summary["issues_by_type"][checker][code] += count
+
+def __get_issues_by_group(
+    output: OUTPUT_SUMMARY_TYPE,
+) -> SIMPLE_SUMMARY_TYPE:
+    issues_by_group = defaultdict(int)
 
     # Ensure also checkers and codes without issues are included in the report.
     for checker in get_checkers():
-        if checker.__class__.__name__ not in summary["issues_by_group"]:
-            summary["issues_by_group"][checker.__class__.__name__] = 0
+        issues_by_group[checker.__class__.__name__] = 0
 
+    rules: RULE_REPORTS_TYPE = output["rules"]  # type: ignore reportAssignmentType
+    for rule in rules:
+        issues: ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
+
+        for issue in issues:
+            checker = issue.checker
+            if checker is not None:
+                issues_by_group[checker] += 1
+
+    return __sort_mapping(issues_by_group)
+
+
+def __get_issues_by_type(
+    output: OUTPUT_SUMMARY_TYPE,
+) -> EXTENSIVE_SUMMARY_TYPE:
+    issues_by_type: EXTENSIVE_SUMMARY_TYPE = defaultdict(lambda: defaultdict(int))
+
+    # Ensure also checkers and codes without issues are included in the report.
+    for checker in get_checkers():
         for code in checker.codes:
-            if code not in summary["issues_by_type"][checker.__class__.__name__]:
-                summary["issues_by_type"][checker.__class__.__name__][code] = 0
+            issues_by_type[checker.__class__.__name__][code] = 0
 
-    # Sort dictionaries for deterministic output
-    summary["issues_by_group"] = {
-        key: summary["issues_by_group"][key]
-        for key in sorted(summary["issues_by_group"].keys())
-    }
-    summary["issues_by_type"] = {
-        key: {
-            key2: summary["issues_by_type"][key][key2]
-            for key2 in sorted(summary["issues_by_type"][key])
-        }
-        for key in sorted(summary["issues_by_type"].keys())
-    }
+    rules: RULE_REPORTS_TYPE = output["rules"]  # type: ignore reportAssignmentType
+    for rule in rules:
+        issues: ISSUES_TYPE = rule["issues"]  # type: ignore reportAssignmentType
 
-    return summary
+        checker_codes = defaultdict(lambda: defaultdict(int))
+        for issue in issues:
+            checker = issue.checker
+            if checker is not None:
+                code = issue.code
+                checker_codes[checker][code] += 1
+
+        for checker, codes in checker_codes.items():
+            for code, count in codes.items():
+                issues_by_type[checker][code] += count
+
+    for key in issues_by_type:
+        issues_by_type[key] = __sort_mapping(issues_by_type[key])
+
+    return __sort_mapping(issues_by_type)
+
+
+def __sort_mapping(mapping: Mapping) -> dict:
+    return {key: mapping[key] for key in sorted(mapping.keys())}
 
 
 if __name__ == "__main__":

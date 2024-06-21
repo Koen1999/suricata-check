@@ -8,7 +8,7 @@ import idstools.rule
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import get_rule_option
 from suricata_check.utils.regex import get_regex_provider
-from suricata_check.utils.typing import ISSUES_TYPE
+from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 SID_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
     "local": [(1000000, 1999999)],
@@ -48,7 +48,7 @@ class SidChecker(CheckerInterface):
         self: "SidChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:
-        issues = []
+        issues: ISSUES_TYPE = []
 
         sid = get_rule_option(rule, "sid")
         msg = get_rule_option(rule, "msg")
@@ -66,24 +66,24 @@ class SidChecker(CheckerInterface):
             and range_name != "local"
         ):
             issues.append(
-                {
-                    "code": "S300",
-                    "message": f"""\
+                Issue(
+                    code="S300",
+                    message=f"""\
 Allocation to reserved SID range, whereas no range is reserved for the rule.
 Consider using an sid in one of the following ranges: {SID_ALLOCATION["local"]}.\
 """,
-                },
+                ),
             )
 
         if prefix not in SID_ALLOCATION.keys() and range_name is None:
             issues.append(
-                {
-                    "code": "S301",
-                    "message": f"""\
+                Issue(
+                    code="S301",
+                    message=f"""\
 Allocation to unallocated SID range, whereas local range should be used.
 Consider using an sid in one of the following ranges: {SID_ALLOCATION["local"]}.\
 """,
-                },
+                ),
             )
 
         if prefix in SID_ALLOCATION.keys() and (
@@ -92,24 +92,24 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION["local"]}.
             and not range_name.startswith(prefix)
         ):
             issues.append(
-                {
-                    "code": "S302",
-                    "message": f"""\
+                Issue(
+                    code="S302",
+                    message=f"""\
 Allocation to wrong reserved SID range, whereas another reserved range should be used.
 Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
 """,
-                },
+                ),
             )
 
         if prefix in SID_ALLOCATION.keys() and range_name is None:
             issues.append(
-                {
-                    "code": "S303",
-                    "message": f"""\
+                Issue(
+                    code="S303",
+                    message=f"""\
 Allocation to unallocated SID range, whereas a reserved range should be used.
 Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
 """,
-                },
+                ),
             )
 
         return self._add_checker_metadata(issues)
@@ -142,7 +142,7 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
         parts = match.group(1).strip().split(" ")
         prefix: str = ""
         for i in list(reversed(range(len(parts)))):
-            prefix = " ".join(parts[:i+1])
+            prefix = " ".join(parts[: i + 1])
             if prefix in SID_ALLOCATION.keys() or " " not in prefix:
                 break
 

@@ -4,7 +4,7 @@ import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import is_rule_option_set
-from suricata_check.utils.typing import ISSUES_TYPE
+from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 
 class MandatoryChecker(CheckerInterface):
@@ -22,22 +22,22 @@ class MandatoryChecker(CheckerInterface):
         self: "MandatoryChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:
-        issues = []
+        issues: ISSUES_TYPE = []
 
         if not is_rule_option_set(rule, "msg"):
             issues.append(
-                {
-                    "code": "M000",
-                    "message": "The rule did not specify a msg, which is a mandatory field.",
-                },
+                Issue(
+                    code="M000",
+                    message="The rule did not specify a msg, which is a mandatory field.",
+                )
             )
 
         if not is_rule_option_set(rule, "sid"):
             issues.append(
-                {
-                    "code": "M001",
-                    "message": "The rule did not specify a sid, which is a mandatory field.",
-                },
+                Issue(
+                    code="M001",
+                    message="The rule did not specify a sid, which is a mandatory field.",
+                )
             )
 
         return self._add_checker_metadata(issues)
