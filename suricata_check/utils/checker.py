@@ -396,7 +396,7 @@ def get_rule_option_positions(
     """
     provided_sequence = True
     if sequence is None:
-        sequence = [option["name"] for option in rule["options"]]
+        sequence = tuple(option["name"] for option in rule["options"])
         provided_sequence = False
 
     positions = []
