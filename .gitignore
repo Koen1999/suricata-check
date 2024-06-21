@@ -11,3 +11,4 @@ suricata-check.jsonl
 suricata-check-fast.log
 suricata-check-stats.log
 .coverage
+cov.xml

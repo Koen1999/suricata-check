@@ -1,5 +1,4 @@
 out
 temp
-emerging-all-v?.rules
-snort3-community-rules.tar.gz
-snort3-community.rules
+emerging-all*
+snort3-community*

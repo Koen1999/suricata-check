@@ -2,8 +2,10 @@ import logging
 import os
 import shutil
 import sys
+import tarfile
 import urllib.request
 import warnings
+import zipfile
 
 import idstools.rule
 import pytest
@@ -15,9 +17,9 @@ from click.testing import CliRunner
 regex_provider = suricata_check.utils.get_regex_provider()
 
 ET_OPEN_URLS = {
-    "v4": "https://rules.emergingthreats.net/open-nogpl/suricata-4.0/emerging-all.rules",
-    "v5": "https://rules.emergingthreats.net/open-nogpl/suricata-5.0/emerging-all.rules",
-    "v7": "https://rules.emergingthreats.net/open-nogpl/suricata-7.0.3/emerging-all.rules",
+    "v4": "https://rules.emergingthreats.net/open/suricata-4.0/emerging-all.rules.tar.gz",
+    "v5": "https://rules.emergingthreats.net/open/suricata-5.0/emerging-all.rules.tar.gz",
+    "v7": "https://rules.emergingthreats.net/open/suricata-7.0.3/emerging-all.rules.tar.gz",
 }
 SNORT_COMMUNITY_URL = (
     "https://www.snort.org/downloads/community/snort3-community-rules.tar.gz"
@@ -79,11 +81,25 @@ def test_main_cli_single_rule():
 @pytest.mark.parametrize(("version", "et_open_url"), ET_OPEN_URLS.items())
 def test_main_cli_integration_et_open(version, et_open_url):
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+
     # Retrieve the latest ET Open rules if not present.
     if not os.path.exists(f"tests/data/emerging-all-{version}.rules"):
-        urllib.request.urlretrieve(
-            et_open_url, f"tests/data/emerging-all-{version}.rules"
+        if not os.path.exists(f"tests/data/emerging-all-{version}.rules.tar.gz"):
+            urllib.request.urlretrieve(
+                et_open_url,
+                f"tests/data/emerging-all-{version}.rules.tar.gz",
+            )
+
+        tarfile.open(f"tests/data/emerging-all-{version}.rules.tar.gz").extract(
+            "emerging-all.rules",
+            "tests/data/temp",
         )
+        os.remove(f"tests/data/emerging-all-{version}.rules.tar.gz")
+        shutil.move(
+            "tests/data/temp/emerging-all.rules",
+            f"tests/data/emerging-all-{version}.rules",
+        )
+        shutil.rmtree("tests/data/temp")
 
     runner = CliRunner()
     result = runner.invoke(
@@ -106,19 +122,20 @@ def test_main_cli_integration_et_open(version, et_open_url):
 @pytest.mark.serial()
 @pytest.hookimpl(trylast=True)
 def test_main_cli_integration_snort_community():
-    # Retrieve the latest ET Open rules if not present.
-    if not os.path.exists("tests/data/snort3-community-rules.tar.gz"):
-        urllib.request.urlretrieve(
-            SNORT_COMMUNITY_URL,
-            "tests/data/snort3-community-rules.tar.gz",
-        )
-
+    # Retrieve the latest Snort rules if not present.
     if not os.path.exists("tests/data/snort3-community.rules"):
-        shutil.unpack_archive(
-            "tests/data/snort3-community-rules.tar.gz",
+        if not os.path.exists("tests/data/snort3-community-rules.tar.gz"):
+            urllib.request.urlretrieve(
+                SNORT_COMMUNITY_URL,
+                "tests/data/snort3-community-rules.tar.gz",
+            )
+
+        tarfile.open("tests/data/snort3-community-rules.tar.gz").extract(
+            "snort3-community-rules/snort3-community.rules",
             "tests/data/temp",
         )
-        shutil.copyfile(
+        os.remove("tests/data/snort3-community-rules.tar.gz")
+        shutil.move(
             "tests/data/temp/snort3-community-rules/snort3-community.rules",
             "tests/data/snort3-community.rules",
         )
