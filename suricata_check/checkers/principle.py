@@ -66,7 +66,7 @@ class PrincipleChecker(CheckerInterface):
         "P005",
     )
 
-    def _check_rule(  
+    def _check_rule(
         self: "PrincipleChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:

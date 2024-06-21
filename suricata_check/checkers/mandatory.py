@@ -18,7 +18,7 @@ class MandatoryChecker(CheckerInterface):
         "M001",
     )
 
-    def _check_rule( 
+    def _check_rule(
         self: "MandatoryChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:

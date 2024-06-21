@@ -68,7 +68,11 @@ class OutputReport:
     _rules: RULE_REPORTS_TYPE = field(default_factory=list, init=False)
     summary: Optional[OutputSummary] = None
 
-    def __init__(self: "OutputReport", rules:RULE_REPORTS_TYPE=[], summary: Optional[OutputSummary]=None) -> None:
+    def __init__(
+        self: "OutputReport",
+        rules: RULE_REPORTS_TYPE = [],
+        summary: Optional[OutputSummary] = None,
+    ) -> None:
         """Initialized the `OutputReport`, optionally with a list of rules and/or a summary."""
         self._rules = []
         for rule in rules:
