@@ -80,7 +80,7 @@ class TestSid(GenericChecker):
             if code in expected["should_raise"]
         ],
     )
-    def test_rule_bad_new(self, code, expected, raw_rule):
+    def test_rule_bad(self, code, expected, raw_rule):
         if code not in RULES[raw_rule]["should_raise"]:
             # Silently skip and succeed the test
             return
@@ -98,7 +98,7 @@ class TestSid(GenericChecker):
             if code in expected["should_not_raise"]
         ],
     )
-    def test_rule_good_new(self, code, expected, raw_rule):
+    def test_rule_good(self, code, expected, raw_rule):
         rule = idstools.rule.parse(raw_rule)
 
         # fail is true, so we do not permit False Positives

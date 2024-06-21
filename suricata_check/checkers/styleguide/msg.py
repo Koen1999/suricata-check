@@ -29,8 +29,12 @@ regex_provider = get_regex_provider()
 S400_REGEX = regex_provider.compile(
     r"""^"[A-Z0-9 ]+ [A-Z0-9]+ (?![A-Z0-9 ]+ ).*( .*)?"$"""
 )
-MALWARE_REGEX = regex_provider.compile(r"^.*(malware).*$")
+MALWARE_REGEX = regex_provider.compile(r"^.*(malware).*$", regex_provider.IGNORECASE)
 S401_REGEX = regex_provider.compile(r"""^".* [a-zA-Z0-9]+/[a-zA-Z0-9]+ .*"$""")
+VAGUE_KEYWORDS = ("possible", "unknown")
+S402_REGEX = regex_provider.compile(
+    r"^.*({}).*$".format("|".join(VAGUE_KEYWORDS)), regex_provider.IGNORECASE
+)
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +48,7 @@ class MsgChecker(CheckerInterface):
     codes = (
         "S400",
         "S401",
+        "S402",
     )
 
     def _check_rule(
@@ -68,7 +73,7 @@ Consider changing the msg field to `RULESET CATEGORY Description`.\
         if (
             is_rule_option_set(rule, "msg")
             and self._desribes_malware(rule)
-            and not is_rule_option_equal_to_regex(rule, "msg", S400_REGEX)
+            and not is_rule_option_equal_to_regex(rule, "msg", S401_REGEX)
         ):
             issues.append(
                 Issue(
@@ -80,6 +85,18 @@ Consider changing the msg field to include `Platform/malfamily`.\
                 ),
             )
 
+        if is_rule_option_equal_to_regex(rule, "msg", S402_REGEX):
+            issues.append(
+                Issue(
+                    code="S402",
+                    message="""\
+The rule uses vague keywords such as possible or unknown in the msg field.
+Consider rephrasing to provide a more clear message for interpreting generated alerts.\
+""",
+                ),
+            )
+        logger.debug(S402_REGEX.pattern)
+
         return issues
 
     @staticmethod
@@ -89,5 +106,7 @@ Consider changing the msg field to include `Platform/malfamily`.\
 
         if is_rule_option_equal_to_regex(rule, "msg", MALWARE_REGEX):
             return True
+
+        logger.debug("Rule does not describe malware: %s", rule["raw"])
 
         return False
