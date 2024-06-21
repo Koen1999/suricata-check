@@ -1,7 +1,7 @@
 # suricata-check
 
 [![Python Version](https://img.shields.io/pypi/pyversions/suricata-check)](https://www.python.org)
-[![PyPi](https://img.shields.io/pypi/status/suricata-check)](https://pypi.org/project/suricata-check)
+[![PyPI](https://img.shields.io/pypi/status/suricata-check)](https://pypi.org/project/suricata-check)
 [![GitHub License](https://img.shields.io/github/license/Koen1999/suricata-check)](https://github.com/Koen1999/suricata-check/blob/master/LICENSE)
 
 [![Quick Test, Build, Lint](https://github.com/Koen1999/suricata-check/actions/workflows/python-pr.yml/badge.svg?event=push)](https://github.com/Koen1999/suricata-check/actions/workflows/python-pr.yml)
@@ -13,9 +13,9 @@ The tool can detect various issues including those covering syntax validity, int
 
 ## Installation
 
-### From PyPi
+### From PyPI
 
-To install `suricata-check` from [PyPi](https://pypi.org/project/suricata-check/), simply run the following command:
+To install `suricata-check` from [PyPI](https://pypi.org/project/suricata-check/), simply run the following command:
 
 ```bash
 pip install suricata-check[performance]
