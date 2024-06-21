@@ -172,6 +172,7 @@ def test_main_single_rule():
 
 @pytest.mark.serial()
 def test_main_error():
+    logging.basicConfig(level=logging.DEBUG)
     with pytest.raises(SystemExit) as excinfo:
         suricata_check.main(
             (
@@ -183,14 +184,14 @@ def test_main_error():
 
     assert excinfo.value.code == 0
 
-    # We do not check the log file as we know some Snort rules are invalid Suricata rules.
-
 
 def test_get_checkers():
+    logging.basicConfig(level=logging.DEBUG)
     suricata_check.get_checkers()
 
 
 def test_analyze_rule():
+    logging.basicConfig(level=logging.DEBUG)
     rule = idstools.rule.parse(
         """alert ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1;)""",
     )
@@ -199,9 +200,11 @@ def test_analyze_rule():
 
 
 def test_version():
+    logging.basicConfig(level=logging.DEBUG)
     if not hasattr(suricata_check, "__version__"):
         pytest.fail("suricata_check has no attribute __version__")
-    if suricata_check.__version__ == "unknown":
+    from suricata_check._version import __version__
+    if __version__ == "unknown":
         pytest.fail("Version is unknown.")
 
 

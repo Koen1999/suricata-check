@@ -14,16 +14,22 @@ def _get_git_revision_short_hash() -> str:
 
 logger = logging.getLogger(__name__)
 
-__version__: str = "unknown"
+
+def get_version() -> str:
+    v = "unknown"
+
+    git_dir = os.path.join(os.path.dirname(__file__), "..", ".git")
+    if os.path.exists(git_dir):
+        v = _get_git_revision_short_hash()
+        logger.debug("Detected suricata-check version using git: %s", v)
+    else:
+        try:
+            v = version("suricata-check")
+            logger.debug("Detected suricata-check version using importlib: %s", v)
+        except PackageNotFoundError:
+            logger.debug("Failed to detect suricata-check version: %s", v)
+
+    return v
 
 
-git_dir = os.path.join(os.path.dirname(__file__), "..", ".git")
-if os.path.exists(git_dir):
-    __version__ = _get_git_revision_short_hash()
-    logger.debug("Detected suricata-check version using git: %s", __version__)
-else:
-    try:
-        __version__ = version("suricata-check")
-        logger.debug("Detected suricata-check version using importlib: %s", __version__)
-    except PackageNotFoundError:
-        logger.debug("Failed to detect suricata-check version: %s", __version__)
+__version__: str = get_version()
