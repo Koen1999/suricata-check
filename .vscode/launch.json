@@ -80,7 +80,8 @@
                 "pytest",
                 "tests/test_suricata_check.py",
                 "-m",
-                "\"slow and not slow\"",
+                "slow",
+                "--cov-fail-under=0"
             ]
         },
         {
@@ -88,7 +89,15 @@
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
-            "args": ["-k", "et_open", "-k", "v4", "-m", "slow or not slow", "--cov-fail-under=0"],
+            "args": [
+                "-k",
+                "et_open",
+                "-k",
+                "v4",
+                "-m",
+                "slow or not slow",
+                "--cov-fail-under=0"
+            ],
             "console": "integratedTerminal",
             "justMyCode": false,
             "subProcess": true,
@@ -102,7 +111,15 @@
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
-            "args": ["-k", "et_open", "-k", "v5", "-m", "slow or not slow", "--cov-fail-under=0"],
+            "args": [
+                "-k",
+                "et_open",
+                "-k",
+                "v5",
+                "-m",
+                "slow or not slow",
+                "--cov-fail-under=0"
+            ],
             "console": "integratedTerminal",
             "justMyCode": false,
             "subProcess": true,
@@ -116,7 +133,15 @@
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
-            "args": ["-k", "et_open", "-k", "v7", "-m", "slow or not slow", "--cov-fail-under=0"],
+            "args": [
+                "-k",
+                "et_open",
+                "-k",
+                "v7",
+                "-m",
+                "slow or not slow",
+                "--cov-fail-under=0"
+            ],
             "console": "integratedTerminal",
             "justMyCode": false,
             "subProcess": true,
@@ -130,7 +155,13 @@
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
-            "args": ["-k", "snort_community", "-m", "slow or not slow", "--cov-fail-under=0"],
+            "args": [
+                "-k",
+                "snort_community",
+                "-m",
+                "slow or not slow",
+                "--cov-fail-under=0"
+            ],
             "console": "integratedTerminal",
             "justMyCode": false,
             "subProcess": true,
