@@ -1,6 +1,7 @@
 """The `suricata_check.utils` module contains several utilities for the suricata-check main program and the checkers."""
 
 from suricata_check.utils._path import find_rules_file
+from suricata_check.utils._click import ClickHandler
 from suricata_check.utils.checker import (
     are_rule_options_always_put_before,
     are_rule_options_equal_to_regex,

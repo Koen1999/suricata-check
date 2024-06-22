@@ -23,7 +23,10 @@ if sys.path[0] != _suricata_check_path:
 
 from suricata_check import __version__  # noqa: E402
 from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
-from suricata_check.utils import (  # noqa: E402
+from suricata_check.utils._click import ClickHandler  # noqa: E402
+from suricata_check.utils._path import find_rules_file  # noqa: E402
+from suricata_check.utils.checker import check_rule_option_recognition  # noqa: E402
+from suricata_check.utils.typing import (  # noqa: E402
     EXTENSIVE_SUMMARY_TYPE,
     ISSUES_TYPE,
     RULE_REPORTS_TYPE,
@@ -32,8 +35,6 @@ from suricata_check.utils import (  # noqa: E402
     OutputReport,
     OutputSummary,
     RuleReport,
-    check_rule_option_recognition,
-    find_rules_file,
 )
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
@@ -119,7 +120,7 @@ def main(
                 filename=os.path.join(out, "suricata-check.log"),
                 delay=True,
             ),
-            logging.StreamHandler(stream=click.get_text_stream("stdout")),
+            ClickHandler(),
         ),
         force=os.environ.get("SURICATA_CHECK_FORCE_LOGGING", False) == "TRUE",
     )
@@ -200,7 +201,7 @@ def _write_output(
 
                 msg = f"[{code}] Line {line}, sid {rule['sid']}: {issue_msg}"
                 fast_fh.write(msg + "\n")
-                click.echo(msg)
+                click.secho(msg, color=True, fg="blue")
 
     if output.summary is not None:
         with open(
@@ -220,10 +221,8 @@ def _write_output(
                 + "\n\n",
             )
 
-            click.echo(f"Total issues found: {overall_summary['Total Issues']}")
-            click.echo(
-                f"Rules with Issues found: {overall_summary['Rules with Issues']}",
-            )
+            click.secho(f"Total issues found: {overall_summary['Total Issues']}", color=True, bold=True, fg="blue")
+            click.secho(f"Rules with Issues found: {overall_summary['Rules with Issues']}", color=True, bold=True, fg="blue")
 
             issues_by_group: SIMPLE_SUMMARY_TYPE = summary.issues_by_group
 
