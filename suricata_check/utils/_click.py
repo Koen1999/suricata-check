@@ -15,7 +15,7 @@ class ClickHandler(logging.Handler):
         if record.levelno == logging.getLevelName("INFO"):
             click.secho(msg, color=True)
         if record.levelno == logging.getLevelName("WARNING"):
-            click.secho(msg, color=True, bold=True, fg="orange")
+            click.secho(msg, color=True, bold=True, fg="yellow")
         if record.levelno == logging.getLevelName("ERROR"):
             click.secho(msg, color=True, bold=True, fg="red")
         if record.levelno == logging.getLevelName("CRITICAL"):
