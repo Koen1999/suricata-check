@@ -13,14 +13,16 @@ from suricata_check.utils.regex import (
     ALL_METADATA_KEYWORDS,
     BUFFER_KEYWORDS,
     STICKY_BUFFER_NAMING,
+    get_regex_provider,
     get_variable_groups,
-    regex_provider,
 )
 
-LRU_CACHE_SIZE = 10
+_LRU_CACHE_SIZE = 10
 
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
+
+_regex_provider = get_regex_provider()
 
 
 def check_rule_option_recognition(rule: idstools.rule.Rule) -> None:
@@ -31,33 +33,31 @@ def check_rule_option_recognition(rule: idstools.rule.Rule) -> None:
     for option in rule["options"]:
         name = option["name"]
         if name not in ALL_KEYWORDS:
-            logger.warning(
+            _logger.warning(
                 "Option %s from rule %i is not recognized.",
                 name,
                 rule["sid"],
             )
 
     for option in rule["metadata"]:
-        name = regex_provider.split(r"\s+", option)[0]
+        name = _regex_provider.split(r"\s+", option)[0]
         if name not in ALL_METADATA_KEYWORDS:
-            logger.warning(
+            _logger.warning(
                 "Metadata option %s from rule %i is not recognized.",
                 name,
                 rule["sid"],
             )
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
     """Checks whether a rule has a certain option set.
 
     Args:
-    ----
         rule (idstools.rule.Rule): rule to be inspected
         name (str): name of the option
 
     Returns:
-    -------
         bool: True iff the option is set atleast once
 
     """
@@ -71,7 +71,7 @@ def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
         "dest_port",
     ):
         if name not in ALL_KEYWORDS:
-            logger.warning("Requested a non-recognized keyword: %s", name)
+            _logger.warning("Requested a non-recognized keyword: %s", name)
 
         for option in rule["options"]:
             if option["name"] == name:
@@ -98,7 +98,7 @@ def get_suboptions(rule: idstools.rule.Rule, name: str) -> Mapping[str, Optional
     if value is not None:
         values = value.split(",")
         suboptions: list[Optional[tuple[str, Optional[str]]]] = [
-            _split_suboption(suboption) for suboption in values
+            __split_suboption(suboption) for suboption in values
         ]
         # Filter out suboptions that could not be parsed
         valid_suboptions = [
@@ -108,7 +108,7 @@ def get_suboptions(rule: idstools.rule.Rule, name: str) -> Mapping[str, Optional
     return dict(valid_suboptions)
 
 
-def _split_suboption(suboption: str) -> Optional[tuple[str, Optional[str]]]:
+def __split_suboption(suboption: str) -> Optional[tuple[str, Optional[str]]]:
     suboption = suboption.strip()
 
     splitted = suboption.split(" ")
@@ -119,7 +119,7 @@ def _split_suboption(suboption: str) -> Optional[tuple[str, Optional[str]]]:
     if len(splitted) == 2:  # noqa: PLR2004
         return tuple(splitted)  # type: ignore reportReturnType
 
-    logger.warning("Failed to split suboption: %s", suboption)
+    _logger.warning("Failed to split suboption: %s", suboption)
     return None
 
 
@@ -140,22 +140,20 @@ def count_rule_options(
     """Counts how often an option is set in a rule.
 
     Args:
-    ----
         rule (idstools.rule.Rule): rule to be inspected
         name (Union[str, Iterable[str]]): name or names of the option
 
     Returns:
-    -------
         int: The number of times an option is set
 
     """
     if not isinstance(name, str):
         name = tuple(sorted(name))
-    return _count_rule_options(rule, name)
+    return __count_rule_options(rule, name)
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
-def _count_rule_options(
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __count_rule_options(
     rule: idstools.rule.Rule,
     name: Union[str, Iterable[str]],
 ) -> int:
@@ -176,7 +174,7 @@ def _count_rule_options(
         "dest_port",
     ):
         if name not in ALL_KEYWORDS:
-            logger.warning("Requested a non-recognized keyword: %s", name)
+            _logger.warning("Requested a non-recognized keyword: %s", name)
 
         for option in rule["options"]:
             if option["name"] == name:
@@ -188,19 +186,17 @@ def _count_rule_options(
     return count
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
     """Retrieves one option of a rule with a certain name.
 
     If an option is set multiple times, it returns only one indeterminately.
 
     Args:
-    ----
         rule (idstools.rule.Rule): rule to be inspected
         name (str): name of the option
 
     Returns:
-    -------
         Optional[str]: The value of the option or None if it was not set.
 
     """
@@ -208,12 +204,12 @@ def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
 
     if len(options) == 0:
         msg = f"Option {name} not found in rule."
-        logger.debug(msg)
+        _logger.debug(msg)
         return None
 
     if len(options) == 0:
         msg = f"Cannot unambiguously determine the value of {name} because it is set multiple times."
-        logger.warning(msg)
+        _logger.warning(msg)
         return None
 
     return options[0]
@@ -226,22 +222,20 @@ def get_rule_options(
     """Retrieves all options of a rule with a certain name.
 
     Args:
-    ----
         rule (idstools.rule.Rule): rule to be inspected
         name (Union[str, Iterable[str]]): name or names of the option
 
     Returns:
-    -------
         Sequence[str]: The values of the option.
 
     """
     if not isinstance(name, str):
         name = tuple(sorted(name))
-    return _get_rule_options(rule, name)
+    return __get_rule_options(rule, name)
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
-def _get_rule_options(
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __get_rule_options(
     rule: idstools.rule.Rule,
     name: Union[str, Iterable[str]],
     warn_not_found: bool = True,
@@ -250,7 +244,7 @@ def _get_rule_options(
 
     if not isinstance(name, str):
         for single_name in name:
-            values.extend(_get_rule_options(rule, single_name, warn_not_found=False))
+            values.extend(__get_rule_options(rule, single_name, warn_not_found=False))
         return values
 
     if name not in (
@@ -263,7 +257,7 @@ def _get_rule_options(
         "dest_port",
     ):
         if name not in ALL_KEYWORDS:
-            logger.warning("Requested a non-recognized keyword: %s", name)
+            _logger.warning("Requested a non-recognized keyword: %s", name)
 
         for option in rule["options"]:
             if option["name"] == name:
@@ -273,7 +267,7 @@ def _get_rule_options(
 
     if warn_not_found and len(values) == 0:
         msg = f"Option {name} not found in rule {rule}."
-        logger.debug(msg)
+        _logger.debug(msg)
 
     return values
 
@@ -284,13 +278,11 @@ def is_rule_option_equal_to(rule: idstools.rule.Rule, name: str, value: str) -> 
     If the option is set multiple times, it will return True if atleast one option matches the value.
 
     Args:
-    ----
         rule (idstools.rule.Rule): rule to be inspected
         name (str): name of the option
         value (str): value to check for
 
     Returns:
-    -------
         bool: True iff the rule has the option set to the value atleast once
 
     """
@@ -316,13 +308,11 @@ def is_rule_option_equal_to_regex(
     If the option is set multiple times, it will return True if atleast one option matches the regex.
 
     Args:
-    ----
         rule (idstools.rule.Rule): rule to be inspected
         name (str): name of the option
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
     Returns:
-    -------
         bool: True iff the rule has atleast one option matching the regex
 
     """
@@ -348,13 +338,11 @@ def are_rule_options_equal_to_regex(
     If multiple options are set, it will return True if atleast one option matches the regex.
 
     Args:
-    ----
         rule (idstools.rule.Rule): rule to be inspected
         names (Iterable[str]): names of the options
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
     Returns:
-    -------
         bool: True iff the rule has atleast one option matching the regex
 
     """
@@ -375,13 +363,11 @@ def is_rule_option_one_of(
     If the option is set multiple times, it will return True if atleast one option matches a value.
 
     Args:
-    ----
         rule (idstools.rule.Rule): rule to be inspected
         name (str): name of the option
         possible_values (Iterable[str]): values to check for
 
     Returns:
-    -------
         bool: True iff the rule has the option set to one of the values atleast once
 
     """
@@ -409,7 +395,7 @@ def get_rule_sticky_buffer_naming(rule: idstools.rule.Rule) -> list[tuple[str, s
     return sticky_buffer_naming
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
     """Returns a list of variable groups such as $HTTP_SERVERS in a rule."""
     variable_groups = []
@@ -428,7 +414,7 @@ def get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
     return variable_groups
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def get_rule_option_positions(
     rule: idstools.rule.Rule, name: str, sequence: Optional[tuple[str, ...]] = None
 ) -> Sequence[int]:
@@ -448,13 +434,13 @@ def get_rule_option_positions(
 
     if not provided_sequence and len(positions) == 0 and is_rule_option_set(rule, name):
         msg = f"Cannot determine position of {name} option since it is not part of the sequence of detection keywords."
-        logger.critical(msg)
+        _logger.critical(msg)
         raise ValueError(msg)
 
     return tuple(sorted(positions))
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def get_rule_option_position(rule: idstools.rule.Rule, name: str) -> Optional[int]:
     """Finds the position of an option in the rule body.
 
@@ -463,7 +449,7 @@ def get_rule_option_position(rule: idstools.rule.Rule, name: str) -> Optional[in
     positions = get_rule_option_positions(rule, name)
 
     if len(positions) == 0:
-        logger.debug(
+        _logger.debug(
             "Cannot unambigously determine the position of the %s option since it it not set.",
             name,
         )
@@ -472,7 +458,7 @@ def get_rule_option_position(rule: idstools.rule.Rule, name: str) -> Optional[in
     if len(positions) == 1:
         return positions[0]
 
-    logger.debug(
+    _logger.debug(
         "Cannot unambigously determine the position of the %s option since it is set multiple times.",
         name,
     )
@@ -484,7 +470,7 @@ def is_rule_option_first(rule: idstools.rule.Rule, name: str) -> Optional[int]:
     position = get_rule_option_position(rule, name)
 
     if position is None:
-        logger.debug("Cannot unambiguously determine if option %s first.", name)
+        _logger.debug("Cannot unambiguously determine if option %s first.", name)
         return None
 
     if position == 0:
@@ -498,7 +484,7 @@ def is_rule_option_last(rule: idstools.rule.Rule, name: str) -> Optional[bool]:
     position = get_rule_option_position(rule, name)
 
     if position is None:
-        logger.debug("Cannot unambiguously determine if option %s last.", name)
+        _logger.debug("Cannot unambiguously determine if option %s last.", name)
         return None
 
     if position == len(rule["options"]) - 1:
@@ -513,11 +499,11 @@ def get_rule_options_positions(
     sequence: Optional[tuple[str, ...]] = None,
 ) -> Iterable[int]:
     """Finds the positions of several options in the rule body."""
-    return _get_rule_options_positions(rule, tuple(sorted(names)), sequence=sequence)
+    return __get_rule_options_positions(rule, tuple(sorted(names)), sequence=sequence)
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
-def _get_rule_options_positions(
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __get_rule_options_positions(
     rule: idstools.rule.Rule,
     names: Iterable[str],
     sequence: Optional[tuple[str, ...]] = None,
@@ -537,20 +523,20 @@ def is_rule_option_put_before(
     sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     """Checks whether a rule option is placed before one or more other options."""
-    return _is_rule_option_put_before(
+    return __is_rule_option_put_before(
         rule, name, tuple(sorted(other_names)), sequence=sequence
     )
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
-def _is_rule_option_put_before(
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __is_rule_option_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
     sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     if len(other_names) == 0:
-        logger.debug(
+        _logger.debug(
             "Cannot unambiguously determine if option %s is put before empty Iterable of other options.",
             name,
         )
@@ -559,7 +545,7 @@ def _is_rule_option_put_before(
     positions = get_rule_option_positions(rule, name, sequence=sequence)
 
     if name in other_names:
-        logger.debug("Excluding name %s from other_names because of overlap.", name)
+        _logger.debug("Excluding name %s from other_names because of overlap.", name)
         other_names = set(other_names).difference({name})
 
     other_positions = get_rule_options_positions(rule, other_names, sequence=sequence)
@@ -578,20 +564,20 @@ def is_rule_option_always_put_before(
     sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     """Checks whether a rule option is placed before one or more other options."""
-    return _is_rule_option_always_put_before(
+    return __is_rule_option_always_put_before(
         rule, name, tuple(sorted(other_names)), sequence=sequence
     )
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
-def _is_rule_option_always_put_before(
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __is_rule_option_always_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
     sequence: Optional[tuple[str, ...]] = None,
 ) -> Optional[bool]:
     if len(other_names) == 0:
-        logger.debug(
+        _logger.debug(
             "Cannot unambiguously determine if option %s is put before empty Iterable of other options.",
             name,
         )
@@ -600,7 +586,7 @@ def _is_rule_option_always_put_before(
     positions = get_rule_option_positions(rule, name, sequence=sequence)
 
     if name in other_names:
-        logger.debug("Excluding name %s from other_names because of overlap.", name)
+        _logger.debug("Excluding name %s from other_names because of overlap.", name)
         other_names = set(other_names).difference({name})
 
     other_positions = get_rule_options_positions(rule, other_names, sequence=sequence)
@@ -620,13 +606,13 @@ def are_rule_options_put_before(
 ) -> Optional[bool]:
     """Checks whether rule options are placed before one or more other options."""
     if len(other_names) == 0:
-        logger.debug(
+        _logger.debug(
             "Cannot unambiguously determine if an empty Iterable of options are put before other options %s.",
             other_names,
         )
         return None
     if len(other_names) == 0:
-        logger.debug(
+        _logger.debug(
             "Cannot unambiguously determine if options %s are put before empty Iterable of other options.",
             names,
         )
@@ -646,13 +632,13 @@ def are_rule_options_always_put_before(
 ) -> Optional[bool]:
     """Checks whether rule options are placed before one or more other options."""
     if len(other_names) == 0:
-        logger.debug(
+        _logger.debug(
             "Cannot unambiguously determine if an empty Iterable of options are put before other options %s.",
             other_names,
         )
         return None
     if len(other_names) == 0:
-        logger.debug(
+        _logger.debug(
             "Cannot unambiguously determine if options %s are put before empty Iterable of other options.",
             names,
         )
@@ -664,17 +650,16 @@ def are_rule_options_always_put_before(
     return True
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def select_rule_options_by_regex(
-    rule: idstools.rule.Rule,
-    regex: regex_provider.Pattern,
+    rule: idstools.rule.Rule, regex  # noqa: ANN001
 ) -> Iterable[str]:
     """Selects rule options present in rule matching a regular expression."""
     options = []
 
     for option in rule["options"]:
         name = option["name"]
-        if regex_provider.match(regex, name):
+        if _regex_provider.match(regex, name):
             options.append(name)
 
     return tuple(sorted(options))
@@ -700,7 +685,7 @@ def get_rule_detection_keyword_sequences(
             sequences[sequence_i].append(name)
 
     if len(sequences) <= 1 and len(sequences[0]) == 0:
-        logger.debug(
+        _logger.debug(
             "No sequences found seperated by %s in rule %s",
             seperator_keywords,
             rule["raw"],
@@ -712,7 +697,7 @@ def get_rule_detection_keyword_sequences(
 
     result = tuple(tuple(sequence) for sequence in sequences)
 
-    logger.debug(
+    _logger.debug(
         "Detected sequences %s seperated by %s in rule %s",
         result,
         seperator_keywords,

@@ -10,3 +10,14 @@ from suricata_check.checkers.styleguide import (
     SidChecker,
     WhitespaceChecker,
 )
+
+__all__ = [
+    "interface",
+    "MandatoryChecker",
+    "PrincipleChecker",
+    "MsgChecker",
+    "OrderChecker",
+    "OverallChecker",
+    "SidChecker",
+    "WhitespaceChecker",
+]

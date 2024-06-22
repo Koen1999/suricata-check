@@ -5,7 +5,6 @@ import sys
 import tarfile
 import urllib.request
 import warnings
-import zipfile
 
 import idstools.rule
 import pytest
@@ -14,7 +13,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 import suricata_check
 from click.testing import CliRunner
 
-regex_provider = suricata_check.utils.get_regex_provider()
+_regex_provider = suricata_check.utils.regex.get_regex_provider()
 
 ET_OPEN_URLS = {
     "v4": "https://rules.emergingthreats.net/open/suricata-4.0/emerging-all.rules.tar.gz",
@@ -27,7 +26,7 @@ SNORT_COMMUNITY_URL = (
 
 
 @pytest.fixture(autouse=True)
-def _run_around_tests():
+def __run_around_tests():
     # Clean up from previous tests.
     if os.path.exists("tests/data/out") and os.path.isdir("tests/data/out"):
         for f in os.listdir("tests/data/out"):
@@ -49,7 +48,7 @@ def test_main_cli():
         catch_exceptions=False,
     )
 
-    _check_log_file()
+    __check_log_file()
 
     if result.exit_code != 0:
         pytest.fail(result.output)
@@ -69,7 +68,7 @@ def test_main_cli_single_rule():
         catch_exceptions=False,
     )
 
-    _check_log_file()
+    __check_log_file()
 
     if result.exit_code != 0:
         pytest.fail(result.output)
@@ -112,7 +111,7 @@ def test_main_cli_integration_et_open(version, et_open_url):
         catch_exceptions=False,
     )
 
-    _check_log_file()
+    __check_log_file()
 
     if result.exit_code != 0:
         pytest.fail(result.output)
@@ -170,7 +169,7 @@ def test_main():
             ),
         )
 
-    _check_log_file()
+    __check_log_file()
 
     assert excinfo.value.code == 0
 
@@ -187,7 +186,7 @@ def test_main_single_rule():
             ),
         )
 
-    _check_log_file()
+    __check_log_file()
 
     assert excinfo.value.code == 0
 
@@ -231,7 +230,7 @@ def test_version():
         warnings.warn(RuntimeWarning("Version is unknown."))
 
 
-def _check_log_file():
+def __check_log_file():
     log_file = "tests/data/out/suricata-check.log"
 
     if not os.path.exists(log_file):
@@ -240,12 +239,12 @@ def _check_log_file():
 
     with open(log_file) as log_fh:
         for line in log_fh.readlines():
-            if regex_provider.match(
+            if _regex_provider.match(
                 r".+ - .+ - (ERROR|CRITICAL) - .+(?<!Error parsing rule)",
                 line,
             ):
                 pytest.fail(line)
-            if regex_provider.match(r".+ - .+ - (WARNING) - .+", line):
+            if _regex_provider.match(r".+ - .+ - (WARNING) - .+", line):
                 warnings.warn(RuntimeWarning(line))
 
 

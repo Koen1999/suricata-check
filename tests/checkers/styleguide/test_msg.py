@@ -67,7 +67,7 @@ sid:2400000;)""": {
 
 class TestMsg(GenericChecker):
     @pytest.fixture(autouse=True)
-    def _run_around_tests(self):
+    def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)
         self.checker = CHECKER_CLASS()
 

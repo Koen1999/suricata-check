@@ -1,4 +1,4 @@
-# noqa: D100
+"""`MandatoryChecker`."""
 
 import idstools.rule
 

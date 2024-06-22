@@ -1,9 +1,9 @@
-# noqa: D100
+"""`OrderChecker`."""
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
-    are_rule_options_always_put_before,
     are_rule_options_put_before,
     count_rule_options,
     get_rule_detection_keyword_sequences,
@@ -16,29 +16,25 @@ from suricata_check.utils.checker import (
 )
 from suricata_check.utils.regex import (
     ALL_DETECTION_KEYWORDS,
-    ALL_MODIFIER_KEYWORDS,
-    ALL_TRANSFORMATION_KEYWORDS,
     BUFFER_KEYWORDS,
     CONTENT_KEYWORDS,
     FLOW_STREAM_KEYWORDS,
-    MATCH_LOCATION_KEYWORDS,
     MODIFIER_KEYWORDS,
     OTHER_PAYLOAD_KEYWORDS,
     POINTER_MOVEMENT_KEYWORDS,
     SIZE_KEYWORDS,
     TRANSFORMATION_KEYWORDS,
-    get_options_regex,
     get_regex_provider,
     get_rule_body,
 )
 from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
-regex_provider = get_regex_provider()
+_regex_provider = get_regex_provider()
 
 
 # Regular expressions are placed here such that they are compiled only once.
 # This has a significant impact on the performance.
-REGEX_S210 = regex_provider.compile(
+REGEX_S210 = _regex_provider.compile(
     r"^\(.*content\s*:.*;\s*content\s*:.*;.*(depth|offset)\s*:.*\)$",
 )
 
@@ -47,19 +43,23 @@ class OrderChecker(CheckerInterface):
     """The `OrderChecker` contains several checks based on the Suricata syntax that are critical.
 
     Note that the correct ordering of detection options is as follows:
-    1. Buffer
-    2. Size
-    3. Transformation
-    4. Coontent
-    5. Pointer movement
-    6. Fast pattern
-    7. Nocase
-    8. Other payload options
+        1. Buffer
+        2. Size
+        3. Transformation
+        4. Coontent
+        5. Pointer movement
+        6. Fast pattern
+        7. Nocase
+        8. Other payload options
 
     Codes S200-S209 report on the non-standard ordering of common options.
+
     Codes S210-S219 report on the non-standard ordering of content matches.
+
     Codes S220-S229 report on the non-standard ordering of flow options.
+
     Codes S230-S239 report on the non-standard ordering of detection options.
+
     Codes S240-S249 report on the non-standard ordering of threshold options.
     """
 

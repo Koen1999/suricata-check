@@ -40,7 +40,7 @@ from suricata_check.utils.typing import (  # noqa: E402
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @click.command()
@@ -83,19 +83,11 @@ def main(
     log_level: LogLevel = "DEBUG",
     evaluate_disabled: bool = False,
 ) -> None:
-    """Processes all rules inside a rules file and outputs a list of issues found.
-
-    Args:
-    ----
-    out: A path to a directory where the output will be written.
-    rules: A path to a Suricata rules file or a directory in which a single rule file can be discovered
-    single_rule: A single Suricata rule to be checked. If set, the rules file will be ignored.
-    log_level: The verbosity level for logging.
-    evaluate_disabled: A flag indicating whether disabled rules should be evaluated.
+    """The `suricata-check` command processes all rules inside a rules file and outputs a list of detected issues.
 
     Raises:
-    ------
       BadParameter: If provided arguments are invalid.
+
       RuntimeError: If no checkers could be automatically discovered.
 
     """
@@ -126,17 +118,17 @@ def main(
     )
 
     # Log the arguments:
-    logger.info("Running suricata-check with the following arguments:")
-    logger.info("out: %s", out)
-    logger.info("rules: %s", rules)
-    logger.info("single_rule: %s", single_rule)
-    logger.info("log_level: %s", log_level)
-    logger.info("evaluate_disabled: %s", evaluate_disabled)
+    _logger.info("Running suricata-check with the following arguments:")
+    _logger.info("out: %s", out)
+    _logger.info("rules: %s", rules)
+    _logger.info("single_rule: %s", single_rule)
+    _logger.info("log_level: %s", log_level)
+    _logger.info("evaluate_disabled: %s", evaluate_disabled)
 
-    logger.debug("Platform: %s", sys.platform)
-    logger.debug("Python version: %s", sys.version)
-    logger.debug("suricata-check path: %s", _suricata_check_path)
-    logger.debug("suricata-check version: %s", __version__)
+    _logger.debug("Platform: %s", sys.platform)
+    _logger.debug("Python version: %s", sys.version)
+    _logger.debug("suricata-check path: %s", _suricata_check_path)
+    _logger.debug("suricata-check version: %s", __version__)
 
     checkers = get_checkers()
 
@@ -146,16 +138,16 @@ def main(
         # Verify that a rule was parsed correctly.
         if rule is None:
             msg = f"Error parsing rule from user input: {single_rule}"
-            logger.critical(msg)
+            _logger.critical(msg)
             raise click.BadParameter(f"Error: {msg}")
 
-        logger.debug("Processing rule: %s", rule["sid"])
+        _logger.debug("Processing rule: %s", rule["sid"])
 
         check_rule_option_recognition(rule)
 
         rule_report = analyze_rule(rule, checkers=checkers)
 
-        _write_output(OutputReport(rules=[rule_report]), out)
+        __write_output(OutputReport(rules=[rule_report]), out)
 
         # Return here so no rules file is processed.
         return
@@ -165,14 +157,14 @@ def main(
 
     output = process_rules_file(rules, evaluate_disabled, checkers=checkers)
 
-    _write_output(output, out)
+    __write_output(output, out)
 
 
-def _write_output(
+def __write_output(
     output: OutputReport,
     out: str,
 ) -> None:
-    logger.info(
+    _logger.info(
         "Writing output to suricata-check.jsonl and suricata-check-fast.log in %s",
         os.path.abspath(out),
     )
@@ -221,8 +213,18 @@ def _write_output(
                 + "\n\n",
             )
 
-            click.secho(f"Total issues found: {overall_summary['Total Issues']}", color=True, bold=True, fg="blue")
-            click.secho(f"Rules with Issues found: {overall_summary['Rules with Issues']}", color=True, bold=True, fg="blue")
+            click.secho(
+                f"Total issues found: {overall_summary['Total Issues']}",
+                color=True,
+                bold=True,
+                fg="blue",
+            )
+            click.secho(
+                f"Rules with Issues found: {overall_summary['Rules with Issues']}",
+                color=True,
+                bold=True,
+                fg="blue",
+            )
 
             issues_by_group: SIMPLE_SUMMARY_TYPE = summary.issues_by_group
 
@@ -255,18 +257,15 @@ def process_rules_file(
     """Processes a rule file and returns a list of rules and their issues.
 
     Args:
-    ----
     rules: A path to a Suricata rules file.
     evaluate_disabled: A flag indicating whether disabled rules should be evaluated.
     checkers: The checkers to be used when processing the rule file.
 
     Returns:
-    -------
-    A list of rules and their issues.
+        A list of rules and their issues.
 
     Raises:
-    ------
-      RuntimeError: If no checkers could be automatically discovered.
+        RuntimeError: If no checkers could be automatically discovered.
 
     """
     if checkers is None:
@@ -282,10 +281,10 @@ def process_rules_file(
     ):
         if len(checkers) == 0:
             msg = "No checkers provided for processing rules."
-            logger.error(msg)
+            _logger.error(msg)
             raise RuntimeError(msg)
 
-        logger.info("Processing rule file: %s", rules)
+        _logger.info("Processing rule file: %s", rules)
 
         for number, line in enumerate(rules_fh.readlines(), start=1):
             if line.startswith("#"):
@@ -293,7 +292,7 @@ def process_rules_file(
                     # Verify that this line is a rule and not a comment
                     if idstools.rule.parse(line) is None:
                         # Log the comment since it may be a invalid rule
-                        logger.warning("Ignoring comment on line %i: %s", number, line)
+                        _logger.warning("Ignoring comment on line %i: %s", number, line)
                         continue
                 else:
                     # Skip the rule
@@ -307,10 +306,10 @@ def process_rules_file(
 
             # Verify that a rule was parsed correctly.
             if rule is None:
-                logger.error("Error parsing rule on line %i: %s", number, line)
+                _logger.error("Error parsing rule on line %i: %s", number, line)
                 continue
 
-            logger.debug("Processing rule: %s on line %i", rule["sid"], number)
+            _logger.debug("Processing rule: %s on line %i", rule["sid"], number)
 
             check_rule_option_recognition(rule)
 
@@ -321,7 +320,7 @@ def process_rules_file(
             rule_report.line = number
             output.rules.append(rule_report)
 
-    logger.info("Completed processing rule file: %s", rules)
+    _logger.info("Completed processing rule file: %s", rules)
 
     output.summary = __summarize_output(output)
 
@@ -332,8 +331,7 @@ def process_rules_file(
 def get_checkers() -> Sequence[CheckerInterface]:
     """Auto discovers all available checkers that implement the CheckerInterface.
 
-    Returns
-    -------
+    Returns:
     A list of available checkers that implement the CheckerInterface.
 
     """
@@ -341,7 +339,7 @@ def get_checkers() -> Sequence[CheckerInterface]:
     for checker in CheckerInterface.__subclasses__():
         checkers.append(checker())
 
-    logger.info(
+    _logger.info(
         "Discovered checkers: [%s]",
         ", ".join([c.__class__.__name__ for c in checkers]),
     )
@@ -353,7 +351,7 @@ def get_checkers() -> Sequence[CheckerInterface]:
                 continue
             if not set(checker1.codes).isdisjoint(checker2.codes):
                 msg = f"Checker {checker1.__class__.__name__} and {checker2.__class__.__name__} have overlapping codes."
-                logger.error(msg)
+                _logger.error(msg)
 
     return sorted(checkers, key=lambda x: x.__class__.__name__)
 
@@ -365,12 +363,10 @@ def analyze_rule(
     """Checks a rule and returns a dictionary containing the rule and a list of issues found.
 
     Args:
-    ----
     rule: The rule to be checked.
     checkers: The checkers to be used to check the rule.
 
     Returns:
-    -------
     A list of issues found in the rule.
     Each issue is typed as a `dict`.
 
@@ -394,11 +390,9 @@ def __summarize_rule(
     """Summarizes the issues found in a rule.
 
     Args:
-    ----
     rule: The rule output dictionary to be summarized.
 
     Returns:
-    -------
     A dictionary containing a summary of all issues found in the rule.
 
     """
@@ -428,11 +422,9 @@ def __summarize_output(
     """Summarizes the issues found in a rules file.
 
     Args:
-    ----
     output: The unsammarized output of the rules file containing all rules and their issues.
 
     Returns:
-    -------
     A dictionary containing a summary of all issues found in the rules file.
 
     """

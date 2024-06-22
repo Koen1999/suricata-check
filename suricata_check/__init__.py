@@ -8,3 +8,13 @@ from suricata_check.suricata_check import (
     main,
     process_rules_file,
 )
+
+__all__ = (
+    "__version__",
+    "analyze_rule",
+    "get_checkers",
+    "main",
+    "process_rules_file",
+    "checkers",
+    "utils",
+)

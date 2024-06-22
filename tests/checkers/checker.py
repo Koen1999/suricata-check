@@ -11,14 +11,14 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import suricata_check
 
-regex_provider = suricata_check.utils.get_regex_provider()
+_regex_provider = suricata_check.utils.regex.get_regex_provider()
 
 
 class GenericChecker:
     checker: suricata_check.checkers.interface.CheckerInterface
 
     @pytest.fixture(autouse=True)
-    def _run_around_tests(self):
+    def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)
 
     @lru_cache(maxsize=1)
@@ -90,7 +90,7 @@ class GenericChecker:
 
     def test_code_structure(self):
         """Asserts the checker only emits codes following the allowed structure."""
-        regex = regex_provider.compile(r"[A-Z]{1,}[0-9]{3}")
+        regex = _regex_provider.compile(r"[A-Z]{1,}[0-9]{3}")
         for code in self.checker.codes:
             if regex.match(code) is None:
                 pytest.fail(code)

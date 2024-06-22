@@ -1,6 +1,6 @@
 """The `suricata_check.typing` module contains all types used by the `suricata-check` package."""
 
-from collections.abc import Iterable, MutableMapping, MutableSequence
+from collections.abc import MutableMapping, MutableSequence
 from dataclasses import dataclass, field
 from typing import (
     Optional,

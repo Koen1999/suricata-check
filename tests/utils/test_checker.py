@@ -1,7 +1,6 @@
 import os
 import sys
 from collections.abc import Iterable
-from math import e
 
 import idstools.rule
 import pytest
@@ -26,7 +25,7 @@ sid:1;)""",
         ("sid", [3]),
         ("pcre", []),
     ):
-        result = suricata_check.utils.get_rule_option_positions(rule, name)
+        result = suricata_check.utils.checker.get_rule_option_positions(rule, name)
         if tuple(sorted(result)) != tuple(sorted(expected)):
             pytest.fail(str((name, expected, result, rule["raw"])))
 
@@ -171,7 +170,7 @@ performance_impact Low, signature_severity Minor;)""",
 
     sequences = {
         tuple(sequence)
-        for sequence in suricata_check.utils.get_rule_detection_keyword_sequences(
+        for sequence in suricata_check.utils.checker.get_rule_detection_keyword_sequences(
             rule, seperator_keywords=seperator_keywords
         )
     }
@@ -204,13 +203,13 @@ sid:1;)""",
         ("sid", 3),
         ("pcre", None),
     ):
-        result = suricata_check.utils.get_rule_option_position(rule, name)
+        result = suricata_check.utils.checker.get_rule_option_position(rule, name)
         if result != expected:
             pytest.fail(str((name, expected, result, rule["raw"])))
 
 
 @pytest.hookimpl(tryfirst=True)
-def test_get_rule_options_positions():
+def test__get_rule_options_positions():
     rule = idstools.rule.parse(
         """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
@@ -222,7 +221,7 @@ sid:1;)""",
     names = ["msg", "content", "pcre"]
     expected = [0, 1, 2]
 
-    result = suricata_check.utils.get_rule_options_positions(rule, names)
+    result = suricata_check.utils.checker.get_rule_options_positions(rule, names)
     if tuple(sorted(result)) != tuple(sorted(expected)):
         pytest.fail(str((names, expected, result, rule["raw"])))
 

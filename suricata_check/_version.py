@@ -4,7 +4,7 @@ import subprocess
 from importlib.metadata import PackageNotFoundError, version
 
 
-def _get_git_revision_short_hash() -> str:
+def __get_git_revision_short_hash() -> str:
     return (
         subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
         .decode("ascii")
@@ -12,7 +12,7 @@ def _get_git_revision_short_hash() -> str:
     )
 
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def get_version() -> str:
@@ -20,14 +20,14 @@ def get_version() -> str:
 
     git_dir = os.path.join(os.path.dirname(__file__), "..", ".git")
     if os.path.exists(git_dir):
-        v = _get_git_revision_short_hash()
-        logger.debug("Detected suricata-check version using git: %s", v)
+        v = __get_git_revision_short_hash()
+        _logger.debug("Detected suricata-check version using git: %s", v)
     else:
         try:
             v = version("suricata-check")
-            logger.debug("Detected suricata-check version using importlib: %s", v)
+            _logger.debug("Detected suricata-check version using importlib: %s", v)
         except PackageNotFoundError:
-            logger.debug("Failed to detect suricata-check version: %s", v)
+            _logger.debug("Failed to detect suricata-check version: %s", v)
 
     return v
 

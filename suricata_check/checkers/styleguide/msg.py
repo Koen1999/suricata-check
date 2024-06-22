@@ -1,4 +1,5 @@
-# noqa: D100
+"""`MsgChecker`."""
+
 import logging
 from collections.abc import Mapping, Sequence
 
@@ -6,7 +7,6 @@ import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
-    get_rule_option,
     is_rule_option_equal_to_regex,
     is_rule_option_set,
     is_rule_suboption_set,
@@ -14,7 +14,7 @@ from suricata_check.utils.checker import (
 from suricata_check.utils.regex import get_regex_provider
 from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
-Msg_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
+MSG_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
     "local": [(1000000, 1999999)],
     "ET OPEN": [
         (2000000, 2103999),
@@ -24,19 +24,19 @@ Msg_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
     "ETPRO": [(2800000, 2899999)],
 }
 
-regex_provider = get_regex_provider()
+_regex_provider = get_regex_provider()
 
-S400_REGEX = regex_provider.compile(
+_S400_REGEX = _regex_provider.compile(
     r"""^"[A-Z0-9 ]+ [A-Z0-9]+ (?![A-Z0-9 ]+ ).*( .*)?"$"""
 )
-MALWARE_REGEX = regex_provider.compile(r"^.*(malware).*$", regex_provider.IGNORECASE)
-S401_REGEX = regex_provider.compile(r"""^".* [a-zA-Z0-9]+/[a-zA-Z0-9]+ .*"$""")
-VAGUE_KEYWORDS = ("possible", "unknown")
-S402_REGEX = regex_provider.compile(
-    r"^.*({}).*$".format("|".join(VAGUE_KEYWORDS)), regex_provider.IGNORECASE
+_MALWARE_REGEX = _regex_provider.compile(r"^.*(malware).*$", _regex_provider.IGNORECASE)
+_S401_REGEX = _regex_provider.compile(r"""^".* [a-zA-Z0-9]+/[a-zA-Z0-9]+ .*"$""")
+_VAGUE_KEYWORDS = ("possible", "unknown")
+_S402_REGEX = _regex_provider.compile(
+    r"^.*({}).*$".format("|".join(_VAGUE_KEYWORDS)), _regex_provider.IGNORECASE
 )
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class MsgChecker(CheckerInterface):
@@ -58,7 +58,7 @@ class MsgChecker(CheckerInterface):
         issues: ISSUES_TYPE = []
 
         if is_rule_option_set(rule, "msg") and not is_rule_option_equal_to_regex(
-            rule, "msg", S400_REGEX
+            rule, "msg", _S400_REGEX
         ):
             issues.append(
                 Issue(
@@ -72,8 +72,8 @@ Consider changing the msg field to `RULESET CATEGORY Description`.\
 
         if (
             is_rule_option_set(rule, "msg")
-            and self._desribes_malware(rule)
-            and not is_rule_option_equal_to_regex(rule, "msg", S401_REGEX)
+            and self.__desribes_malware(rule)
+            and not is_rule_option_equal_to_regex(rule, "msg", _S401_REGEX)
         ):
             issues.append(
                 Issue(
@@ -85,7 +85,7 @@ Consider changing the msg field to include `Platform/malfamily`.\
                 ),
             )
 
-        if is_rule_option_equal_to_regex(rule, "msg", S402_REGEX):
+        if is_rule_option_equal_to_regex(rule, "msg", _S402_REGEX):
             issues.append(
                 Issue(
                     code="S402",
@@ -95,18 +95,18 @@ Consider rephrasing to provide a more clear message for interpreting generated a
 """,
                 ),
             )
-        logger.debug(S402_REGEX.pattern)
+        _logger.debug(_S402_REGEX.pattern)
 
         return issues
 
     @staticmethod
-    def _desribes_malware(rule: idstools.rule.Rule) -> bool:
+    def __desribes_malware(rule: idstools.rule.Rule) -> bool:
         if is_rule_suboption_set(rule, "metadata", "malware_family"):
             return True
 
-        if is_rule_option_equal_to_regex(rule, "msg", MALWARE_REGEX):
+        if is_rule_option_equal_to_regex(rule, "msg", _MALWARE_REGEX):
             return True
 
-        logger.debug("Rule does not describe malware: %s", rule["raw"])
+        _logger.debug("Rule does not describe malware: %s", rule["raw"])
 
         return False

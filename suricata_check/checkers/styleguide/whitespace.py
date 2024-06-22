@@ -1,4 +1,4 @@
-# noqa: D100
+"""`WhitespaceChecker`."""
 
 import idstools.rule
 
@@ -12,41 +12,41 @@ from suricata_check.utils.regex import (
 )
 from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
-regex_provider = get_regex_provider()
+_regex_provider = get_regex_provider()
 
 # Regular expressions are placed here such that they are compiled only once.
 # This has a significant impact on the performance.
-REGEX_S100 = regex_provider.compile(
+REGEX_S100 = _regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\( .*\)\s*(#.*)?$",
 )
-REGEX_S101 = regex_provider.compile(
+REGEX_S101 = _regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.* \)\s*(#.*)?$",
 )
-REGEX_S102 = regex_provider.compile(
+REGEX_S102 = _regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+ :.+\)\s*(#.*)?$",
 )
-REGEX_S103 = regex_provider.compile(
+REGEX_S103 = _regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+: .+\)\s*(#.*)?$",
 )
-REGEX_S104 = regex_provider.compile(
+REGEX_S104 = _regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+ ;.+\)\s*(#.*)?$",
 )
-REGEX_S105 = regex_provider.compile(
+REGEX_S105 = _regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+; \s+.+\)\s*(#.*)?$",
 )
-REGEX_S106 = regex_provider.compile(r'^".*\|.*  .*\|.*"$')
-REGEX_S110 = regex_provider.compile(
+REGEX_S106 = _regex_provider.compile(r'^".*\|.*  .*\|.*"$')
+REGEX_S110 = _regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*\(.+;(?! ).+\)\s*(#.*)?$",
 )
-REGEX_S111 = regex_provider.compile(r'^".*\|.*[a-fA-F0-9]{4}.*\|.*"$')
-REGEX_S120 = regex_provider.compile(
+REGEX_S111 = _regex_provider.compile(r'^".*\|.*[a-fA-F0-9]{4}.*\|.*"$')
+REGEX_S120 = _regex_provider.compile(
     r'^"([^\|]*|(\|[\sa-zA-Z0-9]*\|))*(\\?[\x3a\x3b\x20\x27\x7b\x5c\x2f\x60\x24\x28\x29]+|\\[\x22\x7c]+)([^\|]*|(\|[\sa-zA-Z0-9]*\|))*"$',
 )
-REGEX_S121 = regex_provider.compile(
+REGEX_S121 = _regex_provider.compile(
     r"^\"/.*(\\?[\x3a\x3b\x20\x22\x27\x2f\x60]+|\\[\x7b\x5c\x7c\x24\x28\x29]+).*/[ism]*\"$",
 )
-REGEX_S122 = regex_provider.compile(r'^".*\\.*"$')
-REGEX_S123 = regex_provider.compile(
+REGEX_S122 = _regex_provider.compile(r'^".*\\.*"$')
+REGEX_S123 = _regex_provider.compile(
     r'^".*(?!\\(a|c[0-127]|e|f|n|r|t|0[0-9]{2}|[0-9]{3}|0\{[0-9]{3}\}|x[0-9a-f]{2}|x[0-9a-f]{3}|u[0-9a-f]{4}|d|D|h|H|s|S|v|V|w|W))(\\.).*"$'
 )
 
@@ -55,7 +55,9 @@ class WhitespaceChecker(CheckerInterface):
     """The `WhitespaceChecker` contains several checks based on the Suricata Style guide relating to formatting rules.
 
     Codes S100-S109 report on unneccessary whitespace that should be removed.
+
     Codes S110-S119 report on missing whitespace that should be added.
+
     Codes S120-S129 report on non-standard escaping of special characters.
     """
 

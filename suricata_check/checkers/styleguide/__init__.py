@@ -8,3 +8,11 @@ from suricata_check.checkers.styleguide.order import OrderChecker
 from suricata_check.checkers.styleguide.overall import OverallChecker
 from suricata_check.checkers.styleguide.sid import SidChecker
 from suricata_check.checkers.styleguide.whitespace import WhitespaceChecker
+
+__all__ = [
+    "MsgChecker",
+    "OrderChecker",
+    "OverallChecker",
+    "SidChecker",
+    "WhitespaceChecker",
+]

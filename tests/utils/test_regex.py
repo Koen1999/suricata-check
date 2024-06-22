@@ -8,7 +8,7 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import suricata_check
 
-regex_provider = suricata_check.utils.get_regex_provider()
+_regex_provider = suricata_check.utils.regex.get_regex_provider()
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -27,7 +27,7 @@ def test_rule_regex():
 
             # Ensure our regular expressions are correct
             for raw in (line, rule["raw"]):
-                match = suricata_check.utils.RULE_REGEX.match(raw)
+                match = suricata_check.utils.regex._RULE_REGEX.match(raw)  # type: ignore reportPrivateUsage # noqa: SLF001
                 if match is None:
                     pytest.fail(raw)
 
@@ -45,7 +45,7 @@ def test_rule_regex():
 
 @pytest.hookimpl(tryfirst=True)
 def test_header_regex():
-    regex = regex_provider.compile(r"(\s*#)?\s*([^\(\)]*)\(.*\)")
+    regex = _regex_provider.compile(r"(\s*#)?\s*([^\(\)]*)\(.*\)")
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
@@ -63,7 +63,7 @@ def test_header_regex():
                 match = regex.match(raw)
                 assert match is not None
                 extracted = match.group(2).strip()
-                new_match = suricata_check.utils.HEADER_REGEX.match(
+                new_match = suricata_check.utils.regex.HEADER_REGEX.match(
                     extracted,
                 )
                 if new_match is None:
@@ -75,7 +75,7 @@ def test_header_regex():
 @pytest.hookimpl(tryfirst=True)
 def test_body_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
-        regex = regex_provider.compile(r"^[#a-zA-Z0-9:\$_\.\-<>\s]+(\(.*\))\s*(#.*)?$")
+        regex = _regex_provider.compile(r"^[#a-zA-Z0-9:\$_\.\-<>\s]+(\(.*\))\s*(#.*)?$")
         for line in rules_fh.readlines():
             try:
                 rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
@@ -98,7 +98,7 @@ def test_body_regex():
                 if group is None:
                     pytest.fail(raw)
                 extracted = group.strip()
-                new_match = suricata_check.utils.BODY_REGEX.match(
+                new_match = suricata_check.utils.regex._BODY_REGEX.match(  # type: ignore reportPrivateUsage # noqa: SLF001
                     extracted,
                 )
                 if new_match is None:
@@ -121,7 +121,7 @@ def test_action_regex():
 
             # Ensure our regular expressions are correct
             raw = rule["action"]
-            if suricata_check.utils.ACTION_REGEX.match(raw) is None:
+            if suricata_check.utils.regex._ACTION_REGEX.match(raw) is None:  # type: ignore reportPrivateUsage # noqa: SLF001
                 pytest.fail(raw)
 
 
@@ -141,7 +141,7 @@ def test_direction_regex():
 
             # Ensure our regular expressions are correct
             raw = rule["direction"]
-            if suricata_check.utils.DIRECTION_REGEX.match(raw) is None:
+            if suricata_check.utils.regex._DIRECTION_REGEX.match(raw) is None:  # type: ignore reportPrivateUsage # noqa: SLF001
                 pytest.fail(raw)
 
 
@@ -161,7 +161,7 @@ def test_addr_regex():
 
             # Ensure our regular expressions are correct
             for raw in (rule["source_addr"], rule["dest_addr"]):
-                if suricata_check.utils.ADDR_REGEX.match(raw) is None:
+                if suricata_check.utils.regex._ADDR_REGEX.match(raw) is None:  # type: ignore reportPrivateUsage # noqa: SLF001
                     pytest.fail(raw)
 
 
@@ -181,7 +181,7 @@ def test_port_regex():
 
             # Ensure our regular expressions are correct
             for raw in (rule["source_port"], rule["dest_port"]):
-                if suricata_check.utils.PORT_REGEX.match(raw) is None:
+                if suricata_check.utils.regex._PORT_REGEX.match(raw) is None:  # type: ignore reportPrivateUsage # noqa: SLF001
                     pytest.fail(raw)
 
 
@@ -207,7 +207,7 @@ def test_option_regex():
                     f"{name}:{value} ;",
                     f"{name}: {value} ;",
                 ):
-                    match = suricata_check.utils.OPTION_REGEX.match(raw)
+                    match = suricata_check.utils.regex._OPTION_REGEX.match(raw)  # type: ignore reportPrivateUsage # noqa: SLF001
                     if match is None:
                         pytest.fail(raw)
                     if match.group(0) == "sid":

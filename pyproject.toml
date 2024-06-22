@@ -65,6 +65,11 @@ dev = [
   "ruff>=0.4.9",
   "black>=24.4.2",
   "pyright>=1.1.367",
+  "sphinx>=7.37",
+  "sphinx-rtd-theme>=2.0.0",
+  "myst-parser>=3.0.1",
+  "sphinx-click>=6.0.0",
+  "sphinx-autodoc-2>=0.5.0",
 ]
 
 [project.urls]
@@ -105,6 +110,7 @@ addopts = """
 line-length = 127
 indent-width = 4
 target-version = "py39"
+exclude = ["docs"]
 
 [tool.ruff.lint]
 # Some of these can be removed if blocking. For now, we check everything.
@@ -156,8 +162,11 @@ select = [
   "AIR",
   "RUF",
 ]
-ignore = ["F401", "N807", "D203", "D213", "D401", "COM812", "UP032"]
+ignore = ["N807", "D203", "D213", "D401", "COM812", "UP032"]
 fixable = ["ALL"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.ruff.format]
 quote-style = "double"

@@ -1,4 +1,5 @@
-# noqa: D100
+"""`PrincipleChecker`."""
+
 from typing import Optional
 
 import idstools.rule
@@ -24,15 +25,15 @@ from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 from .interface import CheckerInterface
 
-regex_provider = get_regex_provider()
+_regex_provider = get_regex_provider()
 
-BITS_ISSET_REGEX = regex_provider.compile(r"^\s*isset\s*,.*$")
-BITS_ISNOTSET_REGEX = regex_provider.compile(r"^\s*isnotset\s*,.*$")
-FLOWINT_ISSET_REGEX = regex_provider.compile(r"^.*,\s*isset\s*,.*$")
-FLOWINT_ISNOTSET_REGEX = regex_provider.compile(r"^.*,\s*isnotset\s*,.*$")
-THRESHOLD_LIMITED_REGEX = regex_provider.compile(r"^.*type\s+(limit|both).*$")
-FLOWBITS_ISNOTSET_REGEX = regex_provider.compile(r"^\s*isnotset.*$")
-HTTP_URI_QUERY_PARAMETER_REGEX = regex_provider.compile(
+_BITS_ISSET_REGEX = _regex_provider.compile(r"^\s*isset\s*,.*$")
+_BITS_ISNOTSET_REGEX = _regex_provider.compile(r"^\s*isnotset\s*,.*$")
+_FLOWINT_ISSET_REGEX = _regex_provider.compile(r"^.*,\s*isset\s*,.*$")
+_FLOWINT_ISNOTSET_REGEX = _regex_provider.compile(r"^.*,\s*isnotset\s*,.*$")
+_THRESHOLD_LIMITED_REGEX = _regex_provider.compile(r"^.*type\s+(limit|both).*$")
+_FLOWBITS_ISNOTSET_REGEX = _regex_provider.compile(r"^\s*isnotset.*$")
+_HTTP_URI_QUERY_PARAMETER_REGEX = _regex_provider.compile(
     r"^\(.*http\.uri\s*;\s*content\s*:\s*\"[^\"]*\?[^\"]+\"\s*;.*\)$",
 )
 
@@ -43,17 +44,22 @@ class PrincipleChecker(CheckerInterface):
     Codes P000-P009 report on non-adherence to rule design principles.
 
     Specifically, the `MandatoryChecker` checks for the following:
-    - P000: No Limited Proxy, the rule does not detect a characteristic that relates directly to a malicious action
-        , making it potentially noisy.
-    - P001: No Successful Malicious Action, the rule does not distinguish between successful and unsuccessful malicious actions
-        , making it potentially noisy.
-    - P002: No Alert Throttling, the rule does not utilize the threshold limit option` to prevent alert flooding
-        , making it potentially noisy.
-    - P003: No Exceptions, the rule does not include any exceptions for commom benign traffic,
+        P000: No Limited Proxy, the rule does not detect a characteristic that relates directly to a malicious action,
         making it potentially noisy.
-    - P004: No Generalized Characteristic, the rule does detect a characteristic that is so specific
+
+        P001: No Successful Malicious Action, the rule does not distinguish between successful and unsuccessful malicious
+        actions, making it potentially noisy.
+
+        P002: No Alert Throttling, the rule does not utilize the threshold limit option` to prevent alert flooding,
+        making it potentially noisy.
+
+        P003: No Exceptions, the rule does not include any exceptions for commom benign traffic,
+        making it potentially noisy.
+
+        P004: No Generalized Characteristic, the rule does detect a characteristic that is so specific
         that it is unlikely generalize.
-    - P005: No Generalized Position, the rule does detect the characteristic in a fixed position
+
+        P005: No Generalized Position, the rule does detect the characteristic in a fixed position
         that and is unlikely to generalize as a result.
     """
 
@@ -82,10 +88,10 @@ the rule does not detect a characteristic that relates directly to a malicious a
             )
 
         if (
-            self._is_rule_initiated_internally(rule) is False
-            and self._does_rule_account_for_server_response(rule) is False
-            and self._does_rule_account_for_internal_content(rule) is False
-            and self._is_rule_stateful(rule) is False
+            self.__is_rule_initiated_internally(rule) is False
+            and self.__does_rule_account_for_server_response(rule) is False
+            and self.__does_rule_account_for_internal_content(rule) is False
+            and self.__is_rule_stateful(rule) is False
         ):
             issues.append(
                 Issue(
@@ -95,7 +101,7 @@ the rule does not distinguish between successful and unsuccessful malicious acti
                 ),
             )
 
-        if not self._is_rule_threshold_limited(rule):
+        if not self.__is_rule_threshold_limited(rule):
             issues.append(
                 Issue(
                     code="P002",
@@ -106,7 +112,7 @@ Using track by_both is considered to be safe if unsure which to use.""",
                 ),
             )
 
-        if not self._does_rule_have_exceptions(rule):
+        if not self.__does_rule_have_exceptions(rule):
             issues.append(
                 Issue(
                     code="P003",
@@ -134,7 +140,7 @@ the rule does detect a characteristic that is so specific that it is unlikely ge
                 ),
             )
 
-        if self._has_fixed_http_uri_query_parameter_location(rule):
+        if self.__has_fixed_http_uri_query_parameter_location(rule):
             issues.append(
                 Issue(
                     code="P005",
@@ -146,7 +152,7 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         return issues
 
     @staticmethod
-    def _is_rule_initiated_internally(
+    def __is_rule_initiated_internally(
         rule: idstools.rule.Rule,
     ) -> Optional[bool]:
         if get_rule_option(rule, "proto") in ("ip",):
@@ -182,7 +188,7 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         return False
 
     @staticmethod
-    def _does_rule_account_for_server_response(
+    def __does_rule_account_for_server_response(
         rule: idstools.rule.Rule,
     ) -> Optional[bool]:
         if get_rule_option(rule, "proto") in ("ip",):
@@ -201,7 +207,7 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         return False
 
     @staticmethod
-    def _does_rule_account_for_internal_content(
+    def __does_rule_account_for_internal_content(
         rule: idstools.rule.Rule,
     ) -> bool:
         source_addr = get_rule_option(rule, "source_addr")
@@ -215,28 +221,28 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         return False
 
     @staticmethod
-    def _is_rule_stateful(
+    def __is_rule_stateful(
         rule: idstools.rule.Rule,
     ) -> Optional[bool]:
         if (
-            is_rule_option_equal_to_regex(rule, "flowbits", BITS_ISSET_REGEX)
-            or is_rule_option_equal_to_regex(rule, "flowint", FLOWINT_ISSET_REGEX)
-            or is_rule_option_equal_to_regex(rule, "xbits", BITS_ISSET_REGEX)
+            is_rule_option_equal_to_regex(rule, "flowbits", _BITS_ISSET_REGEX)
+            or is_rule_option_equal_to_regex(rule, "flowint", _FLOWINT_ISSET_REGEX)
+            or is_rule_option_equal_to_regex(rule, "xbits", _BITS_ISSET_REGEX)
         ):
             return True
 
         # flowbits.isnotset is used to reduce false positives as well, so it does not neccesarily indicate a stateful rule.
         if (
-            is_rule_option_equal_to_regex(rule, "flowbits", BITS_ISNOTSET_REGEX)
-            or is_rule_option_equal_to_regex(rule, "flowint", FLOWINT_ISNOTSET_REGEX)
-            or is_rule_option_equal_to_regex(rule, "xbits", BITS_ISNOTSET_REGEX)
+            is_rule_option_equal_to_regex(rule, "flowbits", _BITS_ISNOTSET_REGEX)
+            or is_rule_option_equal_to_regex(rule, "flowint", _FLOWINT_ISNOTSET_REGEX)
+            or is_rule_option_equal_to_regex(rule, "xbits", _BITS_ISNOTSET_REGEX)
         ):
             return True
 
         return False
 
     @staticmethod
-    def _is_rule_threshold_limited(
+    def __is_rule_threshold_limited(
         rule: idstools.rule.Rule,
     ) -> bool:
         value = get_rule_option(rule, "threshold")
@@ -244,13 +250,13 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         if value is None:
             return False
 
-        if THRESHOLD_LIMITED_REGEX.match(value) is not None:
+        if _THRESHOLD_LIMITED_REGEX.match(value) is not None:
             return True
 
         return False
 
     @staticmethod
-    def _does_rule_have_exceptions(
+    def __does_rule_have_exceptions(
         rule: idstools.rule.Rule,
     ) -> bool:
         positive_matches = 0
@@ -267,18 +273,18 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         ) or is_rule_option_equal_to_regex(
             rule,
             "flowbits",
-            FLOWBITS_ISNOTSET_REGEX,
+            _FLOWBITS_ISNOTSET_REGEX,
         ):
             return True
 
         return False
 
     @staticmethod
-    def _has_fixed_http_uri_query_parameter_location(
+    def __has_fixed_http_uri_query_parameter_location(
         rule: idstools.rule.Rule,
     ) -> bool:
         body = get_rule_body(rule)
-        if HTTP_URI_QUERY_PARAMETER_REGEX.match(body) is not None:
+        if _HTTP_URI_QUERY_PARAMETER_REGEX.match(body) is not None:
             return True
 
         return False

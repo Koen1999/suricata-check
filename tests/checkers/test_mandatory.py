@@ -13,7 +13,7 @@ import suricata_check
 
 class TestMandatory(GenericChecker):
     @pytest.fixture(autouse=True)
-    def _run_around_tests(self):
+    def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)
         self.checker = suricata_check.checkers.MandatoryChecker()
 

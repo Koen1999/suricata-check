@@ -1,4 +1,5 @@
-# noqa: D100
+"""`OverallChecker`."""
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -19,13 +20,13 @@ from suricata_check.utils.regex import (
 )
 from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
-regex_provider = get_regex_provider()
+_regex_provider = get_regex_provider()
 
 
 # Regular expressions are placed here such that they are compiled only once.
 # This has a significant impact on the performance.
-REGEX_S030 = regex_provider.compile(r"^[a-z\-]+$")
-REGEX_S031 = regex_provider.compile(r"^[^\|]*\|[^\|]*[A-Z]+[^\|]*\|[^\|]*$")
+_REGEX_S030 = _regex_provider.compile(r"^[a-z\-]+$")
+_REGEX_S031 = _regex_provider.compile(r"^[^\|]*\|[^\|]*[A-Z]+[^\|]*\|[^\|]*$")
 
 
 class OverallChecker(CheckerInterface):
@@ -113,7 +114,7 @@ Consider using the {modifier_alternative} option instead.""",
                 )
             )
 
-        for variable_group in self._get_invented_variable_groups(rule):
+        for variable_group in self.__get_invented_variable_groups(rule):
             issues.append(
                 Issue(
                     code="S013",
@@ -158,7 +159,7 @@ Consider assigning fast_pattern to the most unique content match.""",
         if is_rule_option_equal_to_regex(
             rule,
             "app-layer-protocol",
-            REGEX_S030,
+            _REGEX_S030,
         ):
             issues.append(
                 Issue(
@@ -179,7 +180,7 @@ Consider asserting this in the head instead using {} {} {} {} {} {} {}""".format
         if is_rule_option_equal_to_regex(
             rule,
             "content",
-            REGEX_S031,
+            _REGEX_S031,
         ):
             issues.append(
                 Issue(
@@ -191,7 +192,7 @@ Consider asserting this in the head instead using {} {} {} {} {} {} {}""".format
         return issues
 
     @staticmethod
-    def _get_invented_variable_groups(rule: idstools.rule.Rule) -> list[str]:
+    def __get_invented_variable_groups(rule: idstools.rule.Rule) -> list[str]:
         variable_groups = get_all_variable_groups(rule)
 
         invented_variable_groups = []
