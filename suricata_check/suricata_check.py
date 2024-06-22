@@ -149,7 +149,7 @@ def main(
             logger.critical(msg)
             raise click.BadParameter(f"Error: {msg}")
 
-        logger.debug("Processing rule: %i", rule["sid"])
+        logger.debug("Processing rule: %s", rule["sid"])
 
         check_rule_option_recognition(rule)
 
@@ -293,7 +293,7 @@ def process_rules_file(
                     # Verify that this line is a rule and not a comment
                     if idstools.rule.parse(line) is None:
                         # Log the comment since it may be a invalid rule
-                        logger.warning("Ignoring comment on line %i: %i", number, line)
+                        logger.warning("Ignoring comment on line %i: %s", number, line)
                         continue
                 else:
                     # Skip the rule
@@ -307,10 +307,10 @@ def process_rules_file(
 
             # Verify that a rule was parsed correctly.
             if rule is None:
-                logger.error("Error parsing rule on line %i: %i", number, line)
+                logger.error("Error parsing rule on line %i: %s", number, line)
                 continue
 
-            logger.debug("Processing rule: %i on line %i", rule["sid"], number)
+            logger.debug("Processing rule: %s on line %i", rule["sid"], number)
 
             check_rule_option_recognition(rule)
 
