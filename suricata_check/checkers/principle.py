@@ -8,16 +8,19 @@ from suricata_check.utils.checker import (
     count_rule_options,
     get_rule_option,
     get_rule_options,
+    is_rule_option_equal_to,
     is_rule_option_equal_to_regex,
     is_rule_option_set,
     is_rule_suboption_set,
 )
 from suricata_check.utils.regex import (
     ALL_DETECTION_KEYWORDS,
+    BUFFER_KEYWORDS,
     CONTENT_KEYWORDS,
     IP_ADDRESS_REGEX,
     OTHER_PAYLOAD_KEYWORDS,
     SIZE_KEYWORDS,
+    get_options_regex,
     get_regex_provider,
     get_rule_body,
 )
@@ -34,7 +37,13 @@ _FLOWINT_ISNOTSET_REGEX = _regex_provider.compile(r"^.*,\s*isnotset\s*,.*$")
 _THRESHOLD_LIMITED_REGEX = _regex_provider.compile(r"^.*type\s+(limit|both).*$")
 _FLOWBITS_ISNOTSET_REGEX = _regex_provider.compile(r"^\s*isnotset.*$")
 _HTTP_URI_QUERY_PARAMETER_REGEX = _regex_provider.compile(
-    r"^\(.*http\.uri\s*;\s*content\s*:\s*\"[^\"]*\?[^\"]+\"\s*;.*\)$",
+    rf"^\(.*\s+http\.uri\s*;\s*content\s*:\s*\"[^\"]*\?([^\"]|\\\")+\"\s*;((?!.*{get_options_regex(CONTENT_KEYWORDS).pattern}).*)|((?!.*{get_options_regex(CONTENT_KEYWORDS).pattern}).*\s+{get_options_regex(BUFFER_KEYWORDS).pattern}\s*;.*)\)$"
+)
+_PROXY_MSG_REGEX = _regex_provider.compile(
+    r"^.*(Suspicious).*$", flags=_regex_provider.IGNORECASE
+)
+_SPECIFIC_MSG_REGEX = _regex_provider.compile(
+    r"^.*(CVE|Vulnerability).*$", flags=_regex_provider.IGNORECASE
 )
 
 
@@ -78,7 +87,9 @@ class PrincipleChecker(CheckerInterface):
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 
-        if count_rule_options(rule, ALL_DETECTION_KEYWORDS) == 0:
+        if count_rule_options(
+            rule, ALL_DETECTION_KEYWORDS
+        ) == 0 or is_rule_option_equal_to_regex(rule, "msg", _PROXY_MSG_REGEX):
             issues.append(
                 Issue(
                     code="P000",
@@ -131,7 +142,7 @@ Consider identifying common benign traffic on which the rule may trigger and add
                 .union(OTHER_PAYLOAD_KEYWORDS),
             )
             > 1
-        ):
+        ) or (is_rule_option_equal_to_regex(rule, "msg", _SPECIFIC_MSG_REGEX) and not is_rule_option_set(rule, "pcre")):
             issues.append(
                 Issue(
                     code="P004",
@@ -140,7 +151,9 @@ the rule does detect a characteristic that is so specific that it is unlikely ge
                 ),
             )
 
-        if self.__has_fixed_http_uri_query_parameter_location(rule):
+        if self.__has_fixed_http_uri_query_parameter_location(
+            rule
+        ) or self.__has_single_match_at_fixed_location(rule):
             issues.append(
                 Issue(
                     code="P005",
@@ -283,8 +296,50 @@ the rule does detect the characteristic in a fixed position that and is unlikely
     def __has_fixed_http_uri_query_parameter_location(
         rule: idstools.rule.Rule,
     ) -> bool:
+        if count_rule_options(rule, "content") != 1:
+            return False
+
         body = get_rule_body(rule)
         if _HTTP_URI_QUERY_PARAMETER_REGEX.match(body) is not None:
+            return True
+
+        return False
+
+    @staticmethod
+    def __has_single_match_at_fixed_location(
+        rule: idstools.rule.Rule,
+    ) -> bool:
+        if (
+            count_rule_options(rule, "content") == 2
+            and is_rule_option_set(rule, "http.method")
+            and (
+                is_rule_option_equal_to(rule, "content", "GET")
+                or is_rule_option_equal_to(rule, "content", "POST")
+            )
+        ) and count_rule_options(rule, "content") != 1:
+            return False
+
+        contents = list(
+            set(get_rule_options(rule, "content")).difference(['"GET"', '"POST"'])
+        )
+        if len(contents) != 1:
+            return False
+        content = contents[0]
+
+        if is_rule_option_set(rule, "startswith"):
+            return True
+
+        # -2 to discard quotes
+        length = len(content) - 2
+
+        if (
+            is_rule_option_equal_to(rule, "depth", str(length))
+            or is_rule_option_equal_to(rule, "bsize", str(length))
+            or (
+                is_rule_option_set(rule, "http.uri")
+                and is_rule_option_equal_to(rule, "urilen", str(length))
+            )
+        ):
             return True
 
         return False
