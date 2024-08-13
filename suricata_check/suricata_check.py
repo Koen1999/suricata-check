@@ -205,7 +205,7 @@ def __write_output(
 
             overall_summary: SIMPLE_SUMMARY_TYPE = summary.overall_summary
 
-            n_issues = overall_summary['Total Issues']
+            n_issues = overall_summary["Total Issues"]
             n_rules = (
                 overall_summary["Rules with Issues"]
                 + overall_summary["Rules without Issues"]
@@ -219,7 +219,7 @@ def __write_output(
                             v,
                             (
                                 "{:.0%}".format(v / n_rules)
-                                if k.startswith("Rules ")
+                                if k.startswith("Rules ") and n_rules > 0
                                 else "-"
                             ),
                         )
@@ -251,7 +251,7 @@ def __write_output(
             stats_fh.write(
                 tabulate.tabulate(
                     (
-                        (k, v, "{:.0%}".format(v / n_issues))
+                        (k, v, "{:.0%}".format(v / n_issues) if n_issues > 0 else "-")
                         for k, v in issues_by_group.items()
                     ),
                     headers=(
@@ -269,7 +269,11 @@ def __write_output(
                 stats_fh.write(
                     tabulate.tabulate(
                         (
-                            (k, v, "{:.0%}".format(v / n_rules))
+                            (
+                                k,
+                                v,
+                                "{:.0%}".format(v / n_rules) if n_rules > 0 else "-",
+                            )
                             for k, v in checker_issues_by_type.items()
                         ),
                         headers=(
