@@ -205,10 +205,30 @@ def __write_output(
 
             overall_summary: SIMPLE_SUMMARY_TYPE = summary.overall_summary
 
+            n_issues = overall_summary['Total Issues']
+            n_rules = (
+                overall_summary["Rules with Issues"]
+                + overall_summary["Rules without Issues"]
+            )
+
             stats_fh.write(
                 tabulate.tabulate(
-                    overall_summary.items(),
-                    headers=("Count",),
+                    (
+                        (
+                            k,
+                            v,
+                            (
+                                "{:.0%}".format(v / n_rules)
+                                if k.startswith("Rules ")
+                                else "-"
+                            ),
+                        )
+                        for k, v in overall_summary.items()
+                    ),
+                    headers=(
+                        "Count",
+                        "Percentage of Rules",
+                    ),
                 )
                 + "\n\n",
             )
@@ -230,8 +250,14 @@ def __write_output(
 
             stats_fh.write(
                 tabulate.tabulate(
-                    issues_by_group.items(),
-                    headers=("Count",),
+                    (
+                        (k, v, "{:.0%}".format(v / n_issues))
+                        for k, v in issues_by_group.items()
+                    ),
+                    headers=(
+                        "Count",
+                        "Percentage of Total Issues",
+                    ),
                 )
                 + "\n\n",
             )
@@ -242,8 +268,14 @@ def __write_output(
                 stats_fh.write("-" * (len(checker) + 2) + "\n")
                 stats_fh.write(
                     tabulate.tabulate(
-                        checker_issues_by_type.items(),
-                        headers=("Count",),
+                        (
+                            (k, v, "{:.0%}".format(v / n_rules))
+                            for k, v in checker_issues_by_type.items()
+                        ),
+                        headers=(
+                            "Count",
+                            "Percentage of Rules",
+                        ),
                     )
                     + "\n\n",
                 )
