@@ -401,7 +401,9 @@ size options, transformation options,  the content option, pointer movement opti
             if (
                 are_rule_options_put_before(
                     rule,
-                    set(TRANSFORMATION_KEYWORDS).union(CONTENT_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),  # type: ignore reportArgumentType
+                    set(TRANSFORMATION_KEYWORDS)
+                    .union(CONTENT_KEYWORDS)
+                    .union(OTHER_PAYLOAD_KEYWORDS),
                     SIZE_KEYWORDS,
                     sequence=sequence,
                 )
@@ -421,7 +423,7 @@ Consider moving the size options to after any transformation options, content op
             if (
                 are_rule_options_put_before(
                     rule,
-                    set(CONTENT_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),  # type: ignore reportArgumentType
+                    set(CONTENT_KEYWORDS).union(OTHER_PAYLOAD_KEYWORDS),
                     TRANSFORMATION_KEYWORDS,
                     sequence=sequence,
                 )

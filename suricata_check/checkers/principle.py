@@ -142,7 +142,10 @@ Consider identifying common benign traffic on which the rule may trigger and add
                 .union(OTHER_PAYLOAD_KEYWORDS),
             )
             > 1
-        ) or (is_rule_option_equal_to_regex(rule, "msg", _SPECIFIC_MSG_REGEX) and not is_rule_option_set(rule, "pcre")):
+        ) or (
+            is_rule_option_equal_to_regex(rule, "msg", _SPECIFIC_MSG_REGEX)
+            and not is_rule_option_set(rule, "pcre")
+        ):
             issues.append(
                 Issue(
                     code="P004",
@@ -310,7 +313,7 @@ the rule does detect the characteristic in a fixed position that and is unlikely
         rule: idstools.rule.Rule,
     ) -> bool:
         if (
-            count_rule_options(rule, "content") == 2
+            count_rule_options(rule, "content") == 2  # noqa: PLR2004
             and is_rule_option_set(rule, "http.method")
             and (
                 is_rule_option_equal_to(rule, "content", "GET")

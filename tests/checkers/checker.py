@@ -28,17 +28,39 @@ class GenericChecker:
     ) -> suricata_check.utils.typing.ISSUES_TYPE:
         return self.checker.check_rule(rule)
 
-    def check_issue(        self,
+    def test_issue(
+        self,
         rule: Optional[idstools.rule.Rule],
         code: str,
         raised: bool,
         fail: bool = True,
-        warn: bool = True,
-    )-> Optional[bool]:
+    ) -> Optional[bool]:
         """Checks whether a rule raises or does not raise an issue with a given code.
 
         Raises a pytest failure, warning, or returns a boolean based on the provided arguments.
         """
+        if rule is None:
+            pytest.fail("Rule is None")
+
+        correct, issue = self.check_issue(rule, code, raised)
+
+        if correct is not True:
+            msg = f"""\
+{'Unexpected' if not raised else 'Missing'} code {code}.
+{rule['raw']}
+{issue}\
+"""
+            if fail:
+                pytest.fail(msg)
+            else:
+                warnings.warn(RuntimeWarning(msg))
+
+    def check_issue(
+        self,
+        rule: Optional[idstools.rule.Rule],
+        code: str,
+        raised: bool,
+    ) -> tuple[Optional[bool], Optional[suricata_check.utils.typing.Issue]]:
         if rule is None:
             pytest.fail("Rule is None")
 
@@ -60,18 +82,7 @@ class GenericChecker:
                     correct = False
                     break
 
-        if correct is not True:
-            msg = f"""\
-{'Unexpected' if not raised else 'Missing'} code {code}.
-{rule['raw']}
-{issue}\
-"""
-            if fail:
-                pytest.fail(msg)
-            elif warn:
-                warnings.warn(RuntimeWarning(msg))
-
-        return correct
+        return correct, issue if not correct else None
 
     def test_no_undeclared_codes(self):
         """Asserts the checker emits no undeclared codes."""

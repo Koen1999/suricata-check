@@ -165,7 +165,7 @@ class TestPrinciple(GenericChecker):
         rule = idstools.rule.parse(raw_rule)
 
         # fail is false, so we do permit False Negatives
-        self.check_issue(rule, code, expected, fail=False)
+        self.test_issue(rule, code, expected, fail=False)
 
     @pytest.mark.parametrize(
         ("code", "expected", "raw_rule"),
@@ -180,7 +180,7 @@ class TestPrinciple(GenericChecker):
         rule = idstools.rule.parse(raw_rule)
 
         # fail is true, so we do not permit False Positives
-        self.check_issue(rule, code, expected, fail=True)
+        self.test_issue(rule, code, expected, fail=True)
 
     def test_precision_recall(self):
         location = os.path.join("tests", "data", "principle_rules.csv")
@@ -200,24 +200,30 @@ class TestPrinciple(GenericChecker):
             y_pred_list = []
             for rule in principle_rules["rule.rule"]:
                 parsed_rule = idstools.rule.parse(rule)
-                y_pred_list.append(
-                    self.check_issue(parsed_rule, code, True, fail=False, warn=False)
-                )
+                y_pred_list.append(self.check_issue(parsed_rule, code, True))
 
             y_true = numpy.array(principle_rules[test_col].to_numpy() == 0)
             y_pred = numpy.array(y_pred_list)
 
-            precision = float(sklearn.metrics.precision_score(y_true, y_pred, zero_division=0))
-            recall = float(sklearn.metrics.recall_score(y_true, y_pred, zero_division=1))
+            precision = float(
+                sklearn.metrics.precision_score(y_true, y_pred, zero_division=0)  # type: ignore reportArgumentType
+            )
+            recall = float(
+                sklearn.metrics.recall_score(y_true, y_pred, zero_division=1)  # type: ignore reportArgumentType
+            )
 
             fp_mask = ~y_true & y_pred
             fn_mask = y_true & ~y_pred
 
             for rule in principle_rules.loc[fp_mask, "rule.rule"]:
-                _logger.debug("Code {} False Positive: {}".format(code, rule))  # noqa: G001
+                _logger.debug(
+                    "Code {} False Positive: {}".format(code, rule)  # noqa: G001
+                )
 
             for rule in principle_rules.loc[fn_mask, "rule.rule"]:
-                _logger.debug("Code {} False Negative: {}".format(code, rule))  # noqa: G001
+                _logger.debug(
+                    "Code {} False Negative: {}".format(code, rule)  # noqa: G001
+                )
 
             _logger.info(
                 "Code {}\tPrecision: {}\tRecall: {}".format(  # noqa: G001

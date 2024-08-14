@@ -162,6 +162,7 @@ STICKY_BUFFER_NAMING = {
     "http_uri": "http.uri",
     "http_user_agent": "http.user_agent",
     "ja3_hash": "ja3.hash",
+    "tls_cert_fingerprint": "tls.cert_fingerprint",
     "tls_cert_issuer": "tls.cert_issuer",
     "tls_cert_serial": "tls.cert_serial",
     "tls_cert_subject": "tls.cert_subject",
@@ -337,6 +338,7 @@ HTTP_SPECIFIC_KEYWORDS = (
 )
 
 DNS_SPECIFIC_KEYWORDS = (
+    "dns.opcode",
     "dns.query",
     "dns_query",
 )
@@ -344,12 +346,14 @@ DNS_SPECIFIC_KEYWORDS = (
 TLS_SPECIFIC_KEYWORDS = (
     "ssl_version",
     "ssl_state",
+    "tls.cert_fingerprint",
     "tls.cert_issuer",
     "tls.cert_serial",
     "tls.cert_subject",
     "tls.certs",
     "tls.sni",
     "tls.version",
+    "tls_cert_fingerprint",
     "tls_cert_issuer",
     "tls_cert_serial",
     "tls_cert_subject",
@@ -374,6 +378,8 @@ DCERPC_SPECIFIC_KEYWORDS = (
     "dce_stub_data",
 )
 
+FTP_KEYWORDS = ("ftpbounce", "ftpdata_command")
+
 APP_LAYER_KEYWORDS = (
     "app-layer-event",
     "app-layer-protocol",
@@ -391,7 +397,9 @@ PROTOCOL_SPECIFIC_KEYWORDS = tuple(
                 DNS_SPECIFIC_KEYWORDS,
                 TLS_SPECIFIC_KEYWORDS,
                 SSH_SPECIFIC_KEYWORDS,
+                DCERPC_SPECIFIC_KEYWORDS,
                 JA3_JA4_KEYWORDS,
+                FTP_KEYWORDS,
                 APP_LAYER_KEYWORDS,
             ),
         ),
@@ -399,6 +407,8 @@ PROTOCOL_SPECIFIC_KEYWORDS = tuple(
 )
 
 PERFORMANCE_DETECTION_OPTIONS = ("fast_pattern",)
+
+LUA_KEYWORDS = ("lua", "luajit")
 
 ALL_DETECTION_KEYWORDS: Sequence[str] = tuple(
     sorted(
@@ -414,6 +424,7 @@ ALL_DETECTION_KEYWORDS: Sequence[str] = tuple(
                 OTHER_PAYLOAD_KEYWORDS,
                 PROTOCOL_SPECIFIC_KEYWORDS,
                 PERFORMANCE_DETECTION_OPTIONS,
+                LUA_KEYWORDS,
             ),
         ),
     ),
@@ -471,6 +482,8 @@ METADATA_NON_DATE_KEYWORDS = (
     "signature_severity",
     "tag",
     "tls_state",
+    "first_seen",
+    "confidence_level",
 )
 
 ALL_METADATA_KEYWORDS = tuple(
