@@ -28,7 +28,7 @@ class GenericChecker:
     ) -> suricata_check.utils.typing.ISSUES_TYPE:
         return self.checker.check_rule(rule)
 
-    def test_issue(
+    def _test_issue(
         self,
         rule: Optional[idstools.rule.Rule],
         code: str,

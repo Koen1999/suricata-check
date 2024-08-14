@@ -29,7 +29,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S200", True)
+        self._test_issue(rule, "S200", True)
 
     def test_s200_good(self):
         rule = idstools.rule.parse(
@@ -43,7 +43,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S200", False)
+        self._test_issue(rule, "S200", False)
 
     def test_s201_bad(self):
         rule = idstools.rule.parse(
@@ -57,7 +57,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S201", True)
+        self._test_issue(rule, "S201", True)
 
     def test_s201_good(self):
         rule = idstools.rule.parse(
@@ -71,7 +71,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S201", False)
+        self._test_issue(rule, "S201", False)
 
     def test_s202_bad(self):
         rule = idstools.rule.parse(
@@ -85,7 +85,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S202", True)
+        self._test_issue(rule, "S202", True)
 
     def test_s202_good(self):
         rule = idstools.rule.parse(
@@ -99,7 +99,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S202", False)
+        self._test_issue(rule, "S202", False)
 
     def test_s203_bad(self):
         rule = idstools.rule.parse(
@@ -113,7 +113,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S203", True)
+        self._test_issue(rule, "S203", True)
 
     def test_s203_good(self):
         rule = idstools.rule.parse(
@@ -127,7 +127,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S203", False)
+        self._test_issue(rule, "S203", False)
 
     def test_s204_bad(self):
         rule = idstools.rule.parse(
@@ -141,7 +141,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S204", True)
+        self._test_issue(rule, "S204", True)
 
     def test_s204_good(self):
         rule = idstools.rule.parse(
@@ -155,7 +155,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S204", False)
+        self._test_issue(rule, "S204", False)
 
     def test_s205_bad(self):
         rule = idstools.rule.parse(
@@ -169,7 +169,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S205", True)
+        self._test_issue(rule, "S205", True)
 
     def test_s205_good(self):
         rule = idstools.rule.parse(
@@ -183,7 +183,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S205", False)
+        self._test_issue(rule, "S205", False)
 
     def test_s206_bad(self):
         rule = idstools.rule.parse(
@@ -197,7 +197,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S206", True)
+        self._test_issue(rule, "S206", True)
 
     def test_s206_good(self):
         rule = idstools.rule.parse(
@@ -211,7 +211,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S206", False)
+        self._test_issue(rule, "S206", False)
 
     def test_s207_bad(self):
         rule = idstools.rule.parse(
@@ -225,7 +225,7 @@ sid:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S207", True)
+        self._test_issue(rule, "S207", True)
 
     def test_s207_good(self):
         rule = idstools.rule.parse(
@@ -239,7 +239,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S207", False)
+        self._test_issue(rule, "S207", False)
 
     def test_s208_bad(self):
         rule = idstools.rule.parse(
@@ -253,7 +253,7 @@ metadata:performance_impact Low; \
 rev:1;)""",
         )
 
-        self.test_issue(rule, "S208", True)
+        self._test_issue(rule, "S208", True)
 
     def test_s208_bad2(self):
         rule = idstools.rule.parse(
@@ -267,7 +267,7 @@ sid:1; \
 rev:1;)""",
         )
 
-        self.test_issue(rule, "S208", True)
+        self._test_issue(rule, "S208", True)
 
     def test_s208_good(self):
         rule = idstools.rule.parse(
@@ -281,7 +281,7 @@ rev:1; \
 metadata:performance_impact Low;)""",
         )
 
-        self.test_issue(rule, "S208", False)
+        self._test_issue(rule, "S208", False)
 
     def test_s210_bad(self):
         rule = idstools.rule.parse(
@@ -293,7 +293,7 @@ offset:0; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S210", True)
+        self._test_issue(rule, "S210", True)
 
     def test_s210_good(self):
         rule = idstools.rule.parse(
@@ -305,7 +305,7 @@ content:"test1"; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S210", False)
+        self._test_issue(rule, "S210", False)
 
     def test_s211_bad(self):
         rule = idstools.rule.parse(
@@ -318,7 +318,7 @@ depth:10; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S211", True)
+        self._test_issue(rule, "S211", True)
 
     def test_s211_good(self):
         rule = idstools.rule.parse(
@@ -331,7 +331,7 @@ within:5; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S211", False)
+        self._test_issue(rule, "S211", False)
 
     def test_s212_bad(self):
         rule = idstools.rule.parse(
@@ -344,7 +344,7 @@ offset:5; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S212", True)
+        self._test_issue(rule, "S212", True)
 
     def test_s212_good(self):
         rule = idstools.rule.parse(
@@ -357,7 +357,7 @@ distance:0; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S212", False)
+        self._test_issue(rule, "S212", False)
 
     def test_s220_bad(self):
         rule = idstools.rule.parse(
@@ -368,7 +368,7 @@ flow:established; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S220", True)
+        self._test_issue(rule, "S220", True)
 
     def test_s220_good(self):
         rule = idstools.rule.parse(
@@ -379,7 +379,7 @@ content:"test"; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S220", False)
+        self._test_issue(rule, "S220", False)
 
     def test_s221_bad(self):
         rule = idstools.rule.parse(
@@ -391,7 +391,7 @@ content:"test"; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S221", True)
+        self._test_issue(rule, "S221", True)
 
     def test_s221_good(self):
         rule = idstools.rule.parse(
@@ -403,7 +403,7 @@ content:"test"; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S221", False)
+        self._test_issue(rule, "S221", False)
 
     def test_s222_bad(self):
         rule = idstools.rule.parse(
@@ -415,7 +415,7 @@ flow.age:3; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S222", True)
+        self._test_issue(rule, "S222", True)
 
     def test_s222_good(self):
         rule = idstools.rule.parse(
@@ -427,7 +427,7 @@ content:"test"; \
 sid:1;)""",
         )
 
-        self.test_issue(rule, "S222", False)
+        self._test_issue(rule, "S222", False)
 
     def test_s223_bad(self):
         # Example taken from https://docs.suricata.io/en/latest/rules/http-keywords.html#urilen
@@ -440,7 +440,7 @@ http.method; content:"GET"; \
 classtype:bad-unknown; sid:40; rev:1;)""",
         )
 
-        self.test_issue(rule, "S223", True)
+        self._test_issue(rule, "S223", True)
 
     def test_s223_good(self):
         # Example taken from https://docs.suricata.io/en/latest/rules/http-keywords.html#urilen
@@ -453,7 +453,7 @@ http.method; content:"GET"; \
 classtype:bad-unknown; sid:40; rev:1;)""",
         )
 
-        self.test_issue(rule, "S223", False)
+        self._test_issue(rule, "S223", False)
 
     def test_s224_bad(self):
         # Example taken from https://docs.suricata.io/en/latest/rules/http-keywords.html#urilen
@@ -466,7 +466,7 @@ urilen:11; \
 classtype:bad-unknown; sid:40; rev:1;)""",
         )
 
-        self.test_issue(rule, "S224", True)
+        self._test_issue(rule, "S224", True)
 
     def test_s224_good(self):
         # Example taken from https://docs.suricata.io/en/latest/rules/http-keywords.html#urilen
@@ -479,7 +479,7 @@ http.method; content:"GET"; \
 classtype:bad-unknown; sid:40; rev:1;)""",
         )
 
-        self.test_issue(rule, "S224", False)
+        self._test_issue(rule, "S224", False)
 
     def test_s230_bad(self):
         rule = idstools.rule.parse(
@@ -495,7 +495,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S230", True)
+        self._test_issue(rule, "S230", True)
 
     def test_s230_bad2(self):
         rule = idstools.rule.parse(
@@ -510,7 +510,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S230", True)
+        self._test_issue(rule, "S230", True)
 
     def test_s230_good(self):
         rule = idstools.rule.parse(
@@ -526,7 +526,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S230", False)
+        self._test_issue(rule, "S230", False)
 
     def test_s230_good2(self):
         rule = idstools.rule.parse(
@@ -542,7 +542,7 @@ fast_pattern; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S230", False)
+        self._test_issue(rule, "S230", False)
 
     def test_s231_bad(self):
         rule = idstools.rule.parse(
@@ -558,7 +558,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S231", True)
+        self._test_issue(rule, "S231", True)
 
     def test_s231_bad2(self):
         rule = idstools.rule.parse(
@@ -573,7 +573,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S231", True)
+        self._test_issue(rule, "S231", True)
 
     def test_s231_good(self):
         rule = idstools.rule.parse(
@@ -589,7 +589,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S231", False)
+        self._test_issue(rule, "S231", False)
 
     def test_s232_bad(self):
         rule = idstools.rule.parse(
@@ -605,7 +605,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S232", True)
+        self._test_issue(rule, "S232", True)
 
     def test_s232_good(self):
         rule = idstools.rule.parse(
@@ -621,7 +621,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S232", False)
+        self._test_issue(rule, "S232", False)
 
     def test_s233_bad(self):
         rule = idstools.rule.parse(
@@ -637,7 +637,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S233", True)
+        self._test_issue(rule, "S233", True)
 
     def test_s233_bad2(self):
         rule = idstools.rule.parse(
@@ -652,7 +652,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S233", True)
+        self._test_issue(rule, "S233", True)
 
     def test_s233_good(self):
         rule = idstools.rule.parse(
@@ -668,7 +668,7 @@ isdataat:!1, relative; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S233", False)
+        self._test_issue(rule, "S233", False)
 
     def test_s234_bad(self):
         rule = idstools.rule.parse(
@@ -684,7 +684,7 @@ nocase; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S234", True)
+        self._test_issue(rule, "S234", True)
 
     def test_s234_bad2(self):
         rule = idstools.rule.parse(
@@ -699,7 +699,7 @@ nocase; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S234", True)
+        self._test_issue(rule, "S234", True)
 
     def test_s234_good(self):
         rule = idstools.rule.parse(
@@ -715,7 +715,7 @@ isdataat:!5; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S234", False)
+        self._test_issue(rule, "S234", False)
 
     def test_s235_bad(self):
         rule = idstools.rule.parse(
@@ -732,7 +732,7 @@ isdataat:!5; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S235", True)
+        self._test_issue(rule, "S235", True)
 
     def test_s235_good(self):
         rule = idstools.rule.parse(
@@ -749,7 +749,7 @@ isdataat:!5; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S235", False)
+        self._test_issue(rule, "S235", False)
 
     def test_s236_bad(self):
         rule = idstools.rule.parse(
@@ -767,7 +767,7 @@ isdataat:!5; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S236", True)
+        self._test_issue(rule, "S236", True)
 
     def test_s236_good(self):
         rule = idstools.rule.parse(
@@ -785,7 +785,7 @@ isdataat:!5; \
 sid:1; rev:1;)""",
         )
 
-        self.test_issue(rule, "S236", False)
+        self._test_issue(rule, "S236", False)
 
     def test_s240_bad(self):
         rule = idstools.rule.parse(
@@ -798,7 +798,7 @@ sid:1; \
 rev:1;)""",
         )
 
-        self.test_issue(rule, "S240", True)
+        self._test_issue(rule, "S240", True)
 
     def test_s240_good(self):
         rule = idstools.rule.parse(
@@ -811,7 +811,7 @@ sid:1; \
 rev:1;)""",
         )
 
-        self.test_issue(rule, "S240", False)
+        self._test_issue(rule, "S240", False)
 
     def test_s241_bad(self):
         rule = idstools.rule.parse(
@@ -824,7 +824,7 @@ threshold:type both,track by_both,count 1,seconds 3600;\
 rev:1;)""",
         )
 
-        self.test_issue(rule, "S241", True)
+        self._test_issue(rule, "S241", True)
 
     def test_s241_good(self):
         rule = idstools.rule.parse(
@@ -837,7 +837,7 @@ sid:1; \
 rev:1;)""",
         )
 
-        self.test_issue(rule, "S241", False)
+        self._test_issue(rule, "S241", False)
 
 
 def __main__():

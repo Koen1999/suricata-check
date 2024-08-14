@@ -20,26 +20,26 @@ class TestMandatory(GenericChecker):
     def test_m000_bad(self):
         rule = idstools.rule.parse("""alert ip any any -> any any (sid:1;)""")
 
-        self.test_issue(rule, "M000", True)
+        self._test_issue(rule, "M000", True)
 
     def test_m000_good(self):
         rule = idstools.rule.parse(
             """alert ip any any -> any any (msg:"Test"; sid:1;)""",
         )
 
-        self.test_issue(rule, "M000", False)
+        self._test_issue(rule, "M000", False)
 
     def test_m001_bad(self):
         rule = idstools.rule.parse("""alert ip any any -> any any (msg:"Test";)""")
 
-        self.test_issue(rule, "M001", True)
+        self._test_issue(rule, "M001", True)
 
     def test_m001_good(self):
         rule = idstools.rule.parse(
             """alert ip any any -> any any (msg:"Test"; sid:1;)""",
         )
 
-        self.test_issue(rule, "M001", False)
+        self._test_issue(rule, "M001", False)
 
 
 def __main__():

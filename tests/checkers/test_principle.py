@@ -165,7 +165,7 @@ class TestPrinciple(GenericChecker):
         rule = idstools.rule.parse(raw_rule)
 
         # fail is false, so we do permit False Negatives
-        self.test_issue(rule, code, expected, fail=False)
+        self._test_issue(rule, code, expected, fail=False)
 
     @pytest.mark.parametrize(
         ("code", "expected", "raw_rule"),
@@ -180,7 +180,7 @@ class TestPrinciple(GenericChecker):
         rule = idstools.rule.parse(raw_rule)
 
         # fail is true, so we do not permit False Positives
-        self.test_issue(rule, code, expected, fail=True)
+        self._test_issue(rule, code, expected, fail=True)
 
     def test_precision_recall(self):
         location = os.path.join("tests", "data", "principle_rules.csv")
@@ -200,7 +200,7 @@ class TestPrinciple(GenericChecker):
             y_pred_list = []
             for rule in principle_rules["rule.rule"]:
                 parsed_rule = idstools.rule.parse(rule)
-                y_pred_list.append(self.check_issue(parsed_rule, code, True))
+                y_pred_list.append(self.check_issue(parsed_rule, code, True)[0])
 
             y_true = numpy.array(principle_rules[test_col].to_numpy() == 0)
             y_pred = numpy.array(y_pred_list)

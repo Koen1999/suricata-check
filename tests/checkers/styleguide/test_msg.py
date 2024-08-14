@@ -87,7 +87,7 @@ class TestMsg(GenericChecker):
 
         rule = idstools.rule.parse(raw_rule)
 
-        self.test_issue(rule, code, expected)
+        self._test_issue(rule, code, expected)
 
     @pytest.mark.parametrize(
         ("code", "expected", "raw_rule"),
@@ -101,7 +101,7 @@ class TestMsg(GenericChecker):
     def test_rule_good(self, code, expected, raw_rule):
         rule = idstools.rule.parse(raw_rule)
 
-        self.test_issue(rule, code, expected)
+        self._test_issue(rule, code, expected)
 
 
 def __main__():
