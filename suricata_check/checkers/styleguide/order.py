@@ -83,6 +83,7 @@ class OrderChecker(CheckerInterface):
         "S224",
         "S230",
         "S231",
+        "S232",
         "S233",
         "S234",
         "S235",

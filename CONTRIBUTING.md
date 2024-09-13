@@ -1,5 +1,3 @@
-
-
 # Contributing
 
 If you would like to contribute, below you can find some helpful suggestions and instructions.
@@ -31,7 +29,15 @@ pytest
 To run the slower integration tests at the end of your development cycle, use the following command instead:
 
 ```bash
-pytest -m "slow"
+pytest -m "slow" -k "not train"
+```
+
+## Training new models
+
+To run the train new ML models (i.e., `PrincipleMLChecker`) at the end of your development cycle in case you modified this pipeline, delete the `.pkl` files corresponding to the saved model(s) and run the following command:
+
+```bash
+pytest -m "slow" -k "train" --cov-fail-under=0
 ```
 
 ## Linting

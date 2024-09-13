@@ -33,9 +33,13 @@ class OverallChecker(CheckerInterface):
     """The `OverallChecker` contains several the most basic checks for Suricata rules.
 
     Codes S000-S009 report on issues with the direction of the rule.
+
     Codes S010-S019 report on issues pertaining to the usage of non-standard options.
+
     Codes S020-S029 report on issues pertaining to the non-usage of recommended options.
+
     Codes S020-S029 report on issues pertaining to the non-usage of recommended options.
+
     Codes S031-S039 report on issues pertaining to the inappropriate usage of options.
     """
 

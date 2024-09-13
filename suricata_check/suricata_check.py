@@ -2,10 +2,11 @@
 
 import io
 import logging
+import logging.handlers
 import os
 import sys
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from functools import lru_cache
 from typing import (
     Literal,
@@ -21,11 +22,13 @@ _suricata_check_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "
 if sys.path[0] != _suricata_check_path:
     sys.path.insert(0, _suricata_check_path)
 
-from suricata_check import __version__  # noqa: E402
+from suricata_check import __version__, get_dependency_versions  # noqa: E402
 from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
+from suricata_check.checkers.interface.dummy import DummyChecker  # noqa: E402
 from suricata_check.utils._click import ClickHandler  # noqa: E402
 from suricata_check.utils._path import find_rules_file  # noqa: E402
 from suricata_check.utils.checker import check_rule_option_recognition  # noqa: E402
+from suricata_check.utils.regex import get_regex_provider  # noqa: E402
 from suricata_check.utils.typing import (  # noqa: E402
     EXTENSIVE_SUMMARY_TYPE,
     ISSUES_TYPE,
@@ -41,6 +44,8 @@ LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
 
 _logger = logging.getLogger(__name__)
+
+_regex_provider = get_regex_provider()
 
 
 @click.command()
@@ -75,13 +80,41 @@ _logger = logging.getLogger(__name__)
     default=False,
     help="Flag to evaluate disabled rules.",
     show_default=True,
+    is_flag=True,
 )
-def main(
+@click.option(
+    "--include-all",
+    "-a",
+    default=False,
+    help="Flag to indicate all checker codes should be enabled.",
+    show_default=True,
+    is_flag=True,
+)
+@click.option(
+    "--include",
+    "-i",
+    default=(),
+    help="List of all checker codes to enable.",
+    show_default=True,
+    multiple=True,
+)
+@click.option(
+    "--exclude",
+    "-e",
+    default=(),
+    help="List of all checker codes to disable.",
+    show_default=True,
+    multiple=True,
+)
+def main(  # noqa: PLR0913
     out: str = ".",
     rules: str = ".",
     single_rule: Optional[str] = None,
     log_level: LogLevel = "DEBUG",
     evaluate_disabled: bool = False,
+    include_all: bool = False,
+    include: tuple[str, ...] = (),
+    exclude: tuple[str, ...] = (),
 ) -> None:
     """The `suricata-check` command processes all rules inside a rules file and outputs a list of detected issues.
 
@@ -124,13 +157,27 @@ def main(
     _logger.info("single_rule: %s", single_rule)
     _logger.info("log_level: %s", log_level)
     _logger.info("evaluate_disabled: %s", evaluate_disabled)
+    _logger.info("include_all: %s", include_all)
+    _logger.info("include: %s", include)
+    _logger.info("exclude: %s", exclude)
 
+    # Log the environment:
     _logger.debug("Platform: %s", sys.platform)
     _logger.debug("Python version: %s", sys.version)
     _logger.debug("suricata-check path: %s", _suricata_check_path)
     _logger.debug("suricata-check version: %s", __version__)
+    for package, version in get_dependency_versions().items():
+        _logger.debug("Dependency %s version: %s", package, version)
 
-    checkers = get_checkers()
+    # Verify that include and exclude arguments are valid
+    if include_all and len(include) > 0:
+        raise click.BadParameter(
+            "Error: Cannot use --include-all and --include together."
+        )
+    if include_all:
+        include = (".*",)
+
+    checkers = get_checkers(include, exclude)
 
     if single_rule is not None:
         rule: Optional[idstools.rule.Rule] = idstools.rule.parse(single_rule)
@@ -358,13 +405,26 @@ def process_rules_file(
 
     _logger.info("Completed processing rule file: %s", rules)
 
-    output.summary = __summarize_output(output)
+    output.summary = __summarize_output(output, checkers)
 
     return output
 
 
+def __get_all_subclasses(cls: type) -> Iterable[type]:
+    all_subclasses = []
+
+    for subclass in cls.__subclasses__():
+        all_subclasses.append(subclass)
+        all_subclasses.extend(__get_all_subclasses(subclass))
+
+    return all_subclasses
+
+
 @lru_cache(maxsize=1)
-def get_checkers() -> Sequence[CheckerInterface]:
+def get_checkers(
+    include: Sequence[str] = (".*",),
+    exclude: Sequence[str] = (),
+) -> Sequence[CheckerInterface]:
     """Auto discovers all available checkers that implement the CheckerInterface.
 
     Returns:
@@ -372,11 +432,24 @@ def get_checkers() -> Sequence[CheckerInterface]:
 
     """
     checkers: list[CheckerInterface] = []
-    for checker in CheckerInterface.__subclasses__():
-        checkers.append(checker())
+    for checker in __get_all_subclasses(CheckerInterface):
+        if checker.__name__ == DummyChecker.__name__:
+            continue
+
+        # Initialize DummyCheckers to retrieve error messages.
+        if issubclass(checker, DummyChecker):
+            checker()
+
+        enabled, relevant_codes = __get_checker_enabled(checker, include, exclude)
+
+        if enabled:
+            checkers.append(checker(include=relevant_codes))
+
+        else:
+            _logger.info("Checker %s is disabled.", checker.__name__)
 
     _logger.info(
-        "Discovered checkers: [%s]",
+        "Discovered and enabled checkers: [%s]",
         ", ".join([c.__class__.__name__ for c in checkers]),
     )
 
@@ -390,6 +463,41 @@ def get_checkers() -> Sequence[CheckerInterface]:
                 _logger.error(msg)
 
     return sorted(checkers, key=lambda x: x.__class__.__name__)
+
+
+def __get_checker_enabled(
+    checker: type[CheckerInterface],
+    include: Sequence[str],
+    exclude: Sequence[str],
+) -> tuple[bool, set[str]]:
+    enabled = checker.enabled_by_default
+
+    relevant_codes = set(checker.codes)
+
+    if len(include) > 0:
+        for regex in include:
+            relevant_codes = set(
+                filter(
+                    lambda code: _regex_provider.compile("^" + regex + "$").match(code)
+                    is not None,
+                    checker.codes,
+                )
+            )
+            if len(relevant_codes) > 0:
+                enabled = True
+    for regex in exclude:
+        relevant_codes = set(
+            filter(
+                lambda code: _regex_provider.compile("^" + regex + "$").match(code)
+                is None,
+                checker.codes,
+            )
+        )
+
+    if len(relevant_codes) == 0:
+        enabled = False
+
+    return enabled, relevant_codes
 
 
 def analyze_rule(
@@ -415,23 +523,28 @@ def analyze_rule(
     for checker in checkers:
         rule_report.add_issues(checker.check_rule(rule))
 
-    rule_report.summary = __summarize_rule(rule_report)
+    rule_report.summary = __summarize_rule(rule_report, checkers)
 
     return rule_report
 
 
 def __summarize_rule(
     rule: RuleReport,
+    checkers: Optional[Sequence[CheckerInterface]] = None,
 ) -> RULE_SUMMARY_TYPE:
     """Summarizes the issues found in a rule.
 
     Args:
     rule: The rule output dictionary to be summarized.
+    checkers: The checkers to be used to check the rule.
 
     Returns:
     A dictionary containing a summary of all issues found in the rule.
 
     """
+    if checkers is None:
+        checkers = get_checkers()
+
     summary = {}
 
     issues: ISSUES_TYPE = rule.issues
@@ -442,7 +555,7 @@ def __summarize_rule(
         summary["issues_by_group"][checker] += 1
 
     # Ensure also checkers without issues are included in the report.
-    for checker in get_checkers():
+    for checker in checkers:
         if checker.__class__.__name__ not in summary["issues_by_group"]:
             summary["issues_by_group"][checker.__class__.__name__] = 0
 
@@ -454,20 +567,25 @@ def __summarize_rule(
 
 def __summarize_output(
     output: OutputReport,
+    checkers: Optional[Sequence[CheckerInterface]] = None,
 ) -> OutputSummary:
     """Summarizes the issues found in a rules file.
 
     Args:
     output: The unsammarized output of the rules file containing all rules and their issues.
+    checkers: The checkers to be used to check the rule.
 
     Returns:
     A dictionary containing a summary of all issues found in the rules file.
 
     """
+    if checkers is None:
+        checkers = get_checkers()
+
     return OutputSummary(
         overall_summary=__get_overall_summary(output),
-        issues_by_group=__get_issues_by_group(output),
-        issues_by_type=__get_issues_by_type(output),
+        issues_by_group=__get_issues_by_group(output, checkers),
+        issues_by_type=__get_issues_by_type(output, checkers),
     )
 
 
@@ -495,11 +613,15 @@ def __get_overall_summary(
 
 def __get_issues_by_group(
     output: OutputReport,
+    checkers: Optional[Sequence[CheckerInterface]] = None,
 ) -> SIMPLE_SUMMARY_TYPE:
+    if checkers is None:
+        checkers = get_checkers()
+
     issues_by_group = defaultdict(int)
 
     # Ensure also checkers and codes without issues are included in the report.
-    for checker in get_checkers():
+    for checker in checkers:
         issues_by_group[checker.__class__.__name__] = 0
 
     rules: RULE_REPORTS_TYPE = output.rules
@@ -516,11 +638,14 @@ def __get_issues_by_group(
 
 def __get_issues_by_type(
     output: OutputReport,
+    checkers: Optional[Sequence[CheckerInterface]] = None,
 ) -> EXTENSIVE_SUMMARY_TYPE:
+    if checkers is None:
+        checkers = get_checkers()
     issues_by_type: EXTENSIVE_SUMMARY_TYPE = defaultdict(lambda: defaultdict(int))
 
     # Ensure also checkers and codes without issues are included in the report.
-    for checker in get_checkers():
+    for checker in checkers:
         for code in checker.codes:
             issues_by_type[checker.__class__.__name__][code] = 0
 

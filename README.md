@@ -71,7 +71,7 @@ Usage: suricata-check [OPTIONS]
   ------
 
     BadParameter: If provided arguments are invalid.
-    
+
     RuntimeError: If no checkers could be automatically discovered.
 
 Options:

@@ -4,5 +4,6 @@ Implementation of the `CheckerInterface` is neccessary for checker auto-discover
 """
 
 from suricata_check.checkers.interface.checker import CheckerInterface
+from suricata_check.checkers.interface.dummy import DummyChecker
 
-__all__ = ["CheckerInterface"]
+__all__ = ["CheckerInterface", "DummyChecker"]

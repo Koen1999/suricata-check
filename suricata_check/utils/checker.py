@@ -91,14 +91,16 @@ def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
     return True
 
 
-def get_suboptions(rule: idstools.rule.Rule, name: str) -> Mapping[str, Optional[str]]:
+def get_rule_suboptions(
+    rule: idstools.rule.Rule, name: str, warn: bool = True
+) -> Mapping[str, Optional[str]]:
     """Returns a list of suboptions set in a rule."""
     value = get_rule_option(rule, name)
     valid_suboptions: list[tuple[str, Optional[str]]] = []
     if value is not None:
         values = value.split(",")
         suboptions: list[Optional[tuple[str, Optional[str]]]] = [
-            __split_suboption(suboption) for suboption in values
+            __split_suboption(suboption, warn=warn) for suboption in values
         ]
         # Filter out suboptions that could not be parsed
         valid_suboptions = [
@@ -108,7 +110,9 @@ def get_suboptions(rule: idstools.rule.Rule, name: str) -> Mapping[str, Optional
     return dict(valid_suboptions)
 
 
-def __split_suboption(suboption: str) -> Optional[tuple[str, Optional[str]]]:
+def __split_suboption(
+    suboption: str, warn: bool
+) -> Optional[tuple[str, Optional[str]]]:
     suboption = suboption.strip()
 
     splitted = suboption.split(" ")
@@ -119,18 +123,34 @@ def __split_suboption(suboption: str) -> Optional[tuple[str, Optional[str]]]:
     if len(splitted) == 2:  # noqa: PLR2004
         return tuple(splitted)  # type: ignore reportReturnType
 
-    _logger.warning("Failed to split suboption: %s", suboption)
+    if warn:
+        _logger.warning("Failed to split suboption: %s", suboption)
+
     return None
 
 
 def is_rule_suboption_set(rule: idstools.rule.Rule, name: str, sub_name: str) -> bool:
     """Checks if a suboption within an option is set."""
-    suboptions = get_suboptions(rule, name)
+    suboptions = get_rule_suboptions(rule, name)
 
     if sub_name in suboptions.keys():
         return True
 
     return False
+
+
+def get_rule_suboption(
+    rule: idstools.rule.Rule, name: str, sub_name: str
+) -> Optional[str]:
+    """Returns a suboption within an option is set."""
+    options = get_rule_suboptions(rule, name)
+
+    if sub_name not in options.keys():
+        msg = f"Option {name} not found in rule."
+        _logger.debug(msg)
+        return None
+
+    return options[sub_name]
 
 
 def count_rule_options(

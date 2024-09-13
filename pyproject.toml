@@ -58,6 +58,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 performance = ["regex>=2024.5.15"]
+ml = ["numpy>=1.26.4", "pandas>=2.0.3", "scikit-learn>=1.5.0", "xgboost>=2.0.3"]
 dev = [
   "pytest>=8.2.1",
   "pytest-cov>=5.0.0",
@@ -73,6 +74,7 @@ dev = [
   "numpy>=1.26.4",
   "pandas>=2.0.3",
   "scikit-learn>=1.5.0",
+  "xgboost>=2.0.3",
 ]
 
 [project.urls]
@@ -165,7 +167,7 @@ select = [
   "AIR",
   "RUF",
 ]
-ignore = ["N807", "D203", "D213", "D401", "COM812", "UP032", "ICN001"]
+ignore = ["N807", "D203", "D213", "D401", "COM812", "UP032", "ICN001", "PD101"]
 fixable = ["ALL"]
 
 [tool.ruff.lint.pydocstyle]

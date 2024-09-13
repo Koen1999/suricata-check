@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 
 # Import the fastest regex provider available:
 if importlib.util.find_spec("regex") is not None:
-    _logger.info("Detected regex module as installid, using it.")
+    _logger.info("Detected regex module as installed, using it.")
     import regex as _regex_provider
 else:
     _logger.warning(

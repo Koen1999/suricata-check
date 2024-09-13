@@ -10,7 +10,7 @@ suricata-check.log
 suricata-check.jsonl
 suricata-check-fast.log
 suricata-check-stats.log
-.coverage
+.coverage*
 cov.*
 coverage.*
 htmlcov

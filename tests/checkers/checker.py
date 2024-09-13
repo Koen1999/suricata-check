@@ -21,6 +21,12 @@ class GenericChecker:
     def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)
 
+    def _set_log_level(self, level: int):
+        logger = logging.getLogger()
+        logger.setLevel(level)
+        for handler in logger.handlers:
+            handler.setLevel(level)
+
     @lru_cache(maxsize=1)
     def _check_rule(
         self,
@@ -84,6 +90,7 @@ class GenericChecker:
 
         return correct, issue if not correct else None
 
+    @pytest.hookimpl(trylast=True)
     def test_no_undeclared_codes(self):
         """Asserts the checker emits no undeclared codes."""
         assert self.checker is not None
@@ -105,6 +112,7 @@ class GenericChecker:
             if code not in self.checker.codes:
                 pytest.fail(code)
 
+    @pytest.hookimpl(trylast=True)
     def test_code_structure(self):
         """Asserts the checker only emits codes following the allowed structure."""
         regex = _regex_provider.compile(r"[A-Z]{1,}[0-9]{3}")
@@ -112,6 +120,7 @@ class GenericChecker:
             if regex.match(code) is None:
                 pytest.fail(code)
 
+    @pytest.hookimpl(trylast=True)
     def test_issue_metadata(self):
         """Asserts the checker adds required metadata to emitted issues."""
         output = suricata_check.process_rules_file(
