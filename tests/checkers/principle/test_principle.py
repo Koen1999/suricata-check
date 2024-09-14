@@ -7,11 +7,8 @@ import numpy
 import pandas
 import pytest
 import sklearn.metrics
-import suricata_check.checkers.principle
 
-from ..checker import GenericChecker
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 import suricata_check
 
 CHECKER_CLASS = suricata_check.checkers.PrincipleChecker
@@ -145,7 +142,7 @@ NON_LABELLED_PUBLIC_RULES_PATH = os.path.join("data", "principle_rules.csv")
 _logger = logging.getLogger(__name__)
 
 
-class TestPrinciple(GenericChecker):
+class TestPrinciple(suricata_check.tests.GenericChecker):
     @pytest.fixture(autouse=True)
     def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)

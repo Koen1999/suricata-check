@@ -5,9 +5,7 @@ import sys
 import idstools.rule
 import pytest
 
-from ..checker import GenericChecker
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 import suricata_check
 
 CHECKER_CLASS = suricata_check.checkers.PcreChecker
@@ -55,7 +53,7 @@ sid:2400001;)""": {
 }
 
 
-class TestPcre(GenericChecker):
+class TestPcre(suricata_check.tests.GenericChecker):
     @pytest.fixture(autouse=True)
     def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)

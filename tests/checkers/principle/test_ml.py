@@ -7,13 +7,11 @@ import numpy
 import pandas
 import pytest
 import sklearn.metrics
-import suricata_check.checkers.principle
 
-from ..checker import GenericChecker
 from .test_principle import NON_LABELLED_PUBLIC_RULES_PATH
 from .test_principle import RULES as P_RULES
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 import suricata_check
 
 CHECKER_CLASS = suricata_check.checkers.PrincipleMLChecker
@@ -30,7 +28,7 @@ for rule in P_RULES.keys():
 _logger = logging.getLogger(__name__)
 
 
-class TestPrincipleML(GenericChecker):
+class TestPrincipleML(suricata_check.tests.GenericChecker):
     @pytest.fixture(autouse=True)
     def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)

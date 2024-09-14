@@ -256,7 +256,7 @@ class PrincipleMLChecker(CheckerInterface):
 
         # # Drop zero variance columns
         X_train = X_train.drop(  # noqa: N806
-            X_train.columns[(X_train.fillna(-1337).var(axis=0) <= 0)].to_list(),
+            X_train.columns[(X_train.fillna(-1337).var(axis=0) <= 0)].to_list(),  # type: ignore reportAttributeAccessIssue
             axis=1,
         )
 

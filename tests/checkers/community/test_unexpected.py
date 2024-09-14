@@ -4,11 +4,8 @@ import sys
 
 import idstools.rule
 import pytest
-import suricata_check.checkers.principle
 
-from ..checker import GenericChecker
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 import suricata_check
 
 CHECKER_CLASS = suricata_check.checkers.UnexpectedChecker
@@ -34,7 +31,7 @@ sid:2400000;)""": {
 }
 
 
-class TestUnexpected(GenericChecker):
+class TestUnexpected(suricata_check.tests.GenericChecker):
     @pytest.fixture(autouse=True)
     def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)

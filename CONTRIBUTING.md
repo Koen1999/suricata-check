@@ -50,6 +50,21 @@ ruff check . --fix
 pyright
 ```
 
+## Docs
+
+To automatically generate the documentation from the code, run the following commands:
+```bash
+./docs/make.bat clean
+./docs/make.bat html
+```
+
 ## Pull requests
 
 When you create a pull request (PR), several checks are automatically run. These include some basic code style checks, as well as running all non-slow tests. PRs that do not pass these checks will not be merged. Additionally, PRs will undergo atleast one round of feedback before merging and require approval of atleast one contributor.
+
+## Writing Extensions
+
+It is possible to extend `suricata-check` with additional checkers without contributing these checkers to the main project.
+This may be beneficial if your checkers serve a very narrow use-case or if you would like to develop proprietary checkers.
+An example of such an extension is given in the [suricata-check-extension-example](`https://github.com/Koen1999/suricata-check-extension-example`) project.
+Note that for extensions to be automatically discovered by the CLI, their module name should begin with `suricata_check_`, they should expose `suricata_check_extension.__version__`, and their checkers should implement the `CheckerInterface`.

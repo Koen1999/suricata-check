@@ -1,6 +1,6 @@
+"""`GenericChecker`."""
+
 import logging
-import os
-import sys
 import warnings
 from functools import lru_cache
 from typing import Optional
@@ -8,24 +8,25 @@ from typing import Optional
 import idstools.rule
 import pytest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-import suricata_check
+from suricata_check.checkers.interface.checker import CheckerInterface
+from suricata_check.utils.regex import get_regex_provider
+from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
-_regex_provider = suricata_check.utils.regex.get_regex_provider()
+_regex_provider = get_regex_provider()
 
 _CODE_STRUCTURE_REGEX = _regex_provider.compile(r"[A-Z]{1,}[0-9]{3}")
 
-_logger = logging.getLogger(__name__)
-
 
 class GenericChecker:
-    checker: suricata_check.checkers.interface.CheckerInterface
+    """The GenericChecker class can be extended by tests to test classes implementing `CheckerInterface`."""
+
+    checker: CheckerInterface
 
     @pytest.fixture(autouse=True)
-    def __run_around_tests(self):
+    def __run_around_tests(self: "GenericChecker") -> None:
         logging.basicConfig(level=logging.DEBUG)
 
-    def _set_log_level(self, level: int):
+    def _set_log_level(self: "GenericChecker", level: int) -> None:
         logger = logging.getLogger()
         logger.setLevel(level)
         for handler in logger.handlers:
@@ -33,13 +34,13 @@ class GenericChecker:
 
     @lru_cache(maxsize=1)
     def _check_rule(
-        self,
+        self: "GenericChecker",
         rule: idstools.rule.Rule,
-    ) -> suricata_check.utils.typing.ISSUES_TYPE:
+    ) -> ISSUES_TYPE:
         return self.checker.check_rule(rule)
 
     def _test_issue(
-        self,
+        self: "GenericChecker",
         rule: Optional[idstools.rule.Rule],
         code: str,
         raised: bool,
@@ -66,21 +67,22 @@ class GenericChecker:
                 warnings.warn(RuntimeWarning(msg))
 
     def check_issue(
-        self,
+        self: "GenericChecker",
         rule: Optional[idstools.rule.Rule],
         code: str,
         raised: bool,
-    ) -> tuple[Optional[bool], Optional[suricata_check.utils.typing.Issue]]:
+    ) -> tuple[Optional[bool], Optional[Issue]]:
+        """Checks whether a rule raises an issue with a certain code and returns whether the expectation is met."""
         if rule is None:
             pytest.fail("Rule is None")
 
-        issues: suricata_check.utils.typing.ISSUES_TYPE = self._check_rule(rule)
+        issues: ISSUES_TYPE = self._check_rule(rule)
 
         self._test_no_undeclared_codes(issues)
         self._test_issue_metadata(issues)
 
         correct: Optional[bool] = None
-        issue: Optional[suricata_check.utils.typing.Issue] = None
+        issue: Optional[Issue] = None
 
         if raised:
             correct = False
@@ -98,24 +100,7 @@ class GenericChecker:
 
         return correct, issue if not correct else None
 
-    @pytest.hookimpl(trylast=True)
-    def test_no_undeclared_codes(self):
-        """Asserts the checker emits no undeclared codes."""
-        assert self.checker is not None
-
-        output = suricata_check.process_rules_file(
-            "tests/data/test.rules",
-            False,
-            checkers=[self.checker],
-        )
-
-        rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output.rules
-        for rule in rules:
-            self._test_no_undeclared_codes(rule.issues)
-
-    def _test_no_undeclared_codes(
-        self, issues: suricata_check.utils.typing.ISSUES_TYPE
-    ):
+    def _test_no_undeclared_codes(self: "GenericChecker", issues: ISSUES_TYPE) -> None:
         """Asserts the checker emits no undeclared codes."""
         assert self.checker is not None
 
@@ -128,26 +113,13 @@ class GenericChecker:
                 pytest.fail(code)
 
     @pytest.hookimpl(trylast=True)
-    def test_code_structure(self):
+    def test_code_structure(self: "GenericChecker") -> None:
         """Asserts the checker only emits codes following the allowed structure."""
         for code in self.checker.codes:
             if _CODE_STRUCTURE_REGEX.match(code) is None:
                 pytest.fail(code)
 
-    @pytest.hookimpl(trylast=True)
-    def test_issue_metadata(self):
-        """Asserts the checker adds required metadata to emitted issues."""
-        output = suricata_check.process_rules_file(
-            "tests/data/test.rules",
-            False,
-            checkers=[self.checker],
-        )
-
-        rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output.rules
-        for rule in rules:
-            self._test_issue_metadata(rule.issues)
-
-    def _test_issue_metadata(self, issues: suricata_check.utils.typing.ISSUES_TYPE):
+    def _test_issue_metadata(self: "GenericChecker", issues: ISSUES_TYPE) -> None:
         """Asserts the checker adds required metadata to emitted issues."""
         for issue in issues:
             if not hasattr(issue, "checker"):

@@ -4,6 +4,7 @@ import io
 import logging
 import logging.handlers
 import os
+import pkgutil
 import sys
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
@@ -47,6 +48,9 @@ LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
 _logger = logging.getLogger(__name__)
 
 _regex_provider = get_regex_provider()
+
+# Global variable to check if extensions have already been imported in case get_checkers() is called multiple times.
+suricata_check_extensions_imported = False
 
 
 @click.command()
@@ -411,6 +415,28 @@ def process_rules_file(
     return output
 
 
+def _import_extensions() -> None:
+    global suricata_check_extensions_imported  # noqa: PLW0603
+    if suricata_check_extensions_imported is True:
+        return
+
+    for module in pkgutil.iter_modules():
+        if module.name.startswith("suricata_check_"):
+            try:
+                imported_module = __import__(module.name)
+                _logger.info(
+                    "Detected and successfully imported suricata-check extension %s with version %s.",
+                    module.name.replace("_", "-"),
+                    getattr(imported_module, "__version__"),
+                )
+            except ImportError:
+                _logger.warning(
+                    "Detected potential suricata-check extension %s but failed to import it.",
+                    module.name.replace("_", "-"),
+                )
+    suricata_check_extensions_imported = True
+
+
 @lru_cache(maxsize=1)
 def get_checkers(
     include: Sequence[str] = (".*",),
@@ -422,6 +448,9 @@ def get_checkers(
     A list of available checkers that implement the CheckerInterface.
 
     """
+    # Check for extensions and try to import them
+    _import_extensions()
+
     checkers: list[CheckerInterface] = []
     for checker in get_all_subclasses(CheckerInterface):
         if checker.__name__ == DummyChecker.__name__:
