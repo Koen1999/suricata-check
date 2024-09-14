@@ -1,9 +1,9 @@
 """The `suricata_check.utils.checker` module contains several utilities for developing rule checkers."""
 
 import logging
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Sequence
 from functools import lru_cache
-from typing import Optional, Union
+from typing import Literal, Optional, Union, overload
 
 import idstools.rule
 
@@ -93,21 +93,21 @@ def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
 
 def get_rule_suboptions(
     rule: idstools.rule.Rule, name: str, warn: bool = True
-) -> Mapping[str, Optional[str]]:
+) -> Sequence[tuple[str, Optional[str]]]:
     """Returns a list of suboptions set in a rule."""
-    value = get_rule_option(rule, name)
+    values = get_rule_options(rule, name)
     valid_suboptions: list[tuple[str, Optional[str]]] = []
-    if value is not None:
+    for value in values:
         values = value.split(",")
         suboptions: list[Optional[tuple[str, Optional[str]]]] = [
             __split_suboption(suboption, warn=warn) for suboption in values
         ]
         # Filter out suboptions that could not be parsed
-        valid_suboptions = [
+        valid_suboptions += [
             suboption for suboption in suboptions if suboption is not None
         ]
 
-    return dict(valid_suboptions)
+    return valid_suboptions
 
 
 def __split_suboption(
@@ -132,8 +132,9 @@ def __split_suboption(
 def is_rule_suboption_set(rule: idstools.rule.Rule, name: str, sub_name: str) -> bool:
     """Checks if a suboption within an option is set."""
     suboptions = get_rule_suboptions(rule, name)
+    _logger.debug(suboptions)
 
-    if sub_name in suboptions.keys():
+    if sub_name in [suboption[0] for suboption in suboptions]:
         return True
 
     return False
@@ -143,14 +144,15 @@ def get_rule_suboption(
     rule: idstools.rule.Rule, name: str, sub_name: str
 ) -> Optional[str]:
     """Returns a suboption within an option is set."""
-    options = get_rule_suboptions(rule, name)
+    suboptions = get_rule_suboptions(rule, name)
 
-    if sub_name not in options.keys():
-        msg = f"Option {name} not found in rule."
-        _logger.debug(msg)
-        return None
+    for suboption in suboptions:
+        if sub_name == suboption[0]:
+            return suboption[1]
 
-    return options[sub_name]
+    msg = f"Option {name} not found in rule."
+    _logger.debug(msg)
+    return None
 
 
 def count_rule_options(
@@ -204,6 +206,16 @@ def __count_rule_options(
         count = max(count, 1)
 
     return count
+
+
+@overload
+def get_rule_option(rule: idstools.rule.Rule, name: Literal["msg"]) -> str:
+    pass
+
+
+@overload
+def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
+    pass
 
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
@@ -318,6 +330,35 @@ def is_rule_option_equal_to(rule: idstools.rule.Rule, name: str, value: str) -> 
     return False
 
 
+def is_rule_suboption_equal_to(
+    rule: idstools.rule.Rule, name: str, sub_name: str, value: str
+) -> bool:
+    """Checks whether a rule has a certain suboption set to a certain value.
+
+    If the suboption is set multiple times, it will return True if atleast one option matches the value.
+
+    Args:
+        rule (idstools.rule.Rule): rule to be inspected
+        name (str): name of the option
+        sub_name (str): name of the suboption
+        value (str): value to check for
+
+    Returns:
+        bool: True iff the rule has the option set to the value atleast once
+
+    """
+    if not is_rule_suboption_set(rule, name, sub_name):
+        return False
+
+    values = get_rule_suboptions(rule, name)
+
+    for key, val in values:
+        if key == sub_name and val == value:
+            return True
+
+    return False
+
+
 def is_rule_option_equal_to_regex(
     rule: idstools.rule.Rule,
     name: str,
@@ -346,6 +387,102 @@ def is_rule_option_equal_to_regex(
             return True
 
     return False
+
+
+def is_rule_suboption_equal_to_regex(
+    rule: idstools.rule.Rule,
+    name: str,
+    sub_name: str,
+    regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
+) -> bool:
+    """Checks whether a rule has a certain option set to match a certain regex.
+
+    If the option is set multiple times, it will return True if atleast one option matches the regex.
+
+    Args:
+        rule (idstools.rule.Rule): rule to be inspected
+        name (str): name of the option
+        sub_name (str): name of the suboption
+        regex (Union[re.Pattern, regex.Pattern]): regex to check for
+
+    Returns:
+        bool: True iff the rule has atleast one option matching the regex
+
+    """
+    if not is_rule_suboption_set(rule, name, sub_name):
+        return False
+
+    values = get_rule_suboptions(rule, name)
+
+    for key, value in values:
+        if key == sub_name and regex.match(value) is not None:
+            return True
+
+    return False
+
+
+def is_rule_option_always_equal_to_regex(
+    rule: idstools.rule.Rule,
+    name: str,
+    regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
+) -> Optional[bool]:
+    """Checks whether a rule has a certain option set to match a certain regex.
+
+    If the option is set multiple times, it will return True if all options match the regex.
+    Returns none if the rule option is not set.
+
+    Args:
+        rule (idstools.rule.Rule): rule to be inspected
+        name (str): name of the option
+        regex (Union[re.Pattern, regex.Pattern]): regex to check for
+
+    Returns:
+        bool: True iff the rule has all options matching the regex
+
+    """
+    if not is_rule_option_set(rule, name):
+        return None
+
+    values = get_rule_options(rule, name)
+
+    for value in values:
+        if regex.match(value) is None:
+            return False
+
+    return True
+
+
+def is_rule_suboption_always_equal_to_regex(
+    rule: idstools.rule.Rule,
+    name: str,
+    sub_name: str,
+    regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
+) -> Optional[bool]:
+    """Checks whether a rule has a certain option set to match a certain regex.
+
+    If the option is set multiple times, it will return True if all options match the regex.
+    Returns none if the rule option is not set.
+
+    Args:
+        rule (idstools.rule.Rule): rule to be inspected
+        name (str): name of the option
+        sub_name (str): name of the suboption
+        regex (Union[re.Pattern, regex.Pattern]): regex to check for
+
+    Returns:
+        bool: True iff the rule has all options matching the regex
+
+    """
+    if not is_rule_suboption_set(rule, name, sub_name):
+        return None
+
+    values = get_rule_suboptions(rule, name)
+
+    for key, value in values:
+        if key == sub_name and regex.match(value) is None:
+            return False
+
+    return True
 
 
 def are_rule_options_equal_to_regex(
@@ -516,10 +653,12 @@ def is_rule_option_last(rule: idstools.rule.Rule, name: str) -> Optional[bool]:
 def get_rule_options_positions(
     rule: idstools.rule.Rule,
     names: Iterable[str],
-    sequence: Optional[tuple[str, ...]] = None,
+    sequence: Optional[Iterable[str]] = None,
 ) -> Iterable[int]:
     """Finds the positions of several options in the rule body."""
-    return __get_rule_options_positions(rule, tuple(sorted(names)), sequence=sequence)
+    return __get_rule_options_positions(
+        rule, tuple(sorted(names)), sequence=tuple(sequence) if sequence else None
+    )
 
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
@@ -540,11 +679,14 @@ def is_rule_option_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
-    sequence: Optional[tuple[str, ...]] = None,
+    sequence: Optional[Iterable[str]] = None,
 ) -> Optional[bool]:
     """Checks whether a rule option is placed before one or more other options."""
     return __is_rule_option_put_before(
-        rule, name, tuple(sorted(other_names)), sequence=sequence
+        rule,
+        name,
+        tuple(sorted(other_names)),
+        sequence=tuple(sequence) if sequence else None,
     )
 
 
@@ -581,11 +723,14 @@ def is_rule_option_always_put_before(
     rule: idstools.rule.Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
-    sequence: Optional[tuple[str, ...]] = None,
+    sequence: Optional[Iterable[str]] = None,
 ) -> Optional[bool]:
     """Checks whether a rule option is placed before one or more other options."""
     return __is_rule_option_always_put_before(
-        rule, name, tuple(sorted(other_names)), sequence=sequence
+        rule,
+        name,
+        tuple(sorted(other_names)),
+        sequence=tuple(sequence) if sequence else None,
     )
 
 
@@ -622,7 +767,7 @@ def are_rule_options_put_before(
     rule: idstools.rule.Rule,
     names: Union[Sequence[str], set[str]],
     other_names: Union[Sequence[str], set[str]],
-    sequence: Optional[tuple[str, ...]] = None,
+    sequence: Optional[Iterable[str]] = None,
 ) -> Optional[bool]:
     """Checks whether rule options are placed before one or more other options."""
     if len(other_names) == 0:
@@ -648,7 +793,7 @@ def are_rule_options_always_put_before(
     rule: idstools.rule.Rule,
     names: Iterable[str],
     other_names: Sequence[str],
-    sequence: Optional[tuple[str, ...]] = None,
+    sequence: Optional[Iterable[str]] = None,
 ) -> Optional[bool]:
     """Checks whether rule options are placed before one or more other options."""
     if len(other_names) == 0:

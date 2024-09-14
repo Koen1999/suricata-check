@@ -62,6 +62,111 @@ sid:2400000;)""": {
         "should_raise": [],
         "should_not_raise": ["S402"],
     },
+    # S403, bad
+    """alert ip any any -> any any (\
+msg:"ET SCAN Possible Bruteforce 2022-22-04"; \
+sid:2400000;)""": {
+        "should_raise": ["S403"],
+        "should_not_raise": [],
+    },
+    # S403, bad
+    """alert ip any any -> any any (\
+msg:"ET SCAN Possible Bruteforce 2022/04/22"; \
+sid:2400000;)""": {
+        "should_raise": ["S403"],
+        "should_not_raise": [],
+    },
+    # S403, good
+    """alert ip any any -> any any (\
+msg:"ET SCAN Bruteforce 2022-04-22"; \
+sid:2400000;)""": {
+        "should_raise": [],
+        "should_not_raise": ["S403"],
+    },
+    # S404, bad
+    """alert ip any any -> any any (\
+msg:"ET MALWARE Command & Control"; \
+sid:2400000;)""": {
+        "should_raise": ["S404"],
+        "should_not_raise": [],
+    },
+    # S404, good
+    """alert ip any any -> any any (\
+msg:"ET MALWARE CnC"; \
+sid:2400000;)""": {
+        "should_raise": [],
+        "should_not_raise": ["S404"],
+    },
+    # S405, bad
+    """alert ip any any -> any any (\
+msg:"ET MALWARE BadBot"; \
+sid:2400000;)""": {
+        "should_raise": ["S405"],
+        "should_not_raise": [],
+    },
+    # S405, good
+    """alert ip any any -> any any (\
+msg:"ET MALWARE Win/BadBot Go"; \
+sid:2400000;)""": {
+        "should_raise": [],
+        "should_not_raise": ["S405"],
+    },
+    # S406, bad
+    """alert ip any any -> any any (\
+msg:"ET MALWARE CnC Domain (foo.bar)"; \
+sid:2400000;)""": {
+        "should_raise": ["S406"],
+        "should_not_raise": [],
+    },
+    # S406, good
+    """alert ip any any -> any any (\
+msg:"ET MALWARE CnC Domain (foo .bar)"; \
+sid:2400000;)""": {
+        "should_raise": [],
+        "should_not_raise": ["S406"],
+    },
+    # S407, bad
+    """alert ip any any -> any any (\
+msg:"ET MALWARE CnC Domain (foo[.]bar)"; \
+sid:2400000;)""": {
+        "should_raise": ["S407"],
+        "should_not_raise": [],
+    },
+    # S407, good
+    """alert ip any any -> any any (\
+msg:"ET MALWARE CnC Domain (foo .bar)"; \
+sid:2400001;)""": {
+        "should_raise": [],
+        "should_not_raise": ["S407"],
+    },
+    # S408, bad
+    """alert ip any any -> any any (\
+msg:"ET MALWARE CnC Domain (foo. bar)"; \
+sid:2400000;)""": {
+        "should_raise": ["S408"],
+        "should_not_raise": [],
+    },
+    # S408, good
+    """alert ip any any -> any any (\
+msg:"ET MALWARE CnC Domain (foo .bar)"; \
+sid:2400002;)""": {
+        "should_raise": [],
+        "should_not_raise": ["S408"],
+    },
+    # S409, bad
+    """alert ip any any -> any any (\
+msg:"ET MALWARE CnC Domain (foo .bar) ®"; \
+sid:2400000;)""": {
+        "should_raise": ["S409"],
+        "should_not_raise": [],
+    },
+    # S409, good
+    """alert ip any any -> any any (\
+msg:"ET MALWARE CnC Domain (foo .bar)"; \
+sid:2400003;)""": {
+        "should_raise": [],
+        "should_not_raise": ["S409"],
+    },
 }
 
 

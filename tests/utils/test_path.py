@@ -10,7 +10,7 @@ import suricata_check
 
 
 @pytest.hookimpl(tryfirst=True)
-@pytest.mark.serial
+@pytest.mark.serial()
 def test_find_rules_file():
     full_path = os.path.abspath("tests/data/temp/test.rules")
 

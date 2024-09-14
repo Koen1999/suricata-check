@@ -52,6 +52,20 @@ class TestOverall(GenericChecker):
 
         self._test_issue(rule, "S001", False)
 
+    def test_s002_bad(self):
+        rule = idstools.rule.parse(
+            """alert http $HOME_NET any -> any any (msg:"ET EXPLOIT Some crazy CVE"; sid:1; dns.query:"foo.bar";)""",
+        )
+
+        self._test_issue(rule, "S002", True)
+
+    def test_s002_good(self):
+        rule = idstools.rule.parse(
+            """alert http any any -> any any (msg:"ET EXPLOIT Some crazy CVE"; sid:1; dns.query:"foo.bar";)""",
+        )
+
+        self._test_issue(rule, "S002", False)
+
     def test_s011_bad(self):
         rule = idstools.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1; priority:1;)""",

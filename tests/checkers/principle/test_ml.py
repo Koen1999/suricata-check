@@ -36,7 +36,7 @@ class TestPrincipleML(GenericChecker):
         logging.basicConfig(level=logging.DEBUG)
         self.checker = CHECKER_CLASS()
 
-    @pytest.mark.slow
+    @pytest.mark.slow()
     def test_train_principle_ml(self):
         self._set_log_level(logging.INFO)
 
@@ -84,7 +84,7 @@ class TestPrincipleML(GenericChecker):
         self._test_issue(rule, code, expected, fail=False)
 
     @pytest.hookimpl(trylast=True)
-    @pytest.mark.slow
+    @pytest.mark.slow()
     def test_precision_recall(self):
         self._set_log_level(logging.INFO)
 
@@ -106,8 +106,8 @@ class TestPrincipleML(GenericChecker):
 
             _logger.info("Testing PrincipleMLChecker by leaving out group %s", group)
 
-            principle_rules_train = principle_rules[principle_rules["group"] != group]
-            principle_rules_test = principle_rules[principle_rules["group"] == group]
+            principle_rules_train: pandas.DataFrame = principle_rules[principle_rules["group"] != group]  # type: ignore reportAssignmentType
+            principle_rules_test: pandas.DataFrame = principle_rules[principle_rules["group"] == group]  # type: ignore reportAssignmentType
 
             self.checker.train(principle_rules_train, reuse_models=True)
 

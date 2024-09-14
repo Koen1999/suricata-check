@@ -1,9 +1,10 @@
 """The `suricata_check.typing` module contains all types used by the `suricata-check` package."""
 
-from collections.abc import MutableMapping, MutableSequence
+from collections.abc import Iterable, MutableMapping, MutableSequence
 from dataclasses import dataclass, field
 from typing import (
     Optional,
+    TypeVar,
 )
 
 import idstools.rule
@@ -22,6 +23,19 @@ ISSUES_TYPE = MutableSequence[Issue]
 SIMPLE_SUMMARY_TYPE = MutableMapping[str, int]
 RULE_SUMMARY_TYPE = SIMPLE_SUMMARY_TYPE
 EXTENSIVE_SUMMARY_TYPE = MutableMapping[str, SIMPLE_SUMMARY_TYPE]
+
+Cls = TypeVar("Cls")
+
+
+def get_all_subclasses(cls: type[Cls]) -> Iterable[type[Cls]]:
+    """Returns all class types that subclass the provided type."""
+    all_subclasses = []
+
+    for subclass in cls.__subclasses__():
+        all_subclasses.append(subclass)
+        all_subclasses.extend(get_all_subclasses(subclass))
+
+    return all_subclasses
 
 
 @dataclass

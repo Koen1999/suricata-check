@@ -13,6 +13,10 @@ import suricata_check
 
 _regex_provider = suricata_check.utils.regex.get_regex_provider()
 
+_CODE_STRUCTURE_REGEX = _regex_provider.compile(r"[A-Z]{1,}[0-9]{3}")
+
+_logger = logging.getLogger(__name__)
+
 
 class GenericChecker:
     checker: suricata_check.checkers.interface.CheckerInterface
@@ -71,6 +75,10 @@ class GenericChecker:
             pytest.fail("Rule is None")
 
         issues: suricata_check.utils.typing.ISSUES_TYPE = self._check_rule(rule)
+
+        self._test_no_undeclared_codes(issues)
+        self._test_issue_metadata(issues)
+
         correct: Optional[bool] = None
         issue: Optional[suricata_check.utils.typing.Issue] = None
 
@@ -101,12 +109,19 @@ class GenericChecker:
             checkers=[self.checker],
         )
 
-        codes = set()
         rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output.rules
         for rule in rules:
-            issues: suricata_check.utils.typing.ISSUES_TYPE = rule.issues
-            for issue in issues:
-                codes.add(issue.code)
+            self._test_no_undeclared_codes(rule.issues)
+
+    def _test_no_undeclared_codes(
+        self, issues: suricata_check.utils.typing.ISSUES_TYPE
+    ):
+        """Asserts the checker emits no undeclared codes."""
+        assert self.checker is not None
+
+        codes = set()
+        for issue in issues:
+            codes.add(issue.code)
 
         for code in codes:
             if code not in self.checker.codes:
@@ -115,9 +130,8 @@ class GenericChecker:
     @pytest.hookimpl(trylast=True)
     def test_code_structure(self):
         """Asserts the checker only emits codes following the allowed structure."""
-        regex = _regex_provider.compile(r"[A-Z]{1,}[0-9]{3}")
         for code in self.checker.codes:
-            if regex.match(code) is None:
+            if _CODE_STRUCTURE_REGEX.match(code) is None:
                 pytest.fail(code)
 
     @pytest.hookimpl(trylast=True)
@@ -131,7 +145,20 @@ class GenericChecker:
 
         rules: suricata_check.utils.typing.RULE_REPORTS_TYPE = output.rules
         for rule in rules:
-            issues: suricata_check.utils.typing.ISSUES_TYPE = rule.issues
-            for issue in issues:
-                if not hasattr(issue, "checker"):
-                    pytest.fail(str(issue))
+            self._test_issue_metadata(rule.issues)
+
+    def _test_issue_metadata(self, issues: suricata_check.utils.typing.ISSUES_TYPE):
+        """Asserts the checker adds required metadata to emitted issues."""
+        for issue in issues:
+            if not hasattr(issue, "checker"):
+                pytest.fail(
+                    "Issue with code {} did not specify checker.".format(
+                        str(issue.code)
+                    )
+                )
+            if issue.message.strip() != issue.message:
+                pytest.fail(
+                    'Issue with code {} starts with or ends with whitespace in message: """{}"""'.format(
+                        str(issue.code), str(issue.message)
+                    )
+                )

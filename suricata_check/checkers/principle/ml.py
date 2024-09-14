@@ -5,7 +5,7 @@ import logging
 import os
 import pickle
 from collections import Counter
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable
 from typing import Any, Literal, Optional, Union, overload
 
 import idstools.rule
@@ -148,8 +148,8 @@ class PrincipleMLChecker(CheckerInterface):
         False  # Since the checker is relatively slow, it is disabled by default
     )
 
-    dtypes: Optional[Mapping[str, Any]] = None
-    models: dict[str, Pipeline] = {}
+    _dtypes: Optional[dict[str, Any]] = None
+    _models: dict[str, Pipeline] = {}
 
     def __new__(
         cls: type["PrincipleMLChecker"],
@@ -163,13 +163,28 @@ class PrincipleMLChecker(CheckerInterface):
                 with open(filepath, "rb") as f:
                     inst = pickle.load(f)
 
-                if not isinstance(inst, PrincipleMLChecker):
+                # BEGIN LEGACY CODE
+                # CAN BE REMOVED AFTER TRAINING NEW PKL
+                if hasattr(inst, "models"):
+                    inst._models = inst.models  # noqa: SLF001
+                    inst._dtypes = inst.dtypes  # noqa: SLF001
+                # END LEGACY CODE
+
+                if not inst.__class__.__name__ == cls.__name__:
                     _logger.error("Unpickled object is not of type %s", cls)
                     inst = super().__new__(cls, *args, **kwargs)  # type: ignore reportargumentType
-                elif not hasattr(inst, "models") or len(inst.models) == 0:
+                elif (
+                    not hasattr(inst, "_models")
+                    or len(
+                        inst._models  # noqa: SLF001 type: ignore reportAttributeAccess
+                    )
+                    == 0
+                ):
                     _logger.error("Unpickled object does not have trained models")
                     inst = super().__new__(cls, *args, **kwargs)  # type: ignore reportargumentType
                 else:
+                    if "include" in kwargs:
+                        inst.include = kwargs["include"]
                     _logger.info("Unpickled object with trained models successfully")
             else:
                 _logger.warning("No model found for PrincipleMLChecker at %s", filepath)
@@ -191,10 +206,10 @@ class PrincipleMLChecker(CheckerInterface):
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 
-        if len(self.models) == 0:
+        if len(self._models) == 0:
             return issues
 
-        for code, model in self.models.items():
+        for code, model in self._models.items():
             if model.predict(self._get_features(rule, True))[0]:
                 issues.append(
                     Issue(
@@ -205,7 +220,7 @@ class PrincipleMLChecker(CheckerInterface):
 
         return issues
 
-    def train(
+    def train(  # noqa: C901
         self: "PrincipleMLChecker",
         df: DataFrame,
         rule_col: str = "rule.rule",
@@ -223,9 +238,9 @@ class PrincipleMLChecker(CheckerInterface):
 
         The checker class with trained models is stored in a pickle file (`_PICKLE_PATH`).
         """
-        self.dtypes = None
+        self._dtypes = None
         if not reuse_models:
-            self.models = {}
+            self._models = {}
 
         # Extract features and determine feature dtypes
         X_train = self._get_train_df(df[rule_col])  # noqa: N806
@@ -241,7 +256,7 @@ class PrincipleMLChecker(CheckerInterface):
 
         # # Drop zero variance columns
         X_train = X_train.drop(  # noqa: N806
-            X_train.columns[(X_train.fillna(-1337).var(axis=0) <= 0)],
+            X_train.columns[(X_train.fillna(-1337).var(axis=0) <= 0)].to_list(),
             axis=1,
         )
 
@@ -268,8 +283,8 @@ class PrincipleMLChecker(CheckerInterface):
                 raise
 
         # Store used features and their dtypes
-        self.dtypes = X_train.dtypes.to_dict()
-        _logger.debug(self.dtypes)
+        self._dtypes = X_train.dtypes.to_dict()
+        _logger.debug(self._dtypes)
 
         # Redo feature extraction now that FE parameters are set
         X_train = self._get_train_df(df[rule_col])  # noqa: N806
@@ -284,7 +299,7 @@ class PrincipleMLChecker(CheckerInterface):
         for code, col in principle_cols.items():
             y_true = df[col].to_numpy() == 0
 
-            if not reuse_models or code not in self.models:
+            if not reuse_models or code not in self._models:
                 # Train new model with grid search to find optimal parameters
                 gridsearchcv: GridSearchCV = copy.deepcopy(GRIDSEARCHCV)
 
@@ -295,10 +310,10 @@ class PrincipleMLChecker(CheckerInterface):
                     "Code %s Weighted F1-score: %s", code, gridsearchcv.best_score_
                 )
 
-                self.models[code] = gridsearchcv.best_estimator_
+                self._models[code] = gridsearchcv.best_estimator_
 
             precision = cross_val_score(
-                self.models[code],
+                self._models[code],
                 X_train,
                 y_true,
                 scoring=make_scorer(precision_score, zero_division=0.0),
@@ -306,7 +321,7 @@ class PrincipleMLChecker(CheckerInterface):
                 n_jobs=N_JOBS,
             ).mean()
             recall = cross_val_score(
-                self.models[code],
+                self._models[code],
                 X_train,
                 y_true,
                 scoring=make_scorer(recall_score, zero_division=0.0),
@@ -314,7 +329,7 @@ class PrincipleMLChecker(CheckerInterface):
                 n_jobs=N_JOBS,
             ).mean()
             f1 = cross_val_score(
-                self.models[code],
+                self._models[code],
                 X_train,
                 y_true,
                 scoring=make_scorer(f1_score, zero_division=0.0),
@@ -326,7 +341,7 @@ class PrincipleMLChecker(CheckerInterface):
             _logger.info("Code %s F1-score: %s", code, f1)
 
             # Refit model with training data.
-            self.models[code].fit(X_train, y_true)
+            self._models[code].fit(X_train, y_true)
 
         pickle.dump(self, open(_PICKLE_PATH, "wb"))
 
@@ -338,7 +353,7 @@ class PrincipleMLChecker(CheckerInterface):
 
         return DataFrame(feature_vectors)
 
-    def _get_raw_features(
+    def _get_raw_features(  # noqa: C901
         self: "PrincipleMLChecker", rule: idstools.rule.Rule
     ) -> Series:
         d: dict[str, Optional[Union[str, int]]] = {
@@ -360,9 +375,7 @@ class PrincipleMLChecker(CheckerInterface):
 
             suboptions = [
                 {"name": k, "value": v}
-                for k, v in get_rule_suboptions(
-                    rule, option["name"], warn=False
-                ).items()
+                for k, v in get_rule_suboptions(rule, option["name"], warn=False)
             ]
 
             if len(suboptions) == 0:
@@ -398,7 +411,7 @@ class PrincipleMLChecker(CheckerInterface):
         return Series(d)
 
     def _preprocess_features(self: "PrincipleMLChecker", data: Series) -> Series:
-        original_cols = set(data.index)
+        original_cols: set[str] = set(data.index)
 
         for col in self.string_columns:
             if col not in data:
@@ -448,10 +461,10 @@ class PrincipleMLChecker(CheckerInterface):
     def _get_features_frame(self: "PrincipleMLChecker", features: Series) -> DataFrame:
         features_frame = features.to_frame().transpose()
 
-        if self.dtypes is None:
+        if self._dtypes is None:
             return features_frame
 
-        for col, dtype in self.dtypes.items():
+        for col, dtype in self._dtypes.items():
             if features_frame.dtypes[col] != dtype:
                 features_frame[col] = features_frame[col].astype(dtype)
 
@@ -465,10 +478,10 @@ class PrincipleMLChecker(CheckerInterface):
 
         features["custom.negated.count"] = rule["raw"].count(':!"')
 
-        if self.dtypes is None:
+        if self._dtypes is None:
             return features
 
-        for col, dtype in self.dtypes.items():
+        for col, dtype in self._dtypes.items():
             if col not in features:
                 if col.endswith(".count"):
                     features[col] = 0
@@ -483,7 +496,7 @@ class PrincipleMLChecker(CheckerInterface):
                         dtype,
                     )
 
-        features = features[list(self.dtypes.keys())]
+        features = features[list(self._dtypes.keys())]  # type: ignore reportAssignmentType
 
         if not frame:
             return features

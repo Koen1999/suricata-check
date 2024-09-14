@@ -18,6 +18,4 @@ the rule does detect the characteristic in a fixed position and is unlikely to g
 
 
 def get_message(code: str) -> str:
-    return MESSAGES.get(
-        code[1:], "No message available for this code."
-    )
+    return MESSAGES.get(code[1:], "No message available for this code.")

@@ -40,7 +40,7 @@ REGEX_S210 = _regex_provider.compile(
 
 
 class OrderChecker(CheckerInterface):
-    """The `OrderChecker` contains several checks based on the Suricata syntax that are critical.
+    """The `OrderChecker` contains several checks on the ordering Suricata options.
 
     Note that the correct ordering of detection options is as follows:
         1. Buffer

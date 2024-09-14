@@ -6,7 +6,7 @@ import logging.handlers
 import os
 import sys
 from collections import defaultdict
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from functools import lru_cache
 from typing import (
     Literal,
@@ -38,6 +38,7 @@ from suricata_check.utils.typing import (  # noqa: E402
     OutputReport,
     OutputSummary,
     RuleReport,
+    get_all_subclasses,
 )
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
@@ -410,16 +411,6 @@ def process_rules_file(
     return output
 
 
-def __get_all_subclasses(cls: type) -> Iterable[type]:
-    all_subclasses = []
-
-    for subclass in cls.__subclasses__():
-        all_subclasses.append(subclass)
-        all_subclasses.extend(__get_all_subclasses(subclass))
-
-    return all_subclasses
-
-
 @lru_cache(maxsize=1)
 def get_checkers(
     include: Sequence[str] = (".*",),
@@ -432,7 +423,7 @@ def get_checkers(
 
     """
     checkers: list[CheckerInterface] = []
-    for checker in __get_all_subclasses(CheckerInterface):
+    for checker in get_all_subclasses(CheckerInterface):
         if checker.__name__ == DummyChecker.__name__:
             continue
 

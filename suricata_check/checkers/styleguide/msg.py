@@ -1,28 +1,18 @@
 """`MsgChecker`."""
 
 import logging
-from collections.abc import Mapping, Sequence
 
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
+    get_rule_option,
     is_rule_option_equal_to_regex,
     is_rule_option_set,
     is_rule_suboption_set,
 )
 from suricata_check.utils.regex import get_regex_provider
 from suricata_check.utils.typing import ISSUES_TYPE, Issue
-
-MSG_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
-    "local": [(1000000, 1999999)],
-    "ET OPEN": [
-        (2000000, 2103999),
-        (2400000, 2609999),
-    ],
-    "ET": [(2700000, 2799999)],
-    "ETPRO": [(2800000, 2899999)],
-}
 
 _regex_provider = get_regex_provider()
 
@@ -35,12 +25,35 @@ _VAGUE_KEYWORDS = ("possible", "unknown")
 _S402_REGEX = _regex_provider.compile(
     r"^.*({}).*$".format("|".join(_VAGUE_KEYWORDS)), _regex_provider.IGNORECASE
 )
+_UNDESIRABLE_DATE_REGEXES = (
+    _regex_provider.compile(r"^.*(\d{4}/\d{2}/\d{2}).*$", _regex_provider.IGNORECASE),
+    _regex_provider.compile(r"^.*(\d{4}-[2-9]\d-\d{2}).*$", _regex_provider.IGNORECASE),
+)  # Desirable format is ISO (YYYY-MM-DD)
+_S404_REGEX = _regex_provider.compile(
+    r"^.*(C2|C&C|Command and Control|Command & Control).*$", _regex_provider.IGNORECASE
+)
+_S405_REGEX = _regex_provider.compile(
+    r"^.*(Go|MSIL|ELF64|MSIL|JS|Win32|DOS|Amiga|C64|Plan9).*$",
+    _regex_provider.IGNORECASE,
+)
+_S406_REGEX = _regex_provider.compile(
+    r"^.*((\w+\.)+[a-z]{2,}).*$",
+    _regex_provider.IGNORECASE,
+)
+_S407_REGEX = _regex_provider.compile(
+    r"^.*((\w+\[\.\])+[a-z]{2,}).*$",
+    _regex_provider.IGNORECASE,
+)
+_S408_REGEX = _regex_provider.compile(
+    r"^.*((\w+\. )+[a-z]{2,}).*$",
+    _regex_provider.IGNORECASE,
+)
 
 _logger = logging.getLogger(__name__)
 
 
 class MsgChecker(CheckerInterface):
-    """The `MsgChecker` contains several checks based on the Suricata Msg allocation.
+    """The `MsgChecker` contains several checks based for the Msg option in Suricata rules.
 
     Codes S400-S410 report on non-standard `msg` fields.
     """
@@ -49,9 +62,16 @@ class MsgChecker(CheckerInterface):
         "S400",
         "S401",
         "S402",
+        "S403",
+        "S404",
+        "S405",
+        "S406",
+        "S407",
+        "S408",
+        "S409",
     )
 
-    def _check_rule(
+    def _check_rule(  # noqa: C901
         self: "MsgChecker",
         rule: idstools.rule.Rule,
     ) -> ISSUES_TYPE:
@@ -95,7 +115,88 @@ Consider rephrasing to provide a more clear message for interpreting generated a
 """,
                 ),
             )
-        _logger.debug(_S402_REGEX.pattern)
+
+        for regex in _UNDESIRABLE_DATE_REGEXES:
+            if is_rule_option_equal_to_regex(rule, "msg", regex):
+                issues.append(
+                    Issue(
+                        code="S403",
+                        message="""\
+The rule uses a non-ISO date in the msg field.
+Consider reformatting the date to ISO format (YYYY-MM-DD).\
+""",
+                    ),
+                )
+                break
+
+        if is_rule_option_equal_to_regex(rule, "msg", _S404_REGEX):
+            issues.append(
+                Issue(
+                    code="S404",
+                    message="""\
+The rule uses a different way of writing CnC (Command & Control) in the msg field.
+Consider writing CnC instead.\
+""",
+                ),
+            )
+
+        if self.__desribes_malware(rule) and not is_rule_option_equal_to_regex(
+            rule, "msg", _S405_REGEX
+        ):
+            issues.append(
+                Issue(
+                    code="S405",
+                    message="""\
+The rule likely detects malware but does not specify the file type in the msg field.
+Consider specifying a file type such as `DOS` or `ELF64`.\
+""",
+                ),
+            )
+
+        if is_rule_option_equal_to_regex(rule, "msg", _S406_REGEX):
+            issues.append(
+                Issue(
+                    code="S406",
+                    message="""\
+The rule specifies a domain name without escaping the label seperators.
+Consider escaping the domain names by putting a space before the dot like `foo .bar` to prevent information leaks.\
+""",
+                ),
+            )
+
+        if is_rule_option_equal_to_regex(rule, "msg", _S407_REGEX):
+            issues.append(
+                Issue(
+                    code="S407",
+                    message="""\
+The rule specifies a domain name and escapes it in a non-standard way in the msg field.
+Consider escaping the domain names by putting a space before the dot like `foo .bar`.\
+""",
+                ),
+            )
+
+        if is_rule_option_equal_to_regex(rule, "msg", _S408_REGEX):
+            issues.append(
+                Issue(
+                    code="S408",
+                    message="""\
+The rule specifies a domain name and escapes it in a non-standard way in the msg field.
+Consider escaping the domain names by putting a space before the dot like `foo .bar`.\
+""",
+                ),
+            )
+
+        # Note that all characters under 128 are ASCII
+        if any(ord(c) > 128 for c in get_rule_option(rule, "msg")):  # noqa: PLR2004
+            issues.append(
+                Issue(
+                    code="S409",
+                    message="""\
+The rule uses non-ASCII characters in the msg field.
+Consider removing non-ASCII characters.\
+""",
+                ),
+            )
 
         return issues
 

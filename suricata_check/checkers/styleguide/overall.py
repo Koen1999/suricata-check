@@ -25,6 +25,14 @@ _regex_provider = get_regex_provider()
 
 # Regular expressions are placed here such that they are compiled only once.
 # This has a significant impact on the performance.
+_REGEX_S002a = _regex_provider.compile(
+    r"^.*(EXPLOIT|CVE).*$",
+    _regex_provider.IGNORECASE,
+)
+_REGEX_S002b = _regex_provider.compile(
+    r"^.*(Internal|Inbound|Outbound).*$",
+    _regex_provider.IGNORECASE,
+)
 _REGEX_S030 = _regex_provider.compile(r"^[a-z\-]+$")
 _REGEX_S031 = _regex_provider.compile(r"^[^\|]*\|[^\|]*[A-Z]+[^\|]*\|[^\|]*$")
 
@@ -46,6 +54,7 @@ class OverallChecker(CheckerInterface):
     codes = (
         "S000",
         "S001",
+        "S002",
         "S010",
         "S011",
         "S012",
@@ -86,6 +95,24 @@ Consider constraining the rule to a specific direction such as INBOUND or OUTBOU
                     message="""The rule detects certain dns queries and has dest_addr not set to any \
 causing the rule to be specific to either local or external resolvers.
 Consider setting dest_addr to any.""",
+                )
+            )
+
+        if (
+            is_rule_option_equal_to_regex(rule, "msg", _REGEX_S002a)
+            and not (
+                is_rule_option_equal_to(rule, "source_addr", "any")
+                and is_rule_option_equal_to(rule, "dest_addr", "any")
+            )
+            and not is_rule_option_equal_to_regex(rule, "msg", _REGEX_S002b)
+        ):
+            issues.append(
+                Issue(
+                    code="S002",
+                    message="""The rule detects exploitation attempts in a constrained direction \
+without specifying the direction in the rule msg. \
+Consider setting `src_addr` and `dest_addr` to any to also account for lateral movement scenarios. \
+Alternatively, you can specify the direction (i.e., `Internal` or `Inbound`) in the rule `msg`.""",
                 )
             )
 

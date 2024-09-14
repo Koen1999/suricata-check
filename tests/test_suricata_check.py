@@ -38,7 +38,7 @@ def __run_around_tests():
     logging.shutdown()
 
 
-@pytest.mark.serial
+@pytest.mark.serial()
 def test_main_cli():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
@@ -54,7 +54,7 @@ def test_main_cli():
         pytest.fail(result.output)
 
 
-@pytest.mark.serial
+@pytest.mark.serial()
 def test_main_cli_single_rule():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
@@ -74,8 +74,8 @@ def test_main_cli_single_rule():
         pytest.fail(result.output)
 
 
-@pytest.mark.slow
-@pytest.mark.serial
+@pytest.mark.slow()
+@pytest.mark.serial()
 @pytest.hookimpl(trylast=True)
 @pytest.mark.parametrize(("version", "et_open_url"), ET_OPEN_URLS.items())
 def test_main_cli_integration_et_open(version, et_open_url):
@@ -117,8 +117,8 @@ def test_main_cli_integration_et_open(version, et_open_url):
         pytest.fail(result.output)
 
 
-@pytest.mark.slow
-@pytest.mark.serial
+@pytest.mark.slow()
+@pytest.mark.serial()
 @pytest.hookimpl(trylast=True)
 def test_main_cli_integration_snort_community():
     # Retrieve the latest Snort rules if not present.
@@ -157,7 +157,7 @@ def test_main_cli_integration_snort_community():
     # We do not check the log file as we know some Snort rules are invalid Suricata rules.
 
 
-@pytest.mark.serial
+@pytest.mark.serial()
 def test_main():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     with pytest.raises(SystemExit) as excinfo:
@@ -174,7 +174,7 @@ def test_main():
     assert excinfo.value.code == 0
 
 
-@pytest.mark.serial
+@pytest.mark.serial()
 def test_main_single_rule():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     with pytest.raises(SystemExit) as excinfo:
@@ -191,7 +191,7 @@ def test_main_single_rule():
     assert excinfo.value.code == 0
 
 
-@pytest.mark.serial
+@pytest.mark.serial()
 def test_main_error():
     logging.basicConfig(level=logging.DEBUG)
     with pytest.raises(SystemExit) as excinfo:
