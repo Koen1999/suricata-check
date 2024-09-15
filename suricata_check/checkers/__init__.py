@@ -1,7 +1,7 @@
 """The `suricata_check.checkers` module contains all rule checkers."""
 
 from suricata_check.checkers import interface
-from suricata_check.checkers.community import UnexpectedChecker
+from suricata_check.checkers.community import BestChecker, UnexpectedChecker
 from suricata_check.checkers.mandatory import MandatoryChecker
 from suricata_check.checkers.principle import PrincipleChecker, PrincipleMLChecker
 from suricata_check.checkers.styleguide import (
@@ -33,4 +33,5 @@ __all__ = [
     "ReferenceChecker",
     "PerformanceChecker",
     "UnexpectedChecker",
+    "BestChecker",
 ]
