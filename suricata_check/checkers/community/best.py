@@ -17,7 +17,11 @@ class BestChecker(CheckerInterface):
     Codes C100-C110 report on missing fields that should be set.
     """
 
-    codes = ("C100","C101","C102",)
+    codes = (
+        "C100",
+        "C101",
+        "C102",
+    )
 
     def _check_rule(
         self: "BestChecker",
@@ -25,7 +29,10 @@ class BestChecker(CheckerInterface):
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 
-        if not is_rule_option_set(rule, "target"):
+        if not (
+            is_rule_option_set(rule, "noalert")
+            or is_rule_suboption_set(rule, "flowbits", "noalert")
+        ) and not is_rule_option_set(rule, "target"):
             issues.append(
                 Issue(
                     code="C100",
@@ -49,7 +56,7 @@ Consider adding the `created_at` metadata option to inform users of the recency 
 
         if (
             is_rule_option_set(rule, "rev")
-            and int(get_rule_option(rule, "rev")) > 1 # type: ignore reportArgumentType
+            and int(get_rule_option(rule, "rev")) > 1  # type: ignore reportArgumentType
             and not is_rule_suboption_set(rule, "metadata", "updated_at")
         ):
             issues.append(

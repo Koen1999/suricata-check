@@ -150,8 +150,6 @@ Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
             if prefix in SID_ALLOCATION.keys() or " " not in prefix:
                 break
 
-        assert len(prefix) > 0
-
         _logger.debug("Detected prefix: %s", prefix)
 
         return prefix

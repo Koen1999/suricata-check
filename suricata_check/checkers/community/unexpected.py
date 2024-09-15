@@ -26,11 +26,7 @@ class UnexpectedChecker(CheckerInterface):
 
         if (
             is_rule_suboption_set(rule, "flowbits", "set")
-            or is_rule_suboption_set(rule, "flowbits", "unset")
-            or is_rule_suboption_set(rule, "flowbits", "toggle")
             or is_rule_suboption_set(rule, "xbits", "set")
-            or is_rule_suboption_set(rule, "xbits", "unset")
-            or is_rule_suboption_set(rule, "xbits", "toggle")
         ) and (is_rule_option_set(rule, "threshold")):
             issues.append(
                 Issue(

@@ -12,7 +12,7 @@ from suricata_check.utils.typing import ISSUES_TYPE, Issue
 _regex_provider = get_regex_provider()
 
 _S700_REGEX = _regex_provider.compile(
-    r"^.*[A-Z]+.*$",
+    r"^(?!url).*[A-Z]+.*$",
 )
 _S701_REGEX = _regex_provider.compile(
     r"^url,\s*https?.*$",

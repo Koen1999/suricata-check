@@ -16,9 +16,7 @@ from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 _regex_provider = get_regex_provider()
 
-_S400_REGEX = _regex_provider.compile(
-    r"""^"[A-Z0-9 ]+ [A-Z0-9]+ (?![A-Z0-9 ]+ ).*( .*)?"$"""
-)
+_S400_REGEX = _regex_provider.compile(r"""^"[A-Z0-9 ]+ [A-Z0-9_]+ .*"$""")
 _MALWARE_REGEX = _regex_provider.compile(r"^.*(malware).*$", _regex_provider.IGNORECASE)
 _S401_REGEX = _regex_provider.compile(r"""^".* [a-zA-Z0-9]+/[a-zA-Z0-9]+ .*"$""")
 _VAGUE_KEYWORDS = ("possible", "unknown")
@@ -105,7 +103,10 @@ Consider changing the msg field to include `Platform/malfamily`.\
                 ),
             )
 
-        if is_rule_option_equal_to_regex(rule, "msg", _S402_REGEX):
+        if not (
+            is_rule_option_set(rule, "noalert")
+            or is_rule_suboption_set(rule, "flowbits", "noalert")
+        ) and is_rule_option_equal_to_regex(rule, "msg", _S402_REGEX):
             issues.append(
                 Issue(
                     code="S402",

@@ -4,7 +4,7 @@ import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
-    get_rule_detection_keyword_sequences,
+    get_rule_keyword_sequences,
     is_rule_option_set,
 )
 from suricata_check.utils.regex import (
@@ -56,7 +56,7 @@ Consider detection methods avoiding the usage of `base64_` keywords to improve r
                     ),
                 )
 
-        for sequence in get_rule_detection_keyword_sequences(rule):
+        for sequence in get_rule_keyword_sequences(rule):
             if "http.uri" in sequence and "bsize" in sequence:
                 issues.append(
                     Issue(

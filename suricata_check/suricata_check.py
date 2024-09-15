@@ -500,7 +500,7 @@ def __get_checker_enabled(
                 filter(
                     lambda code: _regex_provider.compile("^" + regex + "$").match(code)
                     is not None,
-                    checker.codes,
+                    relevant_codes,
                 )
             )
             if len(relevant_codes) > 0:
@@ -510,7 +510,7 @@ def __get_checker_enabled(
             filter(
                 lambda code: _regex_provider.compile("^" + regex + "$").match(code)
                 is None,
-                checker.codes,
+                relevant_codes,
             )
         )
 

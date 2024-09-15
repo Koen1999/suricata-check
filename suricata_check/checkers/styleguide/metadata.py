@@ -4,6 +4,7 @@ import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
+    is_rule_option_set,
     is_rule_suboption_set,
 )
 from suricata_check.utils.typing import ISSUES_TYPE, Issue
@@ -39,7 +40,10 @@ Consider specifying the `attack_target` metadata option to help analysts interpr
                 ),
             )
 
-        if not is_rule_suboption_set(rule, "metadata", "signature_severity"):
+        if not is_rule_suboption_set(rule, "metadata", "signature_severity") and not (
+            is_rule_option_set(rule, "noalert")
+            or is_rule_suboption_set(rule, "flowbits", "noalert")
+        ):
             issues.append(
                 Issue(
                     code="S801",

@@ -155,7 +155,9 @@ Consider using the a standard variable group instead.""",
                 )
             )
 
-        if not is_rule_option_one_of(rule, "classtype", CLASSTYPES):
+        if is_rule_option_set(rule, "classtype") and not is_rule_option_one_of(
+            rule, "classtype", CLASSTYPES
+        ):
             issues.append(
                 Issue(
                     code="S014",

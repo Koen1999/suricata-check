@@ -830,26 +830,37 @@ def select_rule_options_by_regex(
     return tuple(sorted(options))
 
 
-def get_rule_detection_keyword_sequences(
-    rule: idstools.rule.Rule, seperator_keywords: Iterable[str] = BUFFER_KEYWORDS
+def get_rule_keyword_sequences(
+    rule: idstools.rule.Rule,
+    seperator_keywords: Iterable[str] = BUFFER_KEYWORDS,
+    included_keywords: Iterable[str] = ALL_DETECTION_KEYWORDS,
 ) -> Sequence[tuple[str, ...]]:
     """Returns a sequence of sequences of detection options in a rule."""
-    sequences: list[list[str]] = [[]]
+    sequences: list[list[str]] = []
 
     # Relies on the assumption that the order of options in the rule is preserved while parsing
-    sequence_i = 0
-    first_found = False
+    sequence_i = -1
+    first_seperator_seen = False
     for option in rule["options"]:
         name = option["name"]
-        if name in seperator_keywords and first_found:
+        if name in seperator_keywords:
+            if not first_seperator_seen:
+                if len(sequences) > 0:
+                    sequences[sequence_i].append(name)
+                else:
+                    sequence_i += 1
+                    sequences.append([name])
+            else:
+                sequence_i += 1
+                sequences.append([name])
+            first_seperator_seen = True
+        elif name in included_keywords and sequence_i == -1:
             sequence_i += 1
-            sequences.append([])
-        elif name in seperator_keywords:
-            first_found = True
-        if name in ALL_DETECTION_KEYWORDS:
+            sequences.append([name])
+        elif name in included_keywords:
             sequences[sequence_i].append(name)
 
-    if len(sequences) <= 1 and len(sequences[0]) == 0:
+    if len(sequences) == 0:
         _logger.debug(
             "No sequences found seperated by %s in rule %s",
             seperator_keywords,

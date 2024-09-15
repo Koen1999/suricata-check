@@ -95,11 +95,18 @@ Consider using `RULESET.description` as name for the flowbit.\
             )
 
         if (
-            is_rule_suboption_set(rule, "flowbits", "set")
-            or is_rule_suboption_set(rule, "flowbits", "unset")
-        ) and not (
-            is_rule_option_set(rule, "noalert")
-            or is_rule_suboption_set(rule, "flowbits", "noalert")
+            (
+                is_rule_suboption_set(rule, "flowbits", "set")
+                or is_rule_suboption_set(rule, "flowbits", "unset")
+            )
+            and not (
+                is_rule_suboption_set(rule, "flowbits", "isset")
+                or is_rule_suboption_set(rule, "flowbits", "isnotset")
+            )
+            and not (
+                is_rule_option_set(rule, "noalert")
+                or is_rule_suboption_set(rule, "flowbits", "noalert")
+            )
         ):
             issues.append(
                 Issue(
@@ -123,9 +130,16 @@ Consider using `RULESET.description` as name for the xbit.\
             )
 
         if (
-            is_rule_suboption_set(rule, "xbits", "set")
-            or is_rule_suboption_set(rule, "xbits", "unset")
-        ) and not is_rule_option_set(rule, "noalert"):
+            (
+                is_rule_suboption_set(rule, "xbits", "set")
+                or is_rule_suboption_set(rule, "xbits", "unset")
+            )
+            and not is_rule_option_set(rule, "noalert")
+            and not (
+                is_rule_suboption_set(rule, "xbits", "isset")
+                or is_rule_suboption_set(rule, "xbits", "isnotset")
+            )
+        ):
             issues.append(
                 Issue(
                     code="S521",

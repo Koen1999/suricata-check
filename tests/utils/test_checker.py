@@ -170,7 +170,7 @@ performance_impact Low, signature_severity Minor;)""",
 
     sequences = {
         tuple(sequence)
-        for sequence in suricata_check.utils.checker.get_rule_detection_keyword_sequences(
+        for sequence in suricata_check.utils.checker.get_rule_keyword_sequences(
             rule, seperator_keywords=seperator_keywords
         )
     }

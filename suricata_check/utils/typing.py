@@ -18,6 +18,22 @@ class Issue:
     message: str
     checker: Optional[str] = None
 
+    def to_dict(self: "Issue") -> dict[str, str]:
+        """Returns the Issue represented as a dictionary."""
+        d = {
+            "code": self.code,
+            "message": self.message,
+        }
+
+        if self.checker is not None:
+            d["checker"] = self.checker
+
+        return d
+
+    def __repr__(self: "Issue") -> str:
+        """Returns the Issue represented as a string."""
+        return str(self.to_dict())
+
 
 ISSUES_TYPE = MutableSequence[Issue]
 SIMPLE_SUMMARY_TYPE = MutableMapping[str, int]
@@ -61,6 +77,25 @@ class RuleReport:
         """Adds an issue to the report."""
         for issue in issues:
             self._issues.append(issue)
+
+    def to_dict(self: "RuleReport") -> dict[str, str]:
+        """Returns the RuleReport represented as a dictionary."""
+        d = {
+            "rule": self.rule["raw"],
+            "issues": [issue.to_dict() for issue in self.issues],
+        }
+
+        if self.summary is not None:
+            d["summary"] = self.summary
+
+        if self.line is not None:
+            d["line"] = self.line
+
+        return d
+
+    def __repr__(self: "RuleReport") -> str:
+        """Returns the RuleReport represented as a string."""
+        return str(self.to_dict())
 
 
 RULE_REPORTS_TYPE = MutableSequence[RuleReport]

@@ -6,21 +6,22 @@ from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
     are_rule_options_put_before,
     count_rule_options,
-    get_rule_detection_keyword_sequences,
+    get_rule_keyword_sequences,
     get_rule_option_position,
     is_rule_option_always_put_before,
     is_rule_option_first,
-    is_rule_option_last,
     is_rule_option_put_before,
     is_rule_option_set,
 )
 from suricata_check.utils.regex import (
     ALL_DETECTION_KEYWORDS,
+    ALL_TRANSFORMATION_KEYWORDS,
     BUFFER_KEYWORDS,
     CONTENT_KEYWORDS,
     FLOW_STREAM_KEYWORDS,
     MODIFIER_KEYWORDS,
     OTHER_PAYLOAD_KEYWORDS,
+    PERFORMANCE_DETECTION_OPTIONS,
     POINTER_MOVEMENT_KEYWORDS,
     SIZE_KEYWORDS,
     TRANSFORMATION_KEYWORDS,
@@ -172,7 +173,7 @@ Consider reording to put the rev option directly after the sid option.""",
                 )
             )
 
-        if is_rule_option_last(rule, "metadata") is False:
+        if is_rule_option_put_before(rule, "metadata", ("sid", "rev")) is True:
             issues.append(
                 Issue(
                     code="S208",
@@ -291,7 +292,9 @@ Consider moving the urilen option to before content buffers and detection option
             )
 
         # Detects pointer movement before any content or buffer option or between a buffer and a content option.
-        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+        for sequence in get_rule_keyword_sequences(
+            rule, seperator_keywords=CONTENT_KEYWORDS
+        ):
             if (
                 are_rule_options_put_before(
                     rule,
@@ -312,12 +315,17 @@ Consider moving the pointer movement options to after the content option.""".for
                 )
 
         # Detects fast_pattern before any content or buffer option or between a buffer and a content option.
-        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+        for sequence in get_rule_keyword_sequences(
+            rule, seperator_keywords=CONTENT_KEYWORDS
+        ):
             if (
                 is_rule_option_put_before(
                     rule,
                     "fast_pattern",
-                    set(CONTENT_KEYWORDS).union(BUFFER_KEYWORDS),
+                    set(SIZE_KEYWORDS)
+                    .union(ALL_TRANSFORMATION_KEYWORDS)
+                    .union(CONTENT_KEYWORDS)
+                    .union(POINTER_MOVEMENT_KEYWORDS),
                     sequence=sequence,
                 )
                 is True
@@ -335,12 +343,18 @@ size options, transformation options, the content option or pointer movement opt
                 )
 
         # Detects no_case before any content or buffer option or between a buffer and a content option.
-        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+        for sequence in get_rule_keyword_sequences(
+            rule, seperator_keywords=CONTENT_KEYWORDS
+        ):
             if (
                 is_rule_option_put_before(
                     rule,
                     "nocase",
-                    set(CONTENT_KEYWORDS).union(BUFFER_KEYWORDS),
+                    set(SIZE_KEYWORDS)
+                    .union(ALL_TRANSFORMATION_KEYWORDS)
+                    .union(CONTENT_KEYWORDS)
+                    .union(POINTER_MOVEMENT_KEYWORDS)
+                    .union(PERFORMANCE_DETECTION_OPTIONS),
                     sequence=sequence,
                 )
                 is True
@@ -358,12 +372,14 @@ size options, transformation options, the content option, pointer movement optio
                 )
 
         # Detects modifier options before any content or buffer option or between a buffer and a content option.
-        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+        for sequence in get_rule_keyword_sequences(
+            rule, seperator_keywords=CONTENT_KEYWORDS
+        ):
             if (
                 are_rule_options_put_before(
                     rule,
                     MODIFIER_KEYWORDS,
-                    set(CONTENT_KEYWORDS).union(BUFFER_KEYWORDS),
+                    set(CONTENT_KEYWORDS),
                     sequence=sequence,
                 )
                 is True
@@ -377,7 +393,9 @@ Consider moving the modifier options to after the content option.""",
                 )
 
         # Detects other detection options before any content or buffer option or between a buffer and a content option.
-        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+        for sequence in get_rule_keyword_sequences(
+            rule, seperator_keywords=CONTENT_KEYWORDS
+        ):
             if (
                 are_rule_options_put_before(
                     rule,
@@ -398,7 +416,9 @@ size options, transformation options,  the content option, pointer movement opti
                 )
 
         # Detects size options after any transformation options, content option or other detection options.
-        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+        for sequence in get_rule_keyword_sequences(
+            rule, seperator_keywords=CONTENT_KEYWORDS
+        ):
             if (
                 are_rule_options_put_before(
                     rule,
@@ -420,7 +440,9 @@ Consider moving the size options to after any transformation options, content op
                 )
 
         # Detects transformation options after any content option or other detection options.
-        for sequence in get_rule_detection_keyword_sequences(rule, CONTENT_KEYWORDS):
+        for sequence in get_rule_keyword_sequences(
+            rule, seperator_keywords=CONTENT_KEYWORDS
+        ):
             if (
                 are_rule_options_put_before(
                     rule,
