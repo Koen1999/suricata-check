@@ -1,8 +1,10 @@
 """The `suricata_check.suricata_check` module contains the command line utility and the main program logic."""
 
+import atexit
 import io
 import logging
 import logging.handlers
+import multiprocessing
 import os
 import pkgutil
 import sys
@@ -111,7 +113,7 @@ suricata_check_extensions_imported = False
     show_default=True,
     multiple=True,
 )
-def main(  # noqa: PLR0913
+def main(  # noqa: PLR0913, PLR0915
     out: str = ".",
     rules: str = ".",
     single_rule: Optional[str] = None,
@@ -141,19 +143,39 @@ def main(  # noqa: PLR0913
     if not os.path.exists(out):
         os.makedirs(out)
 
-    # Setup logging
+    # Setup logging from a seperate thread
+    queue = multiprocessing.Manager().Queue()
+    queue_handler = logging.handlers.QueueHandler(queue)
+
+    click_handler = ClickHandler()
     logging.basicConfig(
         level=log_level,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=(
-            logging.FileHandler(
-                filename=os.path.join(out, "suricata-check.log"),
-                delay=True,
-            ),
-            ClickHandler(),
-        ),
+        handlers=(queue_handler, click_handler),
         force=os.environ.get("SURICATA_CHECK_FORCE_LOGGING", False) == "TRUE",
     )
+
+    file_handler = logging.FileHandler(
+        filename=os.path.join(out, "suricata-check.log"),
+        delay=True,
+    )
+    queue_listener = logging.handlers.QueueListener(
+        queue,
+        file_handler,
+        respect_handler_level=True,
+    )
+
+    def _at_exit() -> None:
+        """Cleans up logging listener and handlers before exiting."""
+        queue_listener.enqueue_sentinel()
+        queue_listener.stop()
+        file_handler.flush()
+        file_handler.close()
+        atexit.unregister(_at_exit)
+
+    atexit.register(_at_exit)
+
+    queue_listener.start()
 
     # Log the arguments:
     _logger.info("Running suricata-check with the following arguments:")
@@ -202,6 +224,7 @@ def main(  # noqa: PLR0913
         __write_output(OutputReport(rules=[rule_report]), out)
 
         # Return here so no rules file is processed.
+        _at_exit()
         return
 
     # Check if the rules argument is valid and find the rules file
@@ -210,6 +233,8 @@ def main(  # noqa: PLR0913
     output = process_rules_file(rules, evaluate_disabled, checkers=checkers)
 
     __write_output(output, out)
+
+    _at_exit()
 
 
 def __write_output(

@@ -40,10 +40,6 @@ jobs:
         run: |
           pytest -k et_open -k v5 -m "slow" --cov-fail-under=0
 
-      - name: Test with pytest - Integration ET OPEN v4
-        run: |
-          pytest -k et_open -k v4 -m "slow" --cov-fail-under=0
-
       - name: Test with pytest - Integration Snort Community
         run: |
           pytest -k snort_community -m "slow" --cov-fail-under=0

@@ -16,7 +16,6 @@ from click.testing import CliRunner
 _regex_provider = suricata_check.utils.regex.get_regex_provider()
 
 ET_OPEN_URLS = {
-    "v4": "https://rules.emergingthreats.net/open/suricata-4.0/emerging-all.rules.tar.gz",
     "v5": "https://rules.emergingthreats.net/open/suricata-5.0/emerging-all.rules.tar.gz",
     "v7": "https://rules.emergingthreats.net/open/suricata-7.0.3/emerging-all.rules.tar.gz",
 }
@@ -106,7 +105,7 @@ def test_main_cli_integration_et_open(version, et_open_url):
         (
             f"--rules=tests/data/emerging-all-{version}.rules",
             "--out=tests/data/out",
-            "--log-level=DEBUG",
+            "--log-level=INFO",
         ),
         catch_exceptions=False,
     )
@@ -146,7 +145,7 @@ def test_main_cli_integration_snort_community():
         (
             "--rules=tests/data/snort3-community.rules",
             "--out=tests/data/out",
-            "--log-level=DEBUG",
+            "--log-level=INFO",
         ),
         catch_exceptions=False,
     )

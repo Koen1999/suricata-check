@@ -79,32 +79,14 @@
                 "-m",
                 "pytest",
                 "tests/test_suricata_check.py",
+                "-k",
+                "et_open",
+                "-k",
+                "v7",
                 "-m",
                 "\"slow or not slow\"",
                 "--cov-fail-under=0"
             ]
-        },
-        {
-            "name": "Pytest: ET OPEN v4 Integration",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "pytest",
-            "args": [
-                "-k",
-                "et_open",
-                "-k",
-                "v4",
-                "-m",
-                "slow or not slow",
-                "--cov-fail-under=0"
-            ],
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "subProcess": true,
-            "stopOnEntry": false,
-            "autoReload": {
-                "enable": false
-            },
         },
         {
             "name": "Pytest: ET OPEN v5 Integration",
