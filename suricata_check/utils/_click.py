@@ -10,13 +10,13 @@ class ClickHandler(logging.Handler):
         """Log the record via click stdout with appropriate colors."""
         msg = self.format(record)
 
-        if record.levelno == logging.getLevelName("DEBUG"):
+        if logging.getLevelName(record.levelno) == "DEBUG":
             click.secho(msg, color=True, dim=True)
-        if record.levelno == logging.getLevelName("INFO"):
+        if logging.getLevelName(record.levelno) == "INFO":
             click.secho(msg, color=True)
-        if record.levelno == logging.getLevelName("WARNING"):
+        if logging.getLevelName(record.levelno) == "WARNING":
             click.secho(msg, color=True, bold=True, fg="yellow")
-        if record.levelno == logging.getLevelName("ERROR"):
+        if logging.getLevelName(record.levelno) == "ERROR":
             click.secho(msg, color=True, bold=True, fg="red")
-        if record.levelno == logging.getLevelName("CRITICAL"):
+        if logging.getLevelName(record.levelno) == "CRITICAL":
             click.secho(msg, color=True, bold=True, blink=True, fg="red")

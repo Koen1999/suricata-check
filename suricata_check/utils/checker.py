@@ -49,7 +49,6 @@ def check_rule_option_recognition(rule: idstools.rule.Rule) -> None:
             )
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
     """Checks whether a rule has a certain option set.
 
@@ -61,6 +60,11 @@ def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
         bool: True iff the option is set atleast once
 
     """
+    return __is_rule_option_set(rule, name)
+
+
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
     if name not in (
         "action",
         "proto",
@@ -202,8 +206,8 @@ def __count_rule_options(
             if option["name"] == name:
                 count += 1
 
-    if is_rule_option_set(rule, name):
-        count = max(count, 1)
+    if count == 0 and is_rule_option_set(rule, name):
+        count = 1
 
     return count
 
@@ -218,7 +222,6 @@ def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
     pass
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
     """Retrieves one option of a rule with a certain name.
 
@@ -232,6 +235,11 @@ def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
         Optional[str]: The value of the option or None if it was not set.
 
     """
+    return __get_rule_option(rule, name)
+
+
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
     options = get_rule_options(rule, name)
 
     if len(options) == 0:
@@ -552,9 +560,13 @@ def get_rule_sticky_buffer_naming(rule: idstools.rule.Rule) -> list[tuple[str, s
     return sticky_buffer_naming
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
     """Returns a list of variable groups such as $HTTP_SERVERS in a rule."""
+    return __get_all_variable_groups(rule)
+
+
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
     variable_groups = []
     for name in (
         "source_addr",
@@ -571,7 +583,6 @@ def get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
     return variable_groups
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def get_rule_option_positions(
     rule: idstools.rule.Rule, name: str, sequence: Optional[tuple[str, ...]] = None
 ) -> Sequence[int]:
@@ -579,6 +590,13 @@ def get_rule_option_positions(
 
     Optionally takes a sequence of options to use instead of `rule['options']`.
     """
+    return __get_rule_option_positions(rule, name, sequence=sequence)
+
+
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __get_rule_option_positions(
+    rule: idstools.rule.Rule, name: str, sequence: Optional[tuple[str, ...]] = None
+) -> Sequence[int]:
     provided_sequence = True
     if sequence is None:
         sequence = tuple(option["name"] for option in rule["options"])
@@ -597,12 +615,16 @@ def get_rule_option_positions(
     return tuple(sorted(positions))
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def get_rule_option_position(rule: idstools.rule.Rule, name: str) -> Optional[int]:
     """Finds the position of an option in the rule body.
 
     Return None if the option is not set or set multiple times.
     """
+    return __get_rule_option_position(rule, name)
+
+
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __get_rule_option_position(rule: idstools.rule.Rule, name: str) -> Optional[int]:
     positions = get_rule_option_positions(rule, name)
 
     if len(positions) == 0:
@@ -815,11 +837,17 @@ def are_rule_options_always_put_before(
     return True
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def select_rule_options_by_regex(
     rule: idstools.rule.Rule, regex  # noqa: ANN001
 ) -> Iterable[str]:
     """Selects rule options present in rule matching a regular expression."""
+    return __select_rule_options_by_regex(rule, regex)
+
+
+@lru_cache(maxsize=_LRU_CACHE_SIZE)
+def __select_rule_options_by_regex(
+    rule: idstools.rule.Rule, regex  # noqa: ANN001
+) -> Iterable[str]:
     options = []
 
     for option in rule["options"]:

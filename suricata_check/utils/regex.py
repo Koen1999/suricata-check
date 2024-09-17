@@ -589,9 +589,13 @@ def get_rule_group_entries(group: str) -> Sequence[str]:
     return entries
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
 def get_variable_groups(value: str) -> Sequence[str]:
     """Returns a list of variable groups such as $HTTP_SERVERS in a variable."""
+    return __get_variable_groups(value)
+
+
+@lru_cache(maxsize=LRU_CACHE_SIZE)
+def __get_variable_groups(value: str) -> Sequence[str]:
     entries = get_rule_group_entries(value)
     variable_groups = []
     for entry in entries:
@@ -602,9 +606,13 @@ def get_variable_groups(value: str) -> Sequence[str]:
     return variable_groups
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
 def get_rule_body(rule: idstools.rule.Rule) -> str:
     """Returns the body of a rule."""
+    return __get_rule_body(rule)
+
+
+@lru_cache(maxsize=LRU_CACHE_SIZE)
+def __get_rule_body(rule: idstools.rule.Rule) -> str:
     match = _BODY_REGEX.search(rule["raw"])
 
     if match is None:
