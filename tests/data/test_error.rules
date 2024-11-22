@@ -8,3 +8,10 @@ alert ip any -> any (msg:"Test"; sid:1;) # Misses source_port and dest_port
 alert ip any any -> any any (msg:"Test";) # Misses sid
 alert ip any any -> any any (sid:1;) # Misses msg
 alert http $HOME_NET any -> any any (msg:"Test"; sid:1; dns.query:"foo.bar") # Misses ; at end
+
+####################################################################################################
+# Next we put a bunch of rules that I know caused errors at some point and are invalid rules
+####################################################################################################
+
+alert dns any any -> any any msg("test"; sid:1; content:"detectme.foobar";)
+alert tcp any any -> any any (msg : "contains RAT communication init "; content; to_lowercase; pcre: "/asyncratserver.*asyncratserver/" content: ;sid: 1;)

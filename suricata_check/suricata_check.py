@@ -31,13 +31,14 @@ from suricata_check.checkers.interface.dummy import DummyChecker  # noqa: E402
 from suricata_check.utils._click import ClickHandler  # noqa: E402
 from suricata_check.utils._path import find_rules_file  # noqa: E402
 from suricata_check.utils.checker import check_rule_option_recognition  # noqa: E402
-from suricata_check.utils.regex import get_regex_provider  # noqa: E402
+from suricata_check.utils.regex import get_regex_provider, is_valid_rule  # noqa: E402
 from suricata_check.utils.typing import (  # noqa: E402
     EXTENSIVE_SUMMARY_TYPE,
     ISSUES_TYPE,
     RULE_REPORTS_TYPE,
     RULE_SUMMARY_TYPE,
     SIMPLE_SUMMARY_TYPE,
+    InvalidRuleError,
     OutputReport,
     OutputSummary,
     RuleReport,
@@ -113,7 +114,7 @@ suricata_check_extensions_imported = False
     show_default=True,
     multiple=True,
 )
-def main(  # noqa: PLR0913, PLR0915
+def main(  # noqa: PLR0913
     out: str = ".",
     rules: str = ".",
     single_rule: Optional[str] = None,
@@ -207,21 +208,7 @@ def main(  # noqa: PLR0913, PLR0915
     checkers = get_checkers(include, exclude)
 
     if single_rule is not None:
-        rule: Optional[idstools.rule.Rule] = idstools.rule.parse(single_rule)
-
-        # Verify that a rule was parsed correctly.
-        if rule is None:
-            msg = f"Error parsing rule from user input: {single_rule}"
-            _logger.critical(msg)
-            raise click.BadParameter(f"Error: {msg}")
-
-        _logger.debug("Processing rule: %s", rule["sid"])
-
-        check_rule_option_recognition(rule)
-
-        rule_report = analyze_rule(rule, checkers=checkers)
-
-        __write_output(OutputReport(rules=[rule_report]), out)
+        __main_single_rule(out, single_rule, checkers)
 
         # Return here so no rules file is processed.
         _at_exit()
@@ -235,6 +222,29 @@ def main(  # noqa: PLR0913, PLR0915
     __write_output(output, out)
 
     _at_exit()
+
+
+def __main_single_rule(
+    out: str, single_rule: str, checkers: Optional[Sequence[CheckerInterface]]
+) -> None:
+    rule: Optional[idstools.rule.Rule] = idstools.rule.parse(single_rule)
+
+    # Verify that a rule was parsed correctly.
+    if rule is None:
+        msg = f"Error parsing rule from user input: {single_rule}"
+        _logger.critical(msg)
+        raise click.BadParameter(f"Error: {msg}")
+
+    if not is_valid_rule(rule):
+        msg = f"Error parsing rule from user input: {single_rule}"
+        _logger.critical(msg)
+        raise click.BadParameter(f"Error: {msg}")
+
+    _logger.debug("Processing rule: %s", rule["sid"])
+
+    rule_report = analyze_rule(rule, checkers=checkers)
+
+    __write_output(OutputReport(rules=[rule_report]), out)
 
 
 def __write_output(
@@ -422,9 +432,11 @@ def process_rules_file(
                 _logger.error("Error parsing rule on line %i: %s", number, line)
                 continue
 
-            _logger.debug("Processing rule: %s on line %i", rule["sid"], number)
+            if not is_valid_rule(rule):
+                _logger.error("Invalid rule on line %i: %s", number, line)
+                continue
 
-            check_rule_option_recognition(rule)
+            _logger.debug("Processing rule: %s on line %i", rule["sid"], number)
 
             rule_report: RuleReport = analyze_rule(
                 rule,
@@ -497,6 +509,10 @@ def get_checkers(
         "Discovered and enabled checkers: [%s]",
         ", ".join([c.__class__.__name__ for c in checkers]),
     )
+    if len(checkers) == 0:
+        _logger.warning(
+            "No checkers were enabled. Check the include and exclude arguments."
+        )
 
     # Perform a uniqueness check on the codes emmitted by the checkers
     for checker1 in checkers:
@@ -559,7 +575,15 @@ def analyze_rule(
     A list of issues found in the rule.
     Each issue is typed as a `dict`.
 
+    Raises:
+    InvalidRuleError: If the rule does not follow the Suricata syntax.
+
     """
+    if not is_valid_rule(rule):
+        raise InvalidRuleError(rule["raw"])
+
+    check_rule_option_recognition(rule)
+
     if checkers is None:
         checkers = get_checkers()
 

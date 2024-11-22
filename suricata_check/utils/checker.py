@@ -3,7 +3,7 @@
 import logging
 from collections.abc import Iterable, Sequence
 from functools import lru_cache
-from typing import Literal, Optional, Union, overload
+from typing import Optional, Union
 
 import idstools.rule
 
@@ -34,7 +34,7 @@ def check_rule_option_recognition(rule: idstools.rule.Rule) -> None:
         name = option["name"]
         if name not in ALL_KEYWORDS:
             _logger.warning(
-                "Option %s from rule %i is not recognized.",
+                "Option %s from rule %s is not recognized.",
                 name,
                 rule["sid"],
             )
@@ -43,7 +43,7 @@ def check_rule_option_recognition(rule: idstools.rule.Rule) -> None:
         name = _regex_provider.split(r"\s+", option)[0]
         if name not in ALL_METADATA_KEYWORDS:
             _logger.warning(
-                "Metadata option %s from rule %i is not recognized.",
+                "Metadata option %s from rule %s is not recognized.",
                 name,
                 rule["sid"],
             )
@@ -102,6 +102,8 @@ def get_rule_suboptions(
     values = get_rule_options(rule, name)
     valid_suboptions: list[tuple[str, Optional[str]]] = []
     for value in values:
+        if value is None:
+            continue
         values = value.split(",")
         suboptions: list[Optional[tuple[str, Optional[str]]]] = [
             __split_suboption(suboption, warn=warn) for suboption in values
@@ -212,16 +214,6 @@ def __count_rule_options(
     return count
 
 
-@overload
-def get_rule_option(rule: idstools.rule.Rule, name: Literal["msg"]) -> str:
-    pass
-
-
-@overload
-def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
-    pass
-
-
 def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
     """Retrieves one option of a rule with a certain name.
 
@@ -258,7 +250,7 @@ def __get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
 def get_rule_options(
     rule: idstools.rule.Rule,
     name: Union[str, Iterable[str]],
-) -> Sequence[str]:
+) -> Sequence[Optional[str]]:
     """Retrieves all options of a rule with a certain name.
 
     Args:
@@ -332,6 +324,8 @@ def is_rule_option_equal_to(rule: idstools.rule.Rule, name: str, value: str) -> 
     values = get_rule_options(rule, name)
 
     for val in values:
+        if value is None:
+            continue
         if val == value:
             return True
 
@@ -391,6 +385,8 @@ def is_rule_option_equal_to_regex(
     values = get_rule_options(rule, name)
 
     for value in values:
+        if value is None:
+            continue
         if regex.match(value) is not None:
             return True
 
@@ -454,6 +450,8 @@ def is_rule_option_always_equal_to_regex(
     values = get_rule_options(rule, name)
 
     for value in values:
+        if value is None:
+            return False
         if regex.match(value) is None:
             return False
 
@@ -542,6 +540,8 @@ def is_rule_option_one_of(
     values = get_rule_options(rule, name)
 
     for value in values:
+        if value is None:
+            continue
         if value in possible_values:
             return True
 

@@ -57,64 +57,62 @@ class SidChecker(CheckerInterface):
         sid = get_rule_option(rule, "sid")
         msg = get_rule_option(rule, "msg")
 
-        assert sid is not None
-        assert msg is not None
+        if sid is not None and msg is not None:
+            sid = int(sid)
+            range_name = self.__get_range_name(sid, SID_ALLOCATION)
+            prefix = self.__get_msg_prefix(msg)
 
-        sid = int(sid)
-        range_name = self.__get_range_name(sid, SID_ALLOCATION)
-        prefix = self.__get_msg_prefix(msg)
-
-        if (
-            prefix not in SID_ALLOCATION.keys()
-            and range_name is not None
-            and range_name != "local"
-        ):
-            issues.append(
-                Issue(
-                    code="S300",
-                    message=f"""\
+            if (
+                prefix not in SID_ALLOCATION.keys()
+                and range_name is not None
+                and range_name != "local"
+            ):
+                issues.append(
+                    Issue(
+                        code="S300",
+                        message=f"""\
 Allocation to reserved SID range, whereas no range is reserved for the rule.
 Consider using an sid in one of the following ranges: {SID_ALLOCATION["local"]}.\
 """,
-                ),
-            )
+                    ),
+                )
 
-        if prefix not in SID_ALLOCATION.keys() and range_name is None:
-            issues.append(
-                Issue(
-                    code="S301",
-                    message=f"""\
+            if prefix not in SID_ALLOCATION.keys() and range_name is None:
+                issues.append(
+                    Issue(
+                        code="S301",
+                        message=f"""\
 Allocation to unallocated SID range, whereas local range should be used.
 Consider using an sid in one of the following ranges: {SID_ALLOCATION["local"]}.\
 """,
-                ),
-            )
+                    ),
+                )
 
-        if prefix in SID_ALLOCATION.keys() and (
-            range_name is not None
-            and not (prefix + " ").startswith(range_name + " ")
-            and not (range_name + " ").startswith(prefix + " ")
-        ):
-            issues.append(
-                Issue(
-                    code="S302",
-                    message=f"""\
+            if prefix in SID_ALLOCATION.keys() and (
+                range_name is not None
+                and not (prefix + " ").startswith(range_name + " ")
+                and not (range_name + " ").startswith(prefix + " ")
+            ):
+                issues.append(
+                    Issue(
+                        code="S302",
+                        message=f"""\
 Allocation to wrong reserved SID range, whereas another reserved range should be used.
 Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
 """,
-                ),
-            )
+                    ),
+                )
 
-        if prefix in SID_ALLOCATION.keys() and range_name is None:
-            issues.append(
-                Issue(
-                    code="S303",
-                    message=f"""\
+            if prefix in SID_ALLOCATION.keys() and range_name is None:
+                issues.append(
+                    Issue(
+                        code="S303",
+                        message=f"""\
 Allocation to unallocated SID range, whereas a reserved range should be used.
 Consider using an sid in one of the following ranges: {SID_ALLOCATION[prefix]}.\
 """,
-                ),
-            )
+                    ),
+                )
 
         return issues
 

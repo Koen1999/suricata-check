@@ -270,6 +270,8 @@ class PrincipleChecker(CheckerInterface):
         negative_matches = 0
 
         for option_value in get_rule_options(rule, CONTENT_KEYWORDS):
+            if option_value is None:
+                continue
             if option_value.startswith("!"):
                 negative_matches += 1
             else:
@@ -323,8 +325,11 @@ class PrincipleChecker(CheckerInterface):
         if is_rule_option_set(rule, "startswith"):
             return True
 
-        # -2 to discard quotes
-        length = len(content) - 2
+        if content is not None:
+            # -2 to discard quotes
+            length = len(content) - 2
+        else:
+            length = -1
 
         if (
             is_rule_option_equal_to(rule, "depth", str(length))

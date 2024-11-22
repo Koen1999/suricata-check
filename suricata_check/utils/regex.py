@@ -505,7 +505,9 @@ _DIRECTION_REGEX = _regex_provider.compile(r"(\->|<>)")
 HEADER_REGEX = _regex_provider.compile(
     rf"{_ACTION_REGEX.pattern}\s*{_PROTOCOL_REGEX.pattern}\s*{_ADDR_REGEX.pattern}\s*{_PORT_REGEX.pattern}\s*{_DIRECTION_REGEX.pattern}\s*{_ADDR_REGEX.pattern}\s*{_PORT_REGEX.pattern}",
 )
-_OPTION_REGEX = _regex_provider.compile(r"[a-z\-\._]+(:(\s*([0-9]+|.*)\s*\,?\s*)+)?;")
+_OPTION_REGEX = _regex_provider.compile(
+    r"[a-z\-\._]+\s*(:(\s*([0-9]+|.+)\s*\,?\s*)+)?;"
+)
 _BODY_REGEX = _regex_provider.compile(rf"\((\s*{_OPTION_REGEX.pattern}\s*)*\)")
 _RULE_REGEX = _regex_provider.compile(
     rf"^(\s*#)?\s*{HEADER_REGEX.pattern}\s*{_BODY_REGEX.pattern}\s*(#.*)?$",
@@ -621,3 +623,11 @@ def __get_rule_body(rule: idstools.rule.Rule) -> str:
         raise RuntimeError(msg)
 
     return match.group(0)
+
+
+def is_valid_rule(rule: idstools.rule.Rule) -> bool:
+    """Checks if a rule is valid."""
+    if _RULE_REGEX.match(rule["raw"]) is None:
+        return False
+
+    return True

@@ -10,6 +10,19 @@ from typing import (
 import idstools.rule
 
 
+class InvalidRuleError(RuntimeError):
+    """Raised when an invalid rule is detected.
+
+    Note that some rules may be invalid due to not following the Suricata rule syntax.
+    Rules following the syntax, but considered invalid by Suricata due to missing options need not raise this error.
+    Rules for which this error is not raised are not neccessarily syntactically correct but can be processed by suricata-check.
+    """
+
+    def __init__(self: "InvalidRuleError", message: str) -> None:
+        """Initializes the `InvalidRuleError` with the raw rule as message."""
+        super().__init__(message)
+
+
 @dataclass
 class Issue:
     """The `Issue` dataclass represents a single issue found in a rule."""

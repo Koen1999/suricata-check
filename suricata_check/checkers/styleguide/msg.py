@@ -188,7 +188,10 @@ Consider escaping the domain names by putting a space before the dot like `foo .
             )
 
         # Note that all characters under 128 are ASCII
-        if any(ord(c) > 128 for c in get_rule_option(rule, "msg")):  # noqa: PLR2004
+        if is_rule_option_set(rule, "msg") and any(
+            ord(c) > 128  # noqa: PLR2004
+            for c in get_rule_option(rule, "msg")  # type: ignore reportOptionalIterable
+        ):
             issues.append(
                 Issue(
                     code="S409",

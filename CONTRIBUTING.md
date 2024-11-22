@@ -53,6 +53,7 @@ pyright
 ## Docs
 
 To automatically generate the documentation from the code, run the following commands:
+
 ```bash
 ./docs/make.bat clean
 ./docs/make.bat html
