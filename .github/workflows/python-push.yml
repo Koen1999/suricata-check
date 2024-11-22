@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -30,16 +30,16 @@ jobs:
 
       - name: Test with pytest - Fast
         run: |
-          pytest -m "not slow"
+          pytest --cov-config=pyproject.toml -m "not slow"
 
       - name: Test with pytest - Integration ET OPEN v7
         run: |
-          pytest -k et_open -k v7 -m "slow" --cov-fail-under=0
+          pytest --cov-config=pyproject.toml -k et_open -k v7 -m "slow" --cov-fail-under=0
 
       - name: Test with pytest - Integration ET OPEN v5
         run: |
-          pytest -k et_open -k v5 -m "slow" --cov-fail-under=0
+          pytest --cov-config=pyproject.toml -k et_open -k v5 -m "slow" --cov-fail-under=0
 
       - name: Test with pytest - Integration Snort Community
         run: |
-          pytest -k snort_community -m "slow" --cov-fail-under=0
+          pytest --cov-config=pyproject.toml -k snort_community -m "slow" --cov-fail-under=0
