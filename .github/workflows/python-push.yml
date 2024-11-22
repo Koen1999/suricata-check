@@ -30,16 +30,16 @@ jobs:
 
       - name: Test with pytest - Fast
         run: |
-          pytest --cov-config=pyproject.toml -m "not slow"
+          pytest -m "not slow"
 
       - name: Test with pytest - Integration ET OPEN v7
         run: |
-          pytest --cov-config=pyproject.toml -k et_open -k v7 -m "slow" --cov-fail-under=0
+          pytest -k et_open -k v7 -m "slow" --cov-fail-under=0
 
       - name: Test with pytest - Integration ET OPEN v5
         run: |
-          pytest --cov-config=pyproject.toml -k et_open -k v5 -m "slow" --cov-fail-under=0
+          pytest -k et_open -k v5 -m "slow" --cov-fail-under=0
 
       - name: Test with pytest - Integration Snort Community
         run: |
-          pytest --cov-config=pyproject.toml -k snort_community -m "slow" --cov-fail-under=0
+          pytest -k snort_community -m "slow" --cov-fail-under=0

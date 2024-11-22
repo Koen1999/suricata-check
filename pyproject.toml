@@ -99,6 +99,7 @@ addopts = """
     -m "not slow"
     --strict-markers
     --color=yes
+    --cov-config=pyproject.toml
     --cov=suricata_check
     --cov-report term
     --cov-report xml

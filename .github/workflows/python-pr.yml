@@ -37,7 +37,7 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pytest --cov-config=pyproject.toml
+          pytest
 
       - name: Remove regex module
         run: |
@@ -45,7 +45,7 @@ jobs:
 
       - name: Test with pytest without regex module
         run: |
-          pytest --cov-config=pyproject.toml
+          pytest
 
   build:
     name: Build

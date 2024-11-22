@@ -29,11 +29,11 @@ jobs:
 
       - name: Test with pytest (fast)
         run: |
-          pytest --cov-config=pyproject.toml
+          pytest
 
       - name: Test with pytest (slow)
         run: |
-          pytest --cov-config=pyproject.toml -m "slow"
+          pytest -m "slow"
 
   release-build:
     name: Build Release
