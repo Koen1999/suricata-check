@@ -15,14 +15,14 @@ from suricata_check.checkers.styleguide.state import StateChecker
 from suricata_check.checkers.styleguide.whitespace import WhitespaceChecker
 
 __all__ = [
+    "MetadataChecker",
     "MsgChecker",
     "OrderChecker",
     "OverallChecker",
-    "SidChecker",
-    "WhitespaceChecker",
-    "StateChecker",
-    "MetadataChecker",
     "PcreChecker",
-    "ReferenceChecker",
     "PerformanceChecker",
+    "ReferenceChecker",
+    "SidChecker",
+    "StateChecker",
+    "WhitespaceChecker",
 ]

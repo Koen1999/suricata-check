@@ -14,14 +14,14 @@ from suricata_check.suricata_check import (
 )
 
 __all__ = (
-    "checkers",
-    "utils",
-    "tests",
     "SURICATA_CHECK_DIR",
     "__version__",
-    "get_dependency_versions",
     "analyze_rule",
+    "checkers",
     "get_checkers",
+    "get_dependency_versions",
     "main",
     "process_rules_file",
+    "tests",
+    "utils",
 )

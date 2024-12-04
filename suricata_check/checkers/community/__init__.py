@@ -7,6 +7,6 @@ from suricata_check.checkers.community.best import BestChecker
 from suricata_check.checkers.community.unexpected import UnexpectedChecker
 
 __all__ = [
-    "UnexpectedChecker",
     "BestChecker",
+    "UnexpectedChecker",
 ]

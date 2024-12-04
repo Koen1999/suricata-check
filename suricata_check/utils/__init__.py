@@ -5,9 +5,9 @@ from suricata_check.utils._click import ClickHandler
 from suricata_check.utils._path import find_rules_file
 
 __all__ = (
-    "typing",
-    "regex",
-    "checker",
     "ClickHandler",
+    "checker",
     "find_rules_file",
+    "regex",
+    "typing",
 )
