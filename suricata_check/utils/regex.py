@@ -499,7 +499,7 @@ _ACTION_REGEX = _regex_provider.compile(
     r"(alert|pass|drop|reject|rejectsrc|rejectdst|rejectboth)",
 )
 _PROTOCOL_REGEX = _regex_provider.compile(r"[a-z0-3\-]+")
-_ADDR_REGEX = _regex_provider.compile(r"[a-zA-Z0-9\$_\!\[\],\s/]+")
+_ADDR_REGEX = _regex_provider.compile(r"[a-zA-Z0-9\$_\!\[\],\s/\.]+")
 _PORT_REGEX = _regex_provider.compile(r"[a-zA-Z0-9\$_\!\[\],\s:]+")
 _DIRECTION_REGEX = _regex_provider.compile(r"(\->|<>)")
 HEADER_REGEX = _regex_provider.compile(
