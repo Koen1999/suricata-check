@@ -69,9 +69,9 @@ dev = [
   "pyright>=1.1.367",
   "sphinx>=7.3.7",
   "sphinx-rtd-theme>=2.0.0",
-  "myst-parser>=3.0.1",
+  "myst-parser[linkify]>=3.0.1",
   "sphinx-click>=6.0.0",
-  "sphinx-autodoc2>=0.5.0",
+  "sphinx-autoapi>=3.4.0",
 ]
 
 [project.urls]

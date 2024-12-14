@@ -7,35 +7,30 @@ Welcome to suricata-check's documentation!
 ==========================================
 
 .. toctree::
-   :maxdepth: 1
-   :caption: README
+   :caption: Documentation
+   :maxdepth: 2
 
    readme.md
-
+   cli_usage.md
+   api_usage.md
+   contributing.md
+   
 .. toctree::
-   :maxdepth: 1
-   :caption: Command Line Interface (CLI)
-   :titlesonly:
+   :caption: CLI Reference
 
    cli.rst
 
 .. toctree::
-   :maxdepth: 1
-   :caption: CONTRIBUTING
-
-   contributing.md
-
-.. toctree::
-   :maxdepth: 5
    :caption: API Reference
+   :maxdepth: 5
    :titlesonly:
 
-   apidocs/index.rst
+   autoapi/suricata_check/index
 
+.. toctree::
+   :caption: Indices and tables
+   :maxdepth: 2
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   genindex
+   modindex
+   search

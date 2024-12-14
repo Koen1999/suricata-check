@@ -26,7 +26,8 @@ release = suricata_check.__version__
 
 extensions = [
     "myst_parser",
-    "autodoc2",
+    'sphinx.ext.autodoc',
+    "autoapi.extension",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_click",
@@ -46,39 +47,49 @@ intersphinx_mapping = {
 }
 
 root_doc = "index"
-master_doc = "readme"
+master_doc = "index"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
-html_static_path = ["_static"]
+html_static_path = ["static"]
+
+# -- Options for MyST     -------------------------------------------------
+# https://myst-parser.readthedocs.io/en/latest/
+
+myst_enable_extensions = ['linkify']
+myst_heading_anchors = 5
 
 # -- Options for Autodoc     -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
-# https://sphinx-autodoc2.readthedocs.io/en/latest/index.html
 
-# autoclass_context = "both"
-# autodoc_class_signature = "seperated"
-# autodoc_member_order = "groupwise"
-# autodoc_default_flags = [
-#     "members",
-#     "special-members",
-#     "inherited-members",
-#     "show-inheritance",
-#     "ignore-module-all",
-#     "maxdepth",
-# ]
-# autodoc_default_options = {
-#     "member-order": "bysource",
-#     "special-members": "__init__",
-#     "undoc-members": False,
-#     "maxdepth": 2,
-# }
-# autodoc_typehints = "signature"
-# autodoc_typehints_description_target = "all"
+autoclass_context = "both"
+autodoc_class_signature = "separated"
+autodoc_member_order = "groupwise"
+autodoc_default_flags = [
+    "members",
+    "special-members",
+    "inherited-members",
+    "show-inheritance",
+    "ignore-module-all",
+    "maxdepth",
+]
+autodoc_default_options = {
+    "member-order": "bysource",
+    "special-members": "__init__",
+    "undoc-members": False,
+    "maxdepth": 2,
+}
+autodoc_typehints = "both"
+autodoc_typehints_description_target = "all"
 
-autodoc2_packages = [{"path": "../suricata_check"}]
-autodoc2_hidden_objects = ["undoc", "dunder", "private"]
-autodoc2_class_docstring = "both"
-autodoc2_docstrings = "all"
+# -- Options for AutoAPI     -------------------------------------------------
+# https://sphinx-autoapi.readthedocs.io/en/latest/
+
+autoapi_dirs = ['../suricata_check']
+autoapi_options = ['members', 'show-inheritance', 'show-module-summary', 'special-members', 'imported-members']
+autoapi_add_toctree_entry = False
+autoapi_python_class_content = "both"
+autoapi_member_order = "groupwise"
+autoapi_own_page_level = "module"

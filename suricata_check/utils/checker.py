@@ -890,7 +890,7 @@ def get_rule_keyword_sequences(
 
     if len(sequences) == 0:
         _logger.debug(
-            "No sequences found seperated by %s in rule %s",
+            "No sequences found separated by %s in rule %s",
             seperator_keywords,
             rule["raw"],
         )
@@ -902,7 +902,7 @@ def get_rule_keyword_sequences(
     result = tuple(tuple(sequence) for sequence in sequences)
 
     _logger.debug(
-        "Detected sequences %s seperated by %s in rule %s",
+        "Detected sequences %s separated by %s in rule %s",
         result,
         seperator_keywords,
         rule["raw"],

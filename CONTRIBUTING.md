@@ -59,6 +59,14 @@ To automatically generate the documentation from the code, run the following com
 ./docs/make.bat html
 ```
 
+To locally view the docs, run the following command:
+
+```bash
+python -m http.server -b localhost -d docs/_build/html 8000
+```
+
+and inspect the docs at `localhost:80`
+
 ## Pull requests
 
 When you create a pull request (PR), several checks are automatically run. These include some basic code style checks, as well as running all non-slow tests. PRs that do not pass these checks will not be merged. Additionally, PRs will undergo atleast one round of feedback before merging and require approval of atleast one contributor.
@@ -67,5 +75,5 @@ When you create a pull request (PR), several checks are automatically run. These
 
 It is possible to extend `suricata-check` with additional checkers without contributing these checkers to the main project.
 This may be beneficial if your checkers serve a very narrow use-case or if you would like to develop proprietary checkers.
-An example of such an extension is given in the [suricata-check-extension-example](`https://github.com/Koen1999/suricata-check-extension-example`) project.
+An example of such an extension is given in the [suricata-check-extension-example](https://github.com/Koen1999/suricata-check-extension-example) project.
 Note that for extensions to be automatically discovered by the CLI, their module name should begin with `suricata_check_`, they should expose `suricata_check_extension.__version__`, and their checkers should implement the `CheckerInterface`.
