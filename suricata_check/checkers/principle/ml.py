@@ -428,7 +428,7 @@ class PrincipleMLChecker(CheckerInterface):
         for col in self.numerical_columns:
             if col not in data:
                 continue
-            data[col + ".num"] = float(data[col])
+            data[col + ".num"] = float(data[col])  # type: ignore reportArgumentType
             data = data.drop(col)
 
         remaining_cols = (
