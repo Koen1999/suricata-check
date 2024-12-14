@@ -67,7 +67,7 @@ rule_report = suricata_check.analyze_rule(parsed_rule, checkers=[MyOwnChecker()]
 Similar to the CLI, it is possible to process entire rulesets at once using `process_rules_file`. Also for this function, it is optionally possible to explcitly pass checkers to use.
 
 ```python
-from suricata_check.checkers.styleguide import MetadataChecker
+from suricata_check.checkers import MetadataChecker
 
 ruleset_report = suricata_check.process_rules_file(
     "/var/lib/suricata/rules/suricata.rules", 

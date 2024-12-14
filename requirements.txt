@@ -18,5 +18,5 @@ sphinx-click>=6.0.0
 sphinx-autoapi>=3.4.0
 numpy>=1.26.4
 pandas>=2.0.3
-scikit-learn>=1.5.0
-xgboost>=2.0.3
+scikit-learn==1.5.1
+xgboost==2.0.3
