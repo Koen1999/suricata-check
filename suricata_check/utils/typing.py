@@ -1,5 +1,6 @@
 """The `suricata_check.typing` module contains all types used by the `suricata-check` package."""
 
+import json
 from collections.abc import Iterable, MutableMapping, MutableSequence
 from dataclasses import dataclass, field
 from typing import (
@@ -45,7 +46,7 @@ class Issue:
 
     def __repr__(self: "Issue") -> str:
         """Returns the Issue represented as a string."""
-        return str(self.to_dict())
+        return json.dumps(self.to_dict())
 
 
 ISSUES_TYPE = MutableSequence[Issue]
@@ -108,7 +109,7 @@ class RuleReport:
 
     def __repr__(self: "RuleReport") -> str:
         """Returns the RuleReport represented as a string."""
-        return str(self.to_dict())
+        return json.dumps(self.to_dict())
 
 
 RULE_REPORTS_TYPE = MutableSequence[RuleReport]
