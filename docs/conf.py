@@ -26,7 +26,7 @@ release = suricata_check.__version__
 
 extensions = [
     "myst_parser",
-    'sphinx.ext.autodoc',
+    "sphinx.ext.autodoc",
     "autoapi.extension",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
@@ -58,7 +58,7 @@ html_static_path = ["static"]
 # -- Options for MyST     -------------------------------------------------
 # https://myst-parser.readthedocs.io/en/latest/
 
-myst_enable_extensions = ['linkify']
+myst_enable_extensions = ["linkify"]
 myst_heading_anchors = 5
 
 # -- Options for Autodoc     -------------------------------------------------
@@ -87,8 +87,14 @@ autodoc_typehints_description_target = "all"
 # -- Options for AutoAPI     -------------------------------------------------
 # https://sphinx-autoapi.readthedocs.io/en/latest/
 
-autoapi_dirs = ['../suricata_check']
-autoapi_options = ['members', 'show-inheritance', 'show-module-summary', 'special-members', 'imported-members']
+autoapi_dirs = ["../suricata_check"]
+autoapi_options = [
+    "members",
+    "show-inheritance",
+    "show-module-summary",
+    "special-members",
+    "imported-members",
+]
 autoapi_add_toctree_entry = False
 autoapi_python_class_content = "both"
 autoapi_member_order = "groupwise"
