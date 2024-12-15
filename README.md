@@ -149,3 +149,6 @@ If you would like to contribute, please check out [CONTRIBUTING.md](https://gith
 ## License
 
 This project is licensed under the [European Union Public Licence (EUPL)](https://github.com/Koen1999/suricata-check/blob/master/LICENSE).
+
+Note that extensions may be licensed under another license as detailed in [CONTRIBUTING.md](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md).
+For example, the [suricata-check-extension-example](https://github.com/Koen1999/suricata-check-extension-example) project is licensed under the [Apache 2.0 license](https://github.com/Koen1999/suricata-check-extension-example/blob/master/LICENSE).
