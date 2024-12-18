@@ -55,6 +55,8 @@ master_doc = "index"
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["static"]
 
+html_js_files = ["js/umami.js"]
+
 # -- Options for MyST     -------------------------------------------------
 # https://myst-parser.readthedocs.io/en/latest/
 
