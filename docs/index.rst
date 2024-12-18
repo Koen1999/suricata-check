@@ -13,6 +13,7 @@ Welcome to suricata-check's documentation!
    readme.md
    cli_usage.md
    api_usage.md
+   checker.md
    contributing.md
    
 .. toctree::
