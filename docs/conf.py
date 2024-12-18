@@ -99,3 +99,8 @@ autoapi_add_toctree_entry = False
 autoapi_python_class_content = "both"
 autoapi_member_order = "groupwise"
 autoapi_own_page_level = "module"
+
+# -- Options for viewcode     -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/viewcode.html
+
+viewcode_line_numbers = True

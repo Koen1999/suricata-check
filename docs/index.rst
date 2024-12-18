@@ -7,7 +7,7 @@ Welcome to suricata-check's documentation!
 ==========================================
 
 .. toctree::
-   :caption: Documentation
+   :caption: Getting Started
    :maxdepth: 2
 
    readme.md

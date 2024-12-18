@@ -1,8 +1,8 @@
 # CLI Usage
 
-After having installed `suricata_check` as described in [Installation](/readme.md#installation) and having ensured it is included in the `PATH` variable (check your operating system specific instructions for this), you can invoke it using by running `suricata-check`.
+After having installed `suricata_check` as described in [Installation](./readme.md#installation) and having ensured it is included in the `PATH` variable (check your operating system specific instructions for this), you can invoke it using by running `suricata-check`.
 
-To get an overview of all CLI options, run `suricata-check --help`. We will go over some basic use-cases below. You can also take a look at the [CLI Reference](/cli.rst)
+To get an overview of all CLI options, run `suricata-check --help`. We will go over some basic use-cases below. You can also take a look at the [CLI Reference](./cli.rst)
 
 Consider a directory containing a rules file such as the following:
 
@@ -192,7 +192,7 @@ Note that output will still be generated in the current working directory unless
 
 ## Enabling and disabling checker issues
 
-When dealing with large rulesets or legacy rulesets, it may be desirable to suppress some issues. Issues are divided into several categories as described in [Issue Codes](/readme.md#issue-codes). Some issues have been disabled by default as a runtime performance optimization. To run `suricata-check` with all checkers and issues enabled, use the `-a` option as follows:
+When dealing with large rulesets or legacy rulesets, it may be desirable to suppress some issues. Issues are divided into several categories as described in [Issue Codes](./readme.md#issue-codes). Some issues have been disabled by default as a runtime performance optimization. To run `suricata-check` with all checkers and issues enabled, use the `-a` option as follows:
 
 ```bash
 suricata-check -a

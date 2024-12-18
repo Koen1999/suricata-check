@@ -56,7 +56,7 @@ checkers = suricata_check.get_checkers(include=("M.*",), exclude=tuple())
 rule_report = suricata_check.analyze_rule(parsed_rule, checkers=checkers)
 ```
 
-If you have implemented a checker implementing the `CheckerInterface` as descibed in [CONTRIBUTING](/contributing.md), the checker will be discoverable by the `get_checkers` function. Any other class (e.g. `MyOwnChecker`) implementing `CheckerInterface`, may be passed to `analyze_rule` directly as follows:
+If you have implemented a checker implementing the `CheckerInterface` as descibed in [CONTRIBUTING](./contributing.md), the checker will be discoverable by the `get_checkers` function. Any other class (e.g. `MyOwnChecker`) implementing `CheckerInterface`, may be passed to `analyze_rule` directly as follows:
 
 ```python
 rule_report = suricata_check.analyze_rule(parsed_rule, checkers=[MyOwnChecker()])
