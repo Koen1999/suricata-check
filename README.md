@@ -152,3 +152,9 @@ This project is licensed under the [European Union Public Licence (EUPL)](https:
 
 Note that extensions may be licensed under another license as detailed in [CONTRIBUTING.md](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md).
 For example, the [suricata-check-extension-example](https://github.com/Koen1999/suricata-check-extension-example) project is licensed under the [Apache 2.0 license](https://github.com/Koen1999/suricata-check-extension-example/blob/master/LICENSE).
+
+## Citations
+If you use the source code, the tool, or otherwise draw from this work, please cite the following paper:
+
+**Koen T. W. Teuwen, Tom Mulders, Emmanuele Zambon, and Luca Allodi. 2025. Ruling the Unruly: Designing Effective, Low-Noise Network Intrusion Detection Rules for Security Operations Centers. In ACM Asia Conference on Computer and Communications Security (ASIA CCS ’25), August 25–29, 2025, Hanoi, Vietnam. ACM, New York, NY, USA, 14 pages. [https://doi.org/10.1145/3708821.3710823](https://doi.org/10.1145/3708821.3710823)**
+
