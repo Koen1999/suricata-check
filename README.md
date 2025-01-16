@@ -1,5 +1,6 @@
 # The `suricata-check` project
 
+[![Static Badge](https://img.shields.io/badge/docs-suricata--check-blue)](https://suricata-check.teuwen.net/)
 [![Python Version](https://img.shields.io/pypi/pyversions/suricata-check)](https://www.python.org)
 [![PyPI](https://img.shields.io/pypi/status/suricata-check)](https://pypi.org/project/suricata-check)
 [![GitHub License](https://img.shields.io/github/license/Koen1999/suricata-check)](https://github.com/Koen1999/suricata-check/blob/master/LICENSE)
@@ -7,6 +8,7 @@
 [![Quick Test, Build, Lint](https://github.com/Koen1999/suricata-check/actions/workflows/python-pr.yml/badge.svg?event=push)](https://github.com/Koen1999/suricata-check/actions/workflows/python-pr.yml)
 [![Extensive Test](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml)
 [![Release](https://github.com/Koen1999/suricata-check/actions/workflows/python-release.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-release.yml)
+
 
 `suricata-check` is a command line utility to provide feedback on [Suricata](https://github.com/OISF/suricata) rules.
 The tool can detect various issues including those covering syntax validity, interpretability, rule specificity, rule coverage, and efficiency.

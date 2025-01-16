@@ -9,8 +9,8 @@ import idstools.rule
 import pytest
 
 from suricata_check.checkers.interface.checker import CheckerInterface
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex import get_regex_provider
-from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 _regex_provider = get_regex_provider()
 

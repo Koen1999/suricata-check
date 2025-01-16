@@ -15,6 +15,7 @@ from suricata_check.utils.checker import (
     is_rule_option_set,
     is_rule_suboption_set,
 )
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex import (
     ALL_DETECTION_KEYWORDS,
     BUFFER_KEYWORDS,
@@ -26,7 +27,6 @@ from suricata_check.utils.regex import (
     get_regex_provider,
     get_rule_body,
 )
-from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 _regex_provider = get_regex_provider()
 

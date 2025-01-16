@@ -23,7 +23,7 @@ from suricata_check._version import SURICATA_CHECK_DIR
 from suricata_check.checkers.interface.checker import CheckerInterface
 from suricata_check.checkers.principle._utils import get_message
 from suricata_check.utils.checker import get_rule_option, get_rule_suboptions
-from suricata_check.utils.typing import ISSUES_TYPE, Issue
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 
 _PICKLE_PATH = os.path.join(SURICATA_CHECK_DIR, "data", "principle_ml_checker.pkl")
 N_JOBS = 8

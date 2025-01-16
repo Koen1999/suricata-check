@@ -7,11 +7,11 @@ from suricata_check.utils.checker import (
     get_rule_keyword_sequences,
     is_rule_option_set,
 )
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex import (
     BASE64_BUFFER_KEYWORDS,
     BASE64_TRANSFORMATION_KEYWORDS,
 )
-from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 
 class PerformanceChecker(CheckerInterface):

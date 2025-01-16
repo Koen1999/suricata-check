@@ -11,7 +11,7 @@ from typing import Optional
 import idstools.rule
 
 from suricata_check.utils.checker import get_rule_option, is_rule_option_set
-from suricata_check.utils.typing import ISSUES_TYPE
+from suricata_check.utils.checker_typing import ISSUES_TYPE
 
 _logger = logging.getLogger(__name__)
 

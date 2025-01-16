@@ -4,7 +4,7 @@ import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import is_rule_option_set
-from suricata_check.utils.typing import ISSUES_TYPE, Issue
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 
 
 class MandatoryChecker(CheckerInterface):

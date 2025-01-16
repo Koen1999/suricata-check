@@ -13,12 +13,12 @@ from suricata_check.utils.checker import (
     is_rule_option_one_of,
     is_rule_option_set,
 )
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex import (
     ALL_VARIABLES,
     CLASSTYPES,
     get_regex_provider,
 )
-from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 _regex_provider = get_regex_provider()
 

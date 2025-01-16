@@ -31,8 +31,7 @@ from suricata_check.checkers.interface.dummy import DummyChecker  # noqa: E402
 from suricata_check.utils._click import ClickHandler  # noqa: E402
 from suricata_check.utils._path import find_rules_file  # noqa: E402
 from suricata_check.utils.checker import check_rule_option_recognition  # noqa: E402
-from suricata_check.utils.regex import get_regex_provider, is_valid_rule  # noqa: E402
-from suricata_check.utils.typing import (  # noqa: E402
+from suricata_check.utils.checker_typing import (  # noqa: E402
     EXTENSIVE_SUMMARY_TYPE,
     ISSUES_TYPE,
     RULE_REPORTS_TYPE,
@@ -44,6 +43,7 @@ from suricata_check.utils.typing import (  # noqa: E402
     RuleReport,
     get_all_subclasses,
 )
+from suricata_check.utils.regex import get_regex_provider, is_valid_rule  # noqa: E402
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
