@@ -117,7 +117,7 @@ For details regarding specific issues, we recommend you check the message of the
 | ----------------------- | ----------------------------------------------------------- |
 | M000                    | Rules pertaining to the detection of valid Suricata syntax. |
 | S000                    | Rules derived from the Suricata Style Guide.                |
-| P000                    | Rules based [Ruling the Unruly]().                          |
+| P000                    | Rules based [Ruling the Unruly](https://doi.org/10.1145/3708821.3710823).                          |
 | C000                    | Rules based on community issues, such as this GitHub.       |
 
 ### Mandatory issues
@@ -135,7 +135,7 @@ Rules with _S_-type issues are likely to hint on interpretability or efficiency 
 
 ### Principle issues
 
-Rules starting with prefix _P_ indicate issues relating to rule design principles posed in the [Ruling the Unruly]() paper.
+Rules starting with prefix _P_ indicate issues relating to rule design principles posed in the [Ruling the Unruly](https://doi.org/10.1145/3708821.3710823) paper.
 Rules with _P_-type issues can relate to a specificity and coverage.
 
 ### Community issues
