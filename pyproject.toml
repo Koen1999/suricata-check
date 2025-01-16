@@ -23,8 +23,7 @@ readme = "README.md"
 license = { file = "LICENSE" }
 authors = [{ name = "Koen Teuwen" }]
 classifiers = [
-  "Development Status :: 3 - Alpha",
-  "Private :: Do Not Upload",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Science/Research",
   "Intended Audience :: Education",
   "Intended Audience :: Developers",
