@@ -164,7 +164,17 @@ select = [
   "AIR",
   "RUF",
 ]
-ignore = ["N807", "D203", "D213", "D401", "COM812", "UP032", "ICN001", "PD101", "RUF012"]
+ignore = [
+  "N807",
+  "D203",
+  "D213",
+  "D401",
+  "COM812",
+  "UP032",
+  "ICN001",
+  "PD101",
+  "RUF012",
+]
 fixable = ["ALL"]
 
 [tool.ruff.lint.pydocstyle]

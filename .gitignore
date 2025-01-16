@@ -1,9 +1,10 @@
 *__pycache__
 .*_cache
-*venv
-build
-dist
-*.egg-info
+*venv*/
+build/
+eggs/
+dist/
+*.egg*
 *.whl
 *.prof
 suricata-check.log
