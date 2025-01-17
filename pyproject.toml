@@ -76,7 +76,7 @@ dev = [
 [project.urls]
 homepage = "https://github.com/Koen1999/suricata-check"
 repository = "https://github.com/Koen1999/suricata-check"
-documentation = "https://github.com/Koen1999/suricata-check/README.md"
+documentation = "https://suricata-check.teuwen.net/"
 bugtracker = "https://github.com/Koen1999/suricata-check/issues"
 
 [project.scripts]
