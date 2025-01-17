@@ -37,7 +37,7 @@ jobs:
 
   release-build:
     name: Build Release
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs:
       - test
 
@@ -67,11 +67,11 @@ jobs:
         run: |
           pipdeptree
 
-      - name: build release distributions
+      - name: Build release distributions
         run: |
           python -m build
 
-      - name: upload windows dists
+      - name: Upload windows dists
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
