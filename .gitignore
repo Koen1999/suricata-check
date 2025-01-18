@@ -11,6 +11,7 @@ suricata-check.log
 suricata-check.jsonl
 suricata-check-fast.log
 suricata-check-stats.log
+suricata-check-gitlab.json
 .coverage*
 cov.*
 coverage.*
