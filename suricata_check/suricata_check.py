@@ -454,7 +454,7 @@ def __write_output_stats(output: OutputReport, out: str) -> None:
 
 def __write_output_gitlab(output: OutputReport, out: str, rules_file: str) -> None:
     with open(
-        os.path.join(out, "suricata-check-gitlab.log"),
+        os.path.join(out, "suricata-check-gitlab.json"),
         "w",
         buffering=io.DEFAULT_BUFFER_SIZE,
     ) as gitlab_fh:

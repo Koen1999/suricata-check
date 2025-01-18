@@ -16,6 +16,6 @@ For GitHub, you can copy [this workflow](https://github.com/Koen1999/suricata-ch
 
 ## GitLab
 
-To integrate `suricata-check` with GitLab, you need to run it in a workflow with the `--gitlab` option to produce the `suricata-check-gitlab.log` file which follows the required [CodeClimate report / GitLab Code Quality Report format](https://docs.gitlab.com/ee/ci/testing/code_quality.html#code-quality-report-format).
+To integrate `suricata-check` with GitLab, you need to run it in a workflow with the `--gitlab` option to produce the `suricata-check-gitlab.json` file which follows the required [CodeClimate report / GitLab Code Quality Report format](https://docs.gitlab.com/ee/ci/testing/code_quality.html#code-quality-report-format).
 
 To have GitLab process this output, you need to declare the code quality report using the syntax prescribed by [GitLab](https://docs.gitlab.com/ee/ci/yaml/artifacts_reports.html#artifactsreportscodequality).
