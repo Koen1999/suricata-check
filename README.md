@@ -17,8 +17,9 @@ The tool can detect various issues including those covering syntax validity, int
 
 - [Static analysis without Suricata installation for any operating system](https://suricata-check.teuwen.net/readme.html)
 - [Simple CLI with options to work with any ruleset](https://suricata-check.teuwen.net/cli_usage.html)
-- [Clearly documented and typed API](https://suricata-check.teuwen.net/api_usage.html)
+- [Documented, Typed, and Tested API](https://suricata-check.teuwen.net/api_usage.html)
 - [CI/CD integration with GitHub and GitLab](https://suricata-check.teuwen.net/ci_cd.html)
+- [Visual Studio Code Extension](https://marketplace.visualstudio.com/items?itemName=Koen1999.suricata-check)
 - [Easily extendable with custom checkers](https://suricata-check.teuwen.net/checker.html)
 
 ## Installation
