@@ -239,4 +239,4 @@ suricata-check --issue-severity=WARNING
 
 ## CI/CD Integration
 
-You can use `suricata-check` to generate output to be processed by platforms such as GitHub and GitLab to integrate it with your Continuous Integration and Continuous Deployment workflows using the `--gitlab` and `--github` options. Read more about those options [here](./ci_cd.rst).
+You can use `suricata-check` to generate output to be processed by platforms such as GitHub and GitLab to integrate it with your Continuous Integration and Continuous Deployment workflows using the `--gitlab` and `--github` options. Read more about those options [here](./ci_cd.md).
