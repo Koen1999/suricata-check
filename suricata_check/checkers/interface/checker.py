@@ -5,7 +5,7 @@ Implementation of the `CheckerInterface` is neccessary for checker auto-discover
 
 import abc
 import logging
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from typing import Optional
 
 import idstools.rule
@@ -29,8 +29,10 @@ class CheckerInterface:
 
     """
 
-    codes: Iterable[str]
-    """A list of issue codes emitted by the checker."""
+    codes: Mapping[str, Mapping[str, int]]
+    """A Mapping of issue codes emitted by the checker to metadata for those issue types.
+    The metadata is structured in the form of a Mapping from attribute name to attribute value.
+    The one mandatory metadata attribute is severity, which must be one of the levels provided by the `logging` module"""
 
     enabled_by_default: bool = True
     """A boolean indicating if the checker is enabled by default when discovered automatically."""
@@ -51,7 +53,9 @@ class CheckerInterface:
     ) -> ISSUES_TYPE:
         """Checks a rule and returns a list of issues found."""
         self.__log_rule_processing(rule)
-        return self.__add_checker_metadata(self.__filter_issues(self._check_rule(rule)))
+        return self.__add_checker_metadata(
+            self.__add_issue_metadata(self.__filter_issues(self._check_rule(rule)))
+        )
 
     @abc.abstractmethod
     def _check_rule(
@@ -71,6 +75,18 @@ class CheckerInterface:
             sid = int(sid_str)
 
         _logger.debug("Running %s on rule %s", self.__class__.__name__, sid)
+
+    def __add_issue_metadata(
+        self: "CheckerInterface",
+        issues: ISSUES_TYPE,
+    ) -> ISSUES_TYPE:
+        """Given a list of issues, return the same list with metadata from the issue types."""
+        for issue in issues:
+            metadata = self.codes[issue.code]
+            if "severity" in metadata:
+                issue.severity = metadata["severity"]
+
+        return issues
 
     def __add_checker_metadata(
         self: "CheckerInterface",

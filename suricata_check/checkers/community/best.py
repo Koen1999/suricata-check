@@ -1,5 +1,7 @@
 """`BestChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -17,11 +19,11 @@ class BestChecker(CheckerInterface):
     Codes C100-C110 report on missing fields that should be set.
     """
 
-    codes = (
-        "C100",
-        "C101",
-        "C102",
-    )
+    codes = {
+        "C100": {"severity": logging.INFO},
+        "C101": {"severity": logging.INFO},
+        "C102": {"severity": logging.INFO},
+    }
 
     def _check_rule(
         self: "BestChecker",

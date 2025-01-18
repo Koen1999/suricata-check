@@ -1,5 +1,6 @@
 """`PrincipleChecker`."""
 
+import logging
 from typing import Optional
 
 import idstools.rule
@@ -72,14 +73,14 @@ class PrincipleChecker(CheckerInterface):
         that and is unlikely to generalize as a result.
     """
 
-    codes = (
-        "P000",
-        "P001",
-        "P002",
-        "P003",
-        "P004",
-        "P005",
-    )
+    codes = {
+        "P000": {"severity": logging.INFO},
+        "P001": {"severity": logging.INFO},
+        "P002": {"severity": logging.INFO},
+        "P003": {"severity": logging.INFO},
+        "P004": {"severity": logging.INFO},
+        "P005": {"severity": logging.INFO},
+    }
 
     def _check_rule(
         self: "PrincipleChecker",

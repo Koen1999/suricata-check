@@ -1,5 +1,7 @@
 """`PcreChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -24,7 +26,7 @@ class PcreChecker(CheckerInterface):
     Codes S600-610 report on unrecommended usages of `pcre`
     """
 
-    codes = ("S600", "S601")
+    codes = {"S600": {"severity": logging.INFO}, "S601": {"severity": logging.INFO}}
 
     def _check_rule(
         self: "PcreChecker",

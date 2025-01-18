@@ -1,5 +1,7 @@
 """`WhitespaceChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -61,21 +63,21 @@ class WhitespaceChecker(CheckerInterface):
     Codes S120-S129 report on non-standard escaping of special characters.
     """
 
-    codes = (
-        "S100",
-        "S101",
-        "S102",
-        "S103",
-        "S104",
-        "S105",
-        "S106",
-        "S110",
-        "S111",
-        "S120",
-        "S121",
-        "S122",
-        "S123",
-    )
+    codes = {
+        "S100": {"severity": logging.INFO},
+        "S101": {"severity": logging.INFO},
+        "S102": {"severity": logging.INFO},
+        "S103": {"severity": logging.INFO},
+        "S104": {"severity": logging.INFO},
+        "S105": {"severity": logging.INFO},
+        "S106": {"severity": logging.INFO},
+        "S110": {"severity": logging.INFO},
+        "S111": {"severity": logging.INFO},
+        "S120": {"severity": logging.INFO},
+        "S121": {"severity": logging.INFO},
+        "S122": {"severity": logging.INFO},
+        "S123": {"severity": logging.INFO},
+    }
 
     def _check_rule(  # noqa: C901, PLR0912
         self: "WhitespaceChecker",

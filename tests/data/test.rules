@@ -64,3 +64,9 @@ alert tcp $EXTERNAL_NET 443 -> $HOME_NET any (msg:"KOEN C2 Inbound HTTP Response
 ####################################################################################################
 
 alert dns any any -> any any (msg : "contains dns to detectme.foobar"; content : "detectme.foobar"; sid: 1;)
+
+alert dns any any -> any any ( \
+    msg:"contains dns to detectme.foobar"; \
+    content:"detectme.foobar"; \
+    sid:1; \
+)

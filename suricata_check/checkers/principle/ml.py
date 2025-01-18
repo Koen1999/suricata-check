@@ -135,14 +135,14 @@ class PrincipleMLChecker(CheckerInterface):
     ip_keywords = IP_KEYWORDS
     ip_columns = IP_COLUMNS
 
-    codes = (
-        "Q000",
-        "Q001",
-        "Q002",
-        "Q003",
-        "Q004",
-        "Q005",
-    )
+    codes = {
+        "Q000": {"severity": logging.INFO},
+        "Q001": {"severity": logging.INFO},
+        "Q002": {"severity": logging.INFO},
+        "Q003": {"severity": logging.INFO},
+        "Q004": {"severity": logging.INFO},
+        "Q005": {"severity": logging.INFO},
+    }
 
     enabled_by_default = (
         False  # Since the checker is relatively slow, it is disabled by default

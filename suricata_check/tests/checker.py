@@ -128,6 +128,12 @@ class GenericChecker:
                         str(issue.code)
                     )
                 )
+            if not hasattr(issue, "severity"):
+                pytest.fail(
+                    "Issue with code {} did not specify severity.".format(
+                        str(issue.code)
+                    )
+                )
             if issue.message.strip() != issue.message:
                 pytest.fail(
                     'Issue with code {} starts with or ends with whitespace in message: """{}"""'.format(

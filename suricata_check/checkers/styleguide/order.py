@@ -1,5 +1,7 @@
 """`OrderChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -64,34 +66,34 @@ class OrderChecker(CheckerInterface):
     Codes S240-S249 report on the non-standard ordering of threshold options.
     """
 
-    codes = (
-        "S200",
-        "S201",
-        "S202",
-        "S203",
-        "S204",
-        "S205",
-        "S206",
-        "S207",
-        "S208",
-        "S210",
-        "S211",
-        "S212",
-        "S220",
-        "S221",
-        "S222",
-        "S223",
-        "S224",
-        "S230",
-        "S231",
-        "S232",
-        "S233",
-        "S234",
-        "S235",
-        "S236",
-        "S240",
-        "S241",
-    )
+    codes = {
+        "S200": {"severity": logging.INFO},
+        "S201": {"severity": logging.INFO},
+        "S202": {"severity": logging.INFO},
+        "S203": {"severity": logging.INFO},
+        "S204": {"severity": logging.INFO},
+        "S205": {"severity": logging.INFO},
+        "S206": {"severity": logging.INFO},
+        "S207": {"severity": logging.INFO},
+        "S208": {"severity": logging.INFO},
+        "S210": {"severity": logging.INFO},
+        "S211": {"severity": logging.INFO},
+        "S212": {"severity": logging.INFO},
+        "S220": {"severity": logging.INFO},
+        "S221": {"severity": logging.INFO},
+        "S222": {"severity": logging.INFO},
+        "S223": {"severity": logging.INFO},
+        "S224": {"severity": logging.INFO},
+        "S230": {"severity": logging.INFO},
+        "S231": {"severity": logging.INFO},
+        "S232": {"severity": logging.INFO},
+        "S233": {"severity": logging.INFO},
+        "S234": {"severity": logging.INFO},
+        "S235": {"severity": logging.INFO},
+        "S236": {"severity": logging.INFO},
+        "S240": {"severity": logging.INFO},
+        "S241": {"severity": logging.INFO},
+    }
 
     def _check_rule(  # noqa: C901, PLR0912, PLR0915
         self: "OrderChecker",

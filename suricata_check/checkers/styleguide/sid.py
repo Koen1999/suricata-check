@@ -41,12 +41,12 @@ class SidChecker(CheckerInterface):
         S303: Allocation to unallocated SID range, whereas a reserved range should be used.
     """
 
-    codes = (
-        "S300",
-        "S301",
-        "S302",
-        "S303",
-    )
+    codes = {
+        "S300": {"severity": logging.INFO},
+        "S301": {"severity": logging.INFO},
+        "S302": {"severity": logging.INFO},
+        "S303": {"severity": logging.INFO},
+    }
 
     def _check_rule(
         self: "SidChecker",

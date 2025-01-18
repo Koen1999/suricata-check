@@ -1,5 +1,7 @@
 """`MetadataChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -16,12 +18,12 @@ class MetadataChecker(CheckerInterface):
     Codes S800-810 report on missing common `metadata` fields
     """
 
-    codes = (
-        "S800",
-        "S801",
-        "S802",
-        "S803",
-    )
+    codes = {
+        "S800": {"severity": logging.INFO},
+        "S801": {"severity": logging.INFO},
+        "S802": {"severity": logging.INFO},
+        "S803": {"severity": logging.INFO},
+    }
 
     def _check_rule(
         self: "MetadataChecker",

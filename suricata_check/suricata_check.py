@@ -2,6 +2,7 @@
 
 import atexit
 import io
+import json
 import logging
 import logging.handlers
 import multiprocessing
@@ -14,6 +15,7 @@ from functools import lru_cache
 from typing import (
     Literal,
     Optional,
+    Union,
 )
 
 import click
@@ -47,6 +49,23 @@ from suricata_check.utils.regex import get_regex_provider, is_valid_rule  # noqa
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
+GITLAB_SEVERITIES = {
+    logging.DEBUG: "info",
+    logging.INFO: "info",
+    logging.WARNING: "minor",
+    logging.ERROR: "major",
+    logging.CRITICAL: "critical",
+}
+GITHUB_SEVERITIES = {
+    logging.DEBUG: "debug",
+    logging.INFO: "notice",
+    logging.WARNING: "warning",
+    logging.ERROR: "error",
+    logging.CRITICAL: "error",
+}
+GITHUB_COMMAND = (
+    "::{level} file={file},line={line},endLine={end_line},title={title}::{message}"
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -57,13 +76,6 @@ suricata_check_extensions_imported = False
 
 
 @click.command()
-@click.option(
-    "--out",
-    "-o",
-    default=".",
-    help="Path to suricata-check output folder.",
-    show_default=True,
-)
 @click.option(
     "--rules",
     "-r",
@@ -78,10 +90,31 @@ suricata_check_extensions_imported = False
     show_default=False,
 )
 @click.option(
+    "--out",
+    "-o",
+    default=".",
+    help="Path to suricata-check output folder.",
+    show_default=True,
+)
+@click.option(
     "--log-level",
     default="INFO",
     help=f"Verbosity level for logging. Can be one of {LOG_LEVELS}",
     show_default=True,
+)
+@click.option(
+    "--gitlab",
+    default=False,
+    help="Flag to create CodeClimate output report for GitLab CI/CD.",
+    show_default=True,
+    is_flag=True,
+)
+@click.option(
+    "--github",
+    default=False,
+    help="Flag to write workflow commands to stdout for GitHub CI/CD.",
+    show_default=True,
+    is_flag=True,
 )
 @click.option(
     "--evaluate-disabled",
@@ -89,6 +122,12 @@ suricata_check_extensions_imported = False
     help="Flag to evaluate disabled rules.",
     show_default=True,
     is_flag=True,
+)
+@click.option(
+    "--issue-severity",
+    default="INFO",
+    help=f"Verbosity level for detected issues. Can be one of {LOG_LEVELS}",
+    show_default=True,
 )
 @click.option(
     "--include-all",
@@ -114,12 +153,15 @@ suricata_check_extensions_imported = False
     show_default=True,
     multiple=True,
 )
-def main(  # noqa: PLR0913
-    out: str = ".",
+def main(  # noqa: PLR0913, PLR0915
     rules: str = ".",
     single_rule: Optional[str] = None,
+    out: str = ".",
     log_level: LogLevel = "DEBUG",
+    gitlab: bool = False,
+    github: bool = False,
     evaluate_disabled: bool = False,
+    issue_severity: LogLevel = "INFO",
     include_all: bool = False,
     include: tuple[str, ...] = (),
     exclude: tuple[str, ...] = (),
@@ -148,7 +190,9 @@ def main(  # noqa: PLR0913
     queue = multiprocessing.Manager().Queue()
     queue_handler = logging.handlers.QueueHandler(queue)
 
-    click_handler = ClickHandler()
+    click_handler = ClickHandler(
+        github=github, github_level=getattr(logging, log_level)
+    )
     logging.basicConfig(
         level=log_level,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -184,7 +228,10 @@ def main(  # noqa: PLR0913
     _logger.info("rules: %s", rules)
     _logger.info("single_rule: %s", single_rule)
     _logger.info("log_level: %s", log_level)
+    _logger.info("gitlab: %s", gitlab)
+    _logger.info("github: %s", github)
     _logger.info("evaluate_disabled: %s", evaluate_disabled)
+    _logger.info("issue_severity: %s", issue_severity)
     _logger.info("include_all: %s", include_all)
     _logger.info("include: %s", include)
     _logger.info("exclude: %s", exclude)
@@ -205,7 +252,15 @@ def main(  # noqa: PLR0913
     if include_all:
         include = (".*",)
 
-    checkers = get_checkers(include, exclude)
+    # Verify that issue_severity argument is valid
+    if issue_severity not in LOG_LEVELS:
+        raise click.BadParameter(
+            f"Error: {issue_severity} is not a valid issue severity or log level."
+        )
+
+    checkers = get_checkers(
+        include, exclude, issue_severity=getattr(logging, issue_severity)
+    )
 
     if single_rule is not None:
         __main_single_rule(out, single_rule, checkers)
@@ -219,7 +274,7 @@ def main(  # noqa: PLR0913
 
     output = process_rules_file(rules, evaluate_disabled, checkers=checkers)
 
-    __write_output(output, out)
+    __write_output(output, out, gitlab=gitlab, github=github, rules_file=rules)
 
     _at_exit()
 
@@ -250,6 +305,9 @@ def __main_single_rule(
 def __write_output(
     output: OutputReport,
     out: str,
+    gitlab: bool = False,
+    github: bool = False,
+    rules_file: Optional[str] = None,
 ) -> None:
     _logger.info(
         "Writing output to suricata-check.jsonl and suricata-check-fast.log in %s",
@@ -272,45 +330,117 @@ def __write_output(
 
         for rule_report in rules:
             rule: idstools.rule.Rule = rule_report.rule
-            line: Optional[int] = rule_report.line
+            lines: str = (
+                "{}-{}".format(rule_report.line_begin, rule_report.line_end)
+                if rule_report.line_begin
+                else "Unknown"
+            )
             issues: ISSUES_TYPE = rule_report.issues
             for issue in issues:
                 code = issue.code
+                severity = issue.severity
                 issue_msg = issue.message.replace("\n", " ")
 
-                msg = f"[{code}] Line {line}, sid {rule['sid']}: {issue_msg}"
+                msg = f"[{code}] ({severity}) Lines {lines}, sid {rule['sid']}: {issue_msg}"
                 fast_fh.write(msg + "\n")
                 click.secho(msg, color=True, fg="blue")
 
     if output.summary is not None:
-        with open(
-            os.path.join(out, "suricata-check-stats.log"),
-            "w",
-            buffering=io.DEFAULT_BUFFER_SIZE,
-        ) as stats_fh:
-            summary: OutputSummary = output.summary
+        __write_output_stats(output, out)
 
-            overall_summary: SIMPLE_SUMMARY_TYPE = summary.overall_summary
+    if gitlab:
+        assert rules_file is not None
 
-            n_issues = overall_summary["Total Issues"]
-            n_rules = (
-                overall_summary["Rules with Issues"]
-                + overall_summary["Rules without Issues"]
+        __write_output_gitlab(output, out, rules_file)
+
+    if github:
+        assert rules_file is not None
+
+        __write_output_github(output, rules_file)
+
+
+def __write_output_stats(output: OutputReport, out: str) -> None:
+    assert output.summary is not None
+
+    with open(
+        os.path.join(out, "suricata-check-stats.log"),
+        "w",
+        buffering=io.DEFAULT_BUFFER_SIZE,
+    ) as stats_fh:
+        summary: OutputSummary = output.summary
+
+        overall_summary: SIMPLE_SUMMARY_TYPE = summary.overall_summary
+
+        n_issues = overall_summary["Total Issues"]
+        n_rules = (
+            overall_summary["Rules with Issues"]
+            + overall_summary["Rules without Issues"]
+        )
+
+        stats_fh.write(
+            tabulate.tabulate(
+                (
+                    (
+                        k,
+                        v,
+                        (
+                            "{:.0%}".format(v / n_rules)
+                            if k.startswith("Rules ") and n_rules > 0
+                            else "-"
+                        ),
+                    )
+                    for k, v in overall_summary.items()
+                ),
+                headers=(
+                    "Count",
+                    "Percentage of Rules",
+                ),
             )
+            + "\n\n",
+        )
 
+        click.secho(
+            f"Total issues found: {overall_summary['Total Issues']}",
+            color=True,
+            bold=True,
+            fg="blue",
+        )
+        click.secho(
+            f"Rules with Issues found: {overall_summary['Rules with Issues']}",
+            color=True,
+            bold=True,
+            fg="blue",
+        )
+
+        issues_by_group: SIMPLE_SUMMARY_TYPE = summary.issues_by_group
+
+        stats_fh.write(
+            tabulate.tabulate(
+                (
+                    (k, v, "{:.0%}".format(v / n_issues) if n_issues > 0 else "-")
+                    for k, v in issues_by_group.items()
+                ),
+                headers=(
+                    "Count",
+                    "Percentage of Total Issues",
+                ),
+            )
+            + "\n\n",
+        )
+
+        issues_by_type: EXTENSIVE_SUMMARY_TYPE = summary.issues_by_type
+        for checker, checker_issues_by_type in issues_by_type.items():
+            stats_fh.write(" " + checker + " " + "\n")
+            stats_fh.write("-" * (len(checker) + 2) + "\n")
             stats_fh.write(
                 tabulate.tabulate(
                     (
                         (
                             k,
                             v,
-                            (
-                                "{:.0%}".format(v / n_rules)
-                                if k.startswith("Rules ") and n_rules > 0
-                                else "-"
-                            ),
+                            "{:.0%}".format(v / n_rules) if n_rules > 0 else "-",
                         )
-                        for k, v in overall_summary.items()
+                        for k, v in checker_issues_by_type.items()
                     ),
                     headers=(
                         "Count",
@@ -320,59 +450,87 @@ def __write_output(
                 + "\n\n",
             )
 
-            click.secho(
-                f"Total issues found: {overall_summary['Total Issues']}",
-                color=True,
-                bold=True,
-                fg="blue",
-            )
-            click.secho(
-                f"Rules with Issues found: {overall_summary['Rules with Issues']}",
-                color=True,
-                bold=True,
-                fg="blue",
-            )
 
-            issues_by_group: SIMPLE_SUMMARY_TYPE = summary.issues_by_group
+def __write_output_gitlab(output: OutputReport, out: str, rules_file: str) -> None:
+    with open(
+        os.path.join(out, "suricata-check-gitlab.log"),
+        "w",
+        buffering=io.DEFAULT_BUFFER_SIZE,
+    ) as gitlab_fh:
+        issue_dicts = []
+        for rule_report in output.rules:
+            line_begin: Optional[int] = rule_report.line_begin
+            assert line_begin is not None
+            line_end: Optional[int] = rule_report.line_end
+            assert line_end is not None
+            issues: ISSUES_TYPE = rule_report.issues
+            for issue in issues:
+                code = issue.code
+                issue_msg = issue.message.replace("\n", " ")
+                assert issue.checker is not None
+                issue_checker = issue.checker
+                issue_hash = str(issue.hash)
+                assert issue.severity is not None
+                issue_severity = GITLAB_SEVERITIES[issue.severity]
 
-            stats_fh.write(
-                tabulate.tabulate(
-                    (
-                        (k, v, "{:.0%}".format(v / n_issues) if n_issues > 0 else "-")
-                        for k, v in issues_by_group.items()
-                    ),
-                    headers=(
-                        "Count",
-                        "Percentage of Total Issues",
-                    ),
+                issue_dict: Mapping[
+                    str,
+                    Union[str, list[str], Mapping[str, Union[str, Mapping[str, int]]]],
+                ] = {
+                    "description": issue_msg,
+                    "categories": [issue_checker],
+                    "check_name": f"Suricata Check {code}",
+                    "fingerprint": issue_hash,
+                    "severity": issue_severity,
+                    "location": {
+                        "path": rules_file,
+                        "lines": {"begin": line_begin, "end": line_end},
+                    },
+                }
+                issue_dicts.append(issue_dict)
+
+            gitlab_fh.write(json.dumps(issue_dicts))
+
+
+def __write_output_github(output: OutputReport, rules_file: str) -> None:
+    output_lines: dict[str, list[str]] = {
+        k: [] for k in set(GITHUB_SEVERITIES.values())
+    }
+    for rule_report in output.rules:
+        line_begin: Optional[int] = rule_report.line_begin
+        assert line_begin is not None
+        line_end: Optional[int] = rule_report.line_end
+        assert line_end is not None
+        issues: ISSUES_TYPE = rule_report.issues
+        for issue in issues:
+            code = issue.code
+            issue_msg = issue.message.replace("\n", " ")
+            assert issue.checker is not None
+            issue_checker = issue.checker
+            assert issue.severity is not None
+            issue_severity = GITHUB_SEVERITIES[issue.severity]
+            title = f"{issue_checker} - {code}"
+
+            output_lines[issue_severity].append(
+                GITHUB_COMMAND.format(
+                    level=issue_severity,
+                    file=rules_file,
+                    line=line_begin,
+                    end_line=line_end,
+                    title=title,
+                    message=issue_msg,
                 )
-                + "\n\n",
             )
 
-            issues_by_type: EXTENSIVE_SUMMARY_TYPE = summary.issues_by_type
-            for checker, checker_issues_by_type in issues_by_type.items():
-                stats_fh.write(" " + checker + " " + "\n")
-                stats_fh.write("-" * (len(checker) + 2) + "\n")
-                stats_fh.write(
-                    tabulate.tabulate(
-                        (
-                            (
-                                k,
-                                v,
-                                "{:.0%}".format(v / n_rules) if n_rules > 0 else "-",
-                            )
-                            for k, v in checker_issues_by_type.items()
-                        ),
-                        headers=(
-                            "Count",
-                            "Percentage of Rules",
-                        ),
-                    )
-                    + "\n\n",
-                )
+    for message_level, lines in output_lines.items():
+        if len(lines) > 0:
+            print(f"::group::{message_level}")  # noqa: T201
+            for message in lines:
+                print(message)  # noqa: T201
+            print("::endgroup::")  # noqa: T201
 
 
-def process_rules_file(
+def process_rules_file(  # noqa: C901, PLR0912
     rules: str,
     evaluate_disabled: bool,
     checkers: Optional[Sequence[CheckerInterface]] = None,
@@ -409,23 +567,49 @@ def process_rules_file(
 
         _logger.info("Processing rule file: %s", rules)
 
-        for number, line in enumerate(rules_fh.readlines(), start=1):
-            if line.startswith("#"):
-                if evaluate_disabled:
-                    # Verify that this line is a rule and not a comment
-                    if idstools.rule.parse(line) is None:
-                        # Log the comment since it may be a invalid rule
-                        _logger.warning("Ignoring comment on line %i: %s", number, line)
-                        continue
-                else:
-                    # Skip the rule
-                    continue
+        collected_multiline_parts: Optional[str] = None
+        multiline_begin_number: Optional[int] = None
 
-            # Skip whitespace
-            if len(line.strip()) == 0:
+        for number, line in enumerate(rules_fh.readlines(), start=1):
+            # First work on collecting and parsing multiline rules
+            if line.rstrip("\r\n").endswith("\\"):
+                multiline_part = line.rstrip("\r\n")[:-1]
+
+                if collected_multiline_parts is None:
+                    collected_multiline_parts = multiline_part
+                    multiline_begin_number = number
+                else:
+                    collected_multiline_parts += multiline_part.lstrip()
+
                 continue
 
-            rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+            # Process final part of multiline rule if one is being collected
+            if collected_multiline_parts is not None:
+                collected_multiline_parts += line.lstrip()
+
+                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(
+                    collected_multiline_parts
+                )
+                collected_multiline_parts = None
+            # If no multiline rule is being collected process as a potential single line rule
+            else:
+                if len(line.strip()) == 0:
+                    continue
+
+                if line.startswith("#"):
+                    if evaluate_disabled:
+                        # Verify that this line is a rule and not a comment
+                        if idstools.rule.parse(line) is None:
+                            # Log the comment since it may be a invalid rule
+                            _logger.warning(
+                                "Ignoring comment on line %i: %s", number, line
+                            )
+                            continue
+                    else:
+                        # Skip the rule
+                        continue
+
+                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
 
             # Verify that a rule was parsed correctly.
             if rule is None:
@@ -442,8 +626,11 @@ def process_rules_file(
                 rule,
                 checkers=checkers,
             )
-            rule_report.line = number
+            rule_report.line_begin = multiline_begin_number or number
+            rule_report.line_end = number
             output.rules.append(rule_report)
+
+            multiline_begin_number = None
 
     _logger.info("Completed processing rule file: %s", rules)
 
@@ -478,6 +665,7 @@ def _import_extensions() -> None:
 def get_checkers(
     include: Sequence[str] = (".*",),
     exclude: Sequence[str] = (),
+    issue_severity: int = logging.INFO,
 ) -> Sequence[CheckerInterface]:
     """Auto discovers all available checkers that implement the CheckerInterface.
 
@@ -497,7 +685,9 @@ def get_checkers(
         if issubclass(checker, DummyChecker):
             checker()
 
-        enabled, relevant_codes = __get_checker_enabled(checker, include, exclude)
+        enabled, relevant_codes = __get_checker_enabled(
+            checker, include, exclude, issue_severity
+        )
 
         if enabled:
             checkers.append(checker(include=relevant_codes))
@@ -530,10 +720,11 @@ def __get_checker_enabled(
     checker: type[CheckerInterface],
     include: Sequence[str],
     exclude: Sequence[str],
+    issue_severity: int,
 ) -> tuple[bool, set[str]]:
     enabled = checker.enabled_by_default
 
-    relevant_codes = set(checker.codes)
+    relevant_codes = set(checker.codes.keys())
 
     if len(include) > 0:
         for regex in include:
@@ -554,6 +745,12 @@ def __get_checker_enabled(
                 relevant_codes,
             )
         )
+    relevant_codes = set(
+        filter(
+            lambda code: checker.codes[code]["severity"] >= issue_severity,
+            relevant_codes,
+        )
+    )
 
     if len(relevant_codes) == 0:
         enabled = False

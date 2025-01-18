@@ -30,6 +30,7 @@ class Issue:
 
     code: str
     message: str
+    severity: Optional[int] = None
     checker: Optional[str] = None
 
     def to_dict(self: "Issue") -> dict[str, str]:
@@ -43,6 +44,11 @@ class Issue:
             d["checker"] = self.checker
 
         return d
+
+    @property
+    def hash(self: "Issue") -> int:
+        """Returns a unique hash that can be used as a fingerprint for the issue."""
+        return hash(tuple(sorted(self.to_dict().items())))
 
     def __repr__(self: "Issue") -> str:
         """Returns the Issue represented as a string."""
@@ -74,7 +80,8 @@ class RuleReport:
 
     rule: idstools.rule.Rule
     summary: Optional[RULE_SUMMARY_TYPE] = None
-    line: Optional[int] = None
+    line_begin: Optional[int] = None
+    line_end: Optional[int] = None
 
     _issues: ISSUES_TYPE = field(default_factory=list, init=False)
 
@@ -102,8 +109,14 @@ class RuleReport:
         if self.summary is not None:
             d["summary"] = self.summary
 
-        if self.line is not None:
-            d["line"] = self.line
+        if self.line_begin is not None or self.line_end is not None:
+            d["lines"] = {}
+
+        if self.line_begin is not None:
+            d["lines"]["begin"] = self.line_begin
+
+        if self.line_begin is not None:
+            d["lines"]["end"] = self.line_end
 
         return d
 

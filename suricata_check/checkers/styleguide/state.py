@@ -38,15 +38,15 @@ class StateChecker(CheckerInterface):
     Codes S520-S530 report on non-standard usages of `xbits`
     """
 
-    codes = (
-        "S500",
-        "S501",
-        "S510",
-        "S511",
-        "S520",
-        "S521",
-        "S522",
-    )
+    codes = {
+        "S500": {"severity": logging.INFO},
+        "S501": {"severity": logging.INFO},
+        "S510": {"severity": logging.INFO},
+        "S511": {"severity": logging.INFO},
+        "S520": {"severity": logging.INFO},
+        "S521": {"severity": logging.INFO},
+        "S522": {"severity": logging.INFO},
+    }
 
     def _check_rule(
         self: "StateChecker",

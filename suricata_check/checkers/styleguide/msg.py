@@ -56,18 +56,18 @@ class MsgChecker(CheckerInterface):
     Codes S400-S410 report on non-standard `msg` fields.
     """
 
-    codes = (
-        "S400",
-        "S401",
-        "S402",
-        "S403",
-        "S404",
-        "S405",
-        "S406",
-        "S407",
-        "S408",
-        "S409",
-    )
+    codes = {
+        "S400": {"severity": logging.INFO},
+        "S401": {"severity": logging.INFO},
+        "S402": {"severity": logging.INFO},
+        "S403": {"severity": logging.INFO},
+        "S404": {"severity": logging.INFO},
+        "S405": {"severity": logging.INFO},
+        "S406": {"severity": logging.WARNING},
+        "S407": {"severity": logging.INFO},
+        "S408": {"severity": logging.INFO},
+        "S409": {"severity": logging.INFO},
+    }
 
     def _check_rule(  # noqa: C901
         self: "MsgChecker",
