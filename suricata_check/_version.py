@@ -3,6 +3,7 @@ import os
 import re
 import subprocess
 from importlib.metadata import PackageNotFoundError, requires, version
+
 import setuptools_git_versioning
 
 SURICATA_CHECK_DIR = os.path.dirname(__file__)
