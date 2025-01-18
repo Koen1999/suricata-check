@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 class DummyChecker(CheckerInterface):
     """Dummy class to prevent runtime errors on import."""
 
-    codes = ()
+    codes = {}
     enabled_by_default = False
 
     def __init__(self: "DummyChecker", include: Optional[Iterable[str]] = None) -> None:

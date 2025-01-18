@@ -52,22 +52,6 @@
             },
         },
         {
-            "name": "Pytest",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "pytest",
-            "args": [
-                
-            ],
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "subProcess": true,
-            "stopOnEntry": false,
-            "autoReload": {
-                "enable": false
-            },
-        },
-        {
             "name": "Profile/Coverage Pytest",
             "type": "debugpy",
             "request": "launch",

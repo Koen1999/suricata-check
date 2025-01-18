@@ -1,5 +1,7 @@
 """`MandatoryChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -13,10 +15,10 @@ class MandatoryChecker(CheckerInterface):
     Codes M000-M009 report on missing mandatory rule options.
     """
 
-    codes = (
-        "M000",
-        "M001",
-    )
+    codes = {
+        "M000": {"severity": logging.ERROR},
+        "M001": {"severity": logging.ERROR},
+    }
 
     def _check_rule(
         self: "MandatoryChecker",

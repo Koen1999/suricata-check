@@ -1,5 +1,7 @@
 """`ReferenceChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -26,10 +28,10 @@ class ReferenceChecker(CheckerInterface):
     Codes S700-710 report on non-standard usages of `reference`
     """
 
-    codes = (
-        "S700",
-        "S701",
-    )
+    codes = {
+        "S700": {"severity": logging.INFO},
+        "S701": {"severity": logging.INFO},
+    }
 
     def _check_rule(
         self: "ReferenceChecker",

@@ -1,5 +1,7 @@
 """`UnexpectedChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -16,7 +18,9 @@ class UnexpectedChecker(CheckerInterface):
     Codes C000-C010 report on unexpected behavior.
     """
 
-    codes = ("C000",)
+    codes = {
+        "C000": {"severity": logging.WARNING},
+    }
 
     def _check_rule(
         self: "UnexpectedChecker",

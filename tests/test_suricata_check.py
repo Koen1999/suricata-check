@@ -73,6 +73,153 @@ def test_main_cli_single_rule():
         pytest.fail(result.output)
 
 
+@pytest.mark.serial()
+def test_main_cli_gitlab():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+            "--gitlab",
+        ),
+        catch_exceptions=False,
+    )
+
+    __check_log_file()
+
+    if result.exit_code != 0:
+        pytest.fail(result.output)
+
+
+@pytest.mark.serial()
+def test_main_cli_github():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+            "--github",
+        ),
+        catch_exceptions=False,
+    )
+
+    __check_log_file()
+
+    if result.exit_code != 0:
+        pytest.fail(result.output)
+
+
+@pytest.mark.serial()
+def test_main_cli_evaluate_disabled():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+            "--evaluate-disabled",
+        ),
+        catch_exceptions=False,
+    )
+
+    __check_log_file()
+
+    if result.exit_code != 0:
+        pytest.fail(result.output)
+
+
+@pytest.mark.serial()
+def test_main_cli_issue_severity():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+            "--issue-severity=WARNING",
+        ),
+        catch_exceptions=False,
+    )
+
+    __check_log_file()
+
+    if result.exit_code != 0:
+        pytest.fail(result.output)
+
+
+@pytest.mark.serial()
+def test_main_cli_include_all():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+            "--include-all",
+        ),
+        catch_exceptions=False,
+    )
+
+    __check_log_file()
+
+    if result.exit_code != 0:
+        pytest.fail(result.output)
+
+
+@pytest.mark.serial()
+def test_main_cli_include():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+            "--include=M.*",
+        ),
+        catch_exceptions=False,
+    )
+
+    __check_log_file()
+
+    if result.exit_code != 0:
+        pytest.fail(result.output)
+
+
+@pytest.mark.serial()
+def test_main_cli_exclude():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+            "--exclude=M.*",
+        ),
+        catch_exceptions=False,
+    )
+
+    __check_log_file()
+
+    if result.exit_code != 0:
+        pytest.fail(result.output)
+
+
 @pytest.mark.slow()
 @pytest.mark.serial()
 @pytest.hookimpl(trylast=True)
@@ -208,6 +355,16 @@ def test_main_error():
 def test_get_checkers():
     logging.basicConfig(level=logging.DEBUG)
     suricata_check.get_checkers()
+
+
+def test_get_checkers_include():
+    logging.basicConfig(level=logging.DEBUG)
+    assert len(suricata_check.get_checkers(include=("M.*",))) == 1
+
+
+def test_get_checkers_exclude():
+    logging.basicConfig(level=logging.DEBUG)
+    assert len(suricata_check.get_checkers(exclude=("(?!M).*",))) == 1
 
 
 def test_analyze_rule():

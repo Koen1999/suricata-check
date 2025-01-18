@@ -1,5 +1,7 @@
 """`PerformanceChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -20,12 +22,12 @@ class PerformanceChecker(CheckerInterface):
     Codes S900-910 report on usage of options that can slow the detection engine.
     """
 
-    codes = (
-        "S900",
-        "S901",
-        "S902",
-        "S903",
-    )
+    codes = {
+        "S900": {"severity": logging.INFO},
+        "S901": {"severity": logging.INFO},
+        "S902": {"severity": logging.INFO},
+        "S903": {"severity": logging.INFO},
+    }
 
     def _check_rule(
         self: "PerformanceChecker",

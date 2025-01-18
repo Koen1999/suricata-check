@@ -1,5 +1,7 @@
 """`OverallChecker`."""
 
+import logging
+
 import idstools.rule
 
 from suricata_check.checkers.interface import CheckerInterface
@@ -51,20 +53,20 @@ class OverallChecker(CheckerInterface):
     Codes S031-S039 report on issues pertaining to the inappropriate usage of options.
     """
 
-    codes = (
-        "S000",
-        "S001",
-        "S002",
-        "S010",
-        "S011",
-        "S012",
-        "S013",
-        "S014",
-        "S020",
-        "S021",
-        "S030",
-        "S031",
-    )
+    codes = {
+        "S000": {"severity": logging.INFO},
+        "S001": {"severity": logging.INFO},
+        "S002": {"severity": logging.INFO},
+        "S010": {"severity": logging.INFO},
+        "S011": {"severity": logging.INFO},
+        "S012": {"severity": logging.INFO},
+        "S013": {"severity": logging.INFO},
+        "S014": {"severity": logging.INFO},
+        "S020": {"severity": logging.INFO},
+        "S021": {"severity": logging.INFO},
+        "S030": {"severity": logging.INFO},
+        "S031": {"severity": logging.INFO},
+    }
 
     def _check_rule(  # noqa: C901
         self: "OverallChecker",

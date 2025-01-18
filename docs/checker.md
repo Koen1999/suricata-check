@@ -11,7 +11,7 @@ from suricata_check.utils.typing import ISSUES_TYPE
 
 
 class ExampleChecker(CheckerInterface):
-    codes = tuple()
+    codes = dict()
 
     def _check_rule(
         self: "ExampleChecker",
@@ -29,6 +29,7 @@ To detect issues, you can use utility functions provided in `suricata_check.util
 All you have to do to add new issue types is, to add the desired issue code (e.g. `E000`) to the `codes` field of the class, and append a new `Issue` to the list of `issues` that is returned at the end of `_check_rule` depending on the output of the utlity function called from `suricata_check.utils.checker`. For example, we can add two new issue types as follows:
 
 ```python
+import logging
 import idstools.rule
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils import checker
@@ -36,10 +37,10 @@ from suricata_check.utils.typing import ISSUES_TYPE, Issue
 
 
 class ExampleChecker(CheckerInterface):
-    codes = (
-        "E000",
-        "E001",
-    )
+    codes = {
+        "E000": {"severity": logging.INFO},
+        "E001": {"severity": logging.INFO},
+    }
 
     def _check_rule(
         self: "ExampleChecker",
