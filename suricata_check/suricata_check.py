@@ -788,7 +788,10 @@ def analyze_rule(
     rule_report: RuleReport = RuleReport(rule=rule)
 
     for checker in checkers:
-        rule_report.add_issues(checker.check_rule(rule))
+        try:
+            rule_report.add_issues(checker.check_rule(rule))
+        except Exception:  # noqa: BLE001
+            _logger.warning("Failed to run %s on rule: %s", checker.__class__.__name__, rule["raw"])
 
     rule_report.summary = __summarize_rule(rule_report, checkers)
 
