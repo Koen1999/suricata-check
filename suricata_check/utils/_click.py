@@ -2,6 +2,16 @@ import logging
 
 import click
 
+from suricata_check._version import get_version
+
+
+class ClickHelpOption(click.HelpOption):
+    @staticmethod
+    def show_help(ctx: click.Context, param: click.Parameter, value: bool) -> None:
+        click.echo("suricata-check {}\n".format(get_version()))
+
+        click.HelpOption.show_help(ctx, param, value)
+
 
 class ClickHandler(logging.Handler):
     """Handler to color and write logging messages for the click module."""

@@ -30,7 +30,7 @@ if sys.path[0] != _suricata_check_path:
 from suricata_check import __version__, get_dependency_versions  # noqa: E402
 from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
 from suricata_check.checkers.interface.dummy import DummyChecker  # noqa: E402
-from suricata_check.utils._click import ClickHandler  # noqa: E402
+from suricata_check.utils._click import ClickHandler, ClickHelpOption  # noqa: E402
 from suricata_check.utils._path import find_rules_file  # noqa: E402
 from suricata_check.utils.checker import check_rule_option_recognition  # noqa: E402
 from suricata_check.utils.checker_typing import (  # noqa: E402
@@ -153,6 +153,7 @@ suricata_check_extensions_imported = False
     show_default=True,
     multiple=True,
 )
+@click.help_option("-h", "--help", cls=ClickHelpOption)
 def main(  # noqa: PLR0913, PLR0915
     rules: str = ".",
     single_rule: Optional[str] = None,
