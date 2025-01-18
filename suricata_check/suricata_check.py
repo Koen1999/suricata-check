@@ -490,7 +490,7 @@ def __write_output_gitlab(output: OutputReport, out: str, rules_file: str) -> No
                 }
                 issue_dicts.append(issue_dict)
 
-            gitlab_fh.write(json.dumps(issue_dicts))
+        gitlab_fh.write(json.dumps(issue_dicts))
 
 
 def __write_output_github(output: OutputReport, rules_file: str) -> None:
