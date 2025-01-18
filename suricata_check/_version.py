@@ -25,7 +25,9 @@ def get_version() -> str:
     if os.path.exists(git_dir):
         try:
             v = str(setuptools_git_versioning.get_version())
-            _logger.debug("Detected suricata-check version using setuptools_git_versioning: %s", v)
+            _logger.debug(
+                "Detected suricata-check version using setuptools_git_versioning: %s", v
+            )
         except:  # noqa: E722
             v = __get_git_revision_short_hash()
             _logger.debug("Detected suricata-check version using git: %s", v)
