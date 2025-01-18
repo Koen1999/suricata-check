@@ -4,8 +4,6 @@ import re
 import subprocess
 from importlib.metadata import PackageNotFoundError, requires, version
 
-import setuptools_git_versioning
-
 SURICATA_CHECK_DIR = os.path.dirname(__file__)
 
 _logger = logging.getLogger(__name__)
@@ -25,6 +23,7 @@ def get_version() -> str:
     git_dir = os.path.join(SURICATA_CHECK_DIR, "..", ".git")
     if os.path.exists(git_dir):
         try:
+            import setuptools_git_versioning
             v = str(setuptools_git_versioning.get_version())
             _logger.debug(
                 "Detected suricata-check version using setuptools_git_versioning: %s", v
