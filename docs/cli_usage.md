@@ -141,7 +141,8 @@ suricata-check -o /path/to/my/output/dir
       "WhitespaceChecker": 0
     }
   },
-  "line": 1
+  "line_begin": 1,
+  "line_end": 1
 }
 ```
 
@@ -227,3 +228,15 @@ You can inspect the `suricata-check.log` output to verify if the intended checke
 2024-12-14 15:26:43,456 - suricata_check.suricata_check - INFO - Checker WhitespaceChecker is disabled.
 2024-12-14 15:26:43,456 - suricata_check.suricata_check - INFO - Discovered and enabled checkers: [MandatoryChecker, MetadataChecker]
 ```
+
+It is also possible to enable issues based on their severity using the `--issue-severity` option.
+
+For example, if one would like to only see issues with severity `WARNING` or greater, one could use the following option:
+
+```bash
+suricata-check --issue-severity=WARNING
+```
+
+## CI/CD Integration
+
+You can use `suricata-check` to generate output to be processed by platforms such as GitHub and GitLab to integrate it with your Continuous Integration and Continuous Deployment workflows using the `--gitlab` and `--github` options. Read more about those options [here](./ci_cd.rst).

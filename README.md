@@ -13,6 +13,14 @@
 `suricata-check` is a command line utility to provide feedback on [Suricata](https://github.com/OISF/suricata) rules.
 The tool can detect various issues including those covering syntax validity, interpretability, rule specificity, rule coverage, and efficiency.
 
+## Features
+
+- [Static analysis without Suricata installation for any operating system](https://suricata-check.teuwen.net/readme.html)
+- [Simple CLI with options to work with any ruleset](https://suricata-check.teuwen.net/cli_usage.html)
+- [Clearly documented and typed API](https://suricata-check.teuwen.net/api_usage.html)
+- [CI/CD integration with GitHub and GitLab](https://suricata-check.teuwen.net/ci_cd.html)
+- [Easily extendable with custom checkers](https://suricata-check.teuwen.net/checker.html)
+
 ## Installation
 
 ### From PyPI
@@ -22,6 +30,8 @@ To install `suricata-check` from [PyPI](https://pypi.org/project/suricata-check/
 ```bash
 pip install suricata-check[performance]
 ```
+
+Installation should work out-of-the-box on any Operating System (OS) and has been tested on Windows and Linux (Fedora and Ubuntu).
 
 ### From source
 
@@ -52,42 +62,34 @@ More details regarding the command line interface can be found below:
 ```
 Usage: suricata-check [OPTIONS]
 
-  Processes all rules inside a rules file and outputs a list of issues found.
 
-  Args:
+  The `suricata-check` command processes all rules inside a rules file and
+  outputs a list of detected issues.
 
-  ----
-
-  out: A path to a directory where the output will be written.
-
-  rules: A path to a Suricata rules file or a directory in which a single rule file can be discovered
-
-  single_rule: A single Suricata rule to be checked. If set, the rules file will be ignored.
-
-  log_level: The verbosity level for logging.
-
-  evaluate_disabled: A flag indicating whether disabled rules should be evaluated.
-
-  Raises:
-
-  ------
-
-    BadParameter: If provided arguments are invalid.
+  Raises:   BadParameter: If provided arguments are invalid.
 
     RuntimeError: If no checkers could be automatically discovered.
 
 Options:
-  -o, --out TEXT               Path to suricata-check output folder.
-                               [default: .]
-  -r, --rules TEXT             Path to Suricata rules to provide check on.
-                               [default: .]
-  -s, --single-rule TEXT       A single Suricata rule to be checked
-  --log-level TEXT             Verbosity level for logging. Can be one of
-                               ('DEBUG', 'INFO', 'WARNING', 'ERROR')
-                               [default: INFO]
-  --evaluate-disabled BOOLEAN  Flag to evaluate disabled rules.  [default:
-                               False]
-  --help                       Show this message and exit
+  -r, --rules TEXT        Path to Suricata rules to provide check on.
+                          [default: .]
+  -s, --single-rule TEXT  A single Suricata rule to be checked
+  -o, --out TEXT          Path to suricata-check output folder.  [default: .]
+  --log-level TEXT        Verbosity level for logging. Can be one of ('DEBUG',
+                          'INFO', 'WARNING', 'ERROR')  [default: INFO]
+  --gitlab                Flag to create CodeClimate output report for GitLab
+                          CI/CD.
+  --github                Flag to write workflow commands to stdout for GitHub
+                          CI/CD.
+  --evaluate-disabled     Flag to evaluate disabled rules.
+  --issue-severity TEXT   Verbosity level for detected issues. Can be one of
+                          ('DEBUG', 'INFO', 'WARNING', 'ERROR')  [default:
+                          INFO]
+  -a, --include-all       Flag to indicate all checker codes should be
+                          enabled.
+  -i, --include TEXT      List of all checker codes to enable.
+  -e, --exclude TEXT      List of all checker codes to disable.
+  --help                  Show this message and exit.
 ```
 
 Usage of suricata-check as a module is currently not documented in detail, but the type hints and docstrings in the code should provide a decent start.
