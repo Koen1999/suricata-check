@@ -24,6 +24,7 @@ def get_version() -> str:
     if os.path.exists(git_dir):
         try:
             import setuptools_git_versioning
+
             v = str(setuptools_git_versioning.get_version())
             _logger.debug(
                 "Detected suricata-check version using setuptools_git_versioning: %s", v

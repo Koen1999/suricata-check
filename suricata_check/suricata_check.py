@@ -339,10 +339,18 @@ def __write_output(
             issues: ISSUES_TYPE = rule_report.issues
             for issue in issues:
                 code = issue.code
-                severity = issue.severity
+                severity = (
+                    logging.getLevelName(issue.severity) if issue.severity else None
+                )
                 issue_msg = issue.message.replace("\n", " ")
 
-                msg = f"[{code}] ({severity}) Lines {lines}, sid {rule['sid']}: {issue_msg}"
+                msg = "[{}]{} Lines {}, sid {}: {}".format(
+                    code,
+                    f" ({severity})" if severity else "",
+                    lines,
+                    rule["sid"],
+                    issue_msg,
+                )
                 fast_fh.write(msg + "\n")
                 click.secho(msg, color=True, fg="blue")
 
@@ -791,7 +799,9 @@ def analyze_rule(
         try:
             rule_report.add_issues(checker.check_rule(rule))
         except Exception:  # noqa: BLE001
-            _logger.warning("Failed to run %s on rule: %s", checker.__class__.__name__, rule["raw"])
+            _logger.warning(
+                "Failed to run %s on rule: %s", checker.__class__.__name__, rule["raw"]
+            )
 
     rule_report.summary = __summarize_rule(rule_report, checkers)
 
