@@ -120,6 +120,8 @@ jobs:
   docs:
     name: Docs
     runs-on: self-hosted
+    needs:
+      - lint
 
     strategy:
       fail-fast: false
