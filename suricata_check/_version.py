@@ -25,7 +25,11 @@ def get_version() -> str:
         try:
             import setuptools_git_versioning
 
-            v = str(setuptools_git_versioning.get_version(root=SURICATA_CHECK_DIR))
+            v = str(
+                setuptools_git_versioning.get_version(
+                    root=os.path.join(SURICATA_CHECK_DIR, "..")
+                )
+            )
             _logger.debug(
                 "Detected suricata-check version using setuptools_git_versioning: %s", v
             )
