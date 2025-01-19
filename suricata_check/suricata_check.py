@@ -733,19 +733,30 @@ def __get_checker_enabled(
 ) -> tuple[bool, set[str]]:
     enabled = checker.enabled_by_default
 
-    relevant_codes = set(checker.codes.keys())
+    # If no include regexes are provided, include all by default
+    if len(include) == 0:
+        relevant_codes = set(checker.codes.keys())
+    else:
+        # If include regexes are provided, include all codes that match any of these regexes
+        relevant_codes = set()
 
-    if len(include) > 0:
         for regex in include:
-            relevant_codes = set(
-                filter(
-                    lambda code: _regex_provider.compile("^" + regex + "$").match(code)
-                    is not None,
-                    relevant_codes,
+            relevant_codes.update(
+                set(
+                    filter(
+                        lambda code: _regex_provider.compile("^" + regex + "$").match(
+                            code
+                        )
+                        is not None,
+                        checker.codes.keys(),
+                    )
                 )
             )
-            if len(relevant_codes) > 0:
-                enabled = True
+
+        if len(relevant_codes) > 0:
+            enabled = True
+
+    # Now remove the codes that are excluded according to any of the provided exclude regexes
     for regex in exclude:
         relevant_codes = set(
             filter(
@@ -754,6 +765,8 @@ def __get_checker_enabled(
                 relevant_codes,
             )
         )
+
+    # Now filter out irrelevant codes based on severity
     relevant_codes = set(
         filter(
             lambda code: checker.codes[code]["severity"] >= issue_severity,

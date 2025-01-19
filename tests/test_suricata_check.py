@@ -357,6 +357,11 @@ def test_get_checkers():
     suricata_check.get_checkers()
 
 
+def test_get_checkers_multiple_include():
+    logging.basicConfig(level=logging.DEBUG)
+    assert len(suricata_check.get_checkers(include=("M.*", "S.*"))) > 0
+
+
 def test_get_checkers_include():
     logging.basicConfig(level=logging.DEBUG)
     assert len(suricata_check.get_checkers(include=("M.*",))) == 1
