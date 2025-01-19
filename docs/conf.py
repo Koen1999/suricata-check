@@ -56,9 +56,9 @@ suppress_warnings = []
 
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
-    'display_version': True,
-    'prev_next_buttons_location': 'both',
-    'style_external_links': True,
+    "display_version": True,
+    "prev_next_buttons_location": "both",
+    "style_external_links": True,
 }
 html_static_path = ["static"]
 html_favicon = "https://docs.readthedocs.io/favicon.ico"
@@ -94,9 +94,6 @@ viewcode_line_numbers = True
 
 html_baseurl = "https://suricata-check.teuwen.net/"
 sitemap_url_scheme = "{link}"
-sitemap_locales = ['en']
-sitemap_excludes = [
-    "search.html",
-    "genindex.html"
-]
-html_extra_path = ['robots.txt']
+sitemap_locales = ["en"]
+sitemap_excludes = ["search.html", "genindex.html"]
+html_extra_path = ["robots.txt"]
