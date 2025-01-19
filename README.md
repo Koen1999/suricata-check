@@ -1,7 +1,7 @@
 # The `suricata-check` project
 
 [![Static Badge](https://img.shields.io/badge/docs-suricata--check-blue)](https://suricata-check.teuwen.net/)
-[![Python Version](https://img.shields.io/pypi/pyversions/suricata-check)](https://www.python.org)
+[![Python Version](https://img.shields.io/pypi/pyversions/suricata-check)]([https://www.python.org](https://pypi.org/project/suricata-check))
 [![PyPI](https://img.shields.io/pypi/status/suricata-check)](https://pypi.org/project/suricata-check)
 [![GitHub License](https://img.shields.io/github/license/Koen1999/suricata-check)](https://github.com/Koen1999/suricata-check/blob/master/LICENSE)
 
