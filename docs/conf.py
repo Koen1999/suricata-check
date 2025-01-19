@@ -26,7 +26,6 @@ release = suricata_check.__version__
 
 extensions = [
     "myst_parser",
-    "sphinx.ext.autodoc",
     "autoapi.extension",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
@@ -49,6 +48,8 @@ intersphinx_mapping = {
 root_doc = "index"
 master_doc = "index"
 
+suppress_warnings = []
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
@@ -62,32 +63,6 @@ html_js_files = ["js/umami.js"]
 
 myst_enable_extensions = ["linkify"]
 myst_heading_anchors = 5
-
-# -- Options for Autodoc     -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
-
-autoclass_context = "both"
-autodoc_class_signature = "separated"
-autodoc_member_order = "groupwise"
-autodoc_default_flags = [
-    "members",
-    "special-members",
-    "inherited-members",
-    "show-inheritance",
-    "ignore-module-all",
-    "maxdepth",
-]
-autodoc_default_options = {
-    "member-order": "bysource",
-    "special-members": "__init__",
-    "undoc-members": False,
-    "maxdepth": 2,
-}
-autodoc_typehints = "both"
-autodoc_typehints_description_target = "all"
-
-# -- Options for AutoAPI     -------------------------------------------------
-# https://sphinx-autoapi.readthedocs.io/en/latest/
 
 autoapi_dirs = ["../suricata_check"]
 autoapi_options = [

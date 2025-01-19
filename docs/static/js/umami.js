@@ -8,4 +8,26 @@ script.setAttribute("data-domains", "suricata-check.teuwen.net");
 
 window.addEventListener('load', function () {
     document.body.appendChild(script);
+
+    (() => {
+        const name = 'internal-link-click';
+        document.querySelectorAll('a').forEach(a => {
+            if (a.host === window.location.host && !a.getAttribute('data-umami-event')) {
+                a.setAttribute('data-umami-event', name);
+                a.setAttribute('data-umami-event-source', window.location.href);
+                a.setAttribute('data-umami-event-target', a.href);
+            }
+        });
+    })();
+    
+    (() => {
+        const name = 'outbound-link-click';
+        document.querySelectorAll('a').forEach(a => {
+            if (a.host !== window.location.host && !a.getAttribute('data-umami-event')) {
+                a.setAttribute('data-umami-event', name);
+                a.setAttribute('data-umami-event-source', window.location.href);
+                a.setAttribute('data-umami-event-target', a.href);
+            }
+        });
+    })();
 });
