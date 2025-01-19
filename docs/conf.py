@@ -55,9 +55,15 @@ suppress_warnings = []
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
+html_theme_options = {
+    'display_version': True,
+    'prev_next_buttons_location': 'both',
+    'style_external_links': True,
+}
 html_static_path = ["static"]
+html_favicon = "https://docs.readthedocs.io/favicon.ico"
 
-html_js_files = ["js/umami.js"]
+html_js_files = ["js/script.js"]
 
 # -- Options for MyST     -------------------------------------------------
 # https://myst-parser.readthedocs.io/en/latest/

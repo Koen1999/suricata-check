@@ -1,3 +1,9 @@
+---
+myst:
+    html_meta:
+      "description lang=en": "suricata-check is a command line utility to provide feedback on Suricata rules to by detecting issues through static analysis."
+      "keywords": "Suricata, rules, ruleset, suricata-check, CLI, Command Line, rules, rule"
+---
 # CLI Usage
 
 After having installed `suricata_check` as described in [Installation](./readme.md#installation) and having ensured it is included in the `PATH` variable (check your operating system specific instructions for this), you can invoke it using by running `suricata-check`.
