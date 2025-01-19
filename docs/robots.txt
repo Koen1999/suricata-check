@@ -1,0 +1,3 @@
+User-agent: *
+
+Sitemap: https://suricata-check.teuwen.net/sitemap.xml

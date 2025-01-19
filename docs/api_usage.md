@@ -1,3 +1,9 @@
+---
+myst:
+    html_meta:
+        "description lang=en": "suricata-check is a command line utility to provide feedback on Suricata rules to by detecting issues through static analysis."
+        "keywords": "Suricata, rules, ruleset, suricata-check, API, Python"
+---
 # API Usage
 
 Sometimes it may be more convenient to avoid the CLI and instead use the module directly, which exposes more functionality and may be easier te extend if your project also uses Python. Below, we will characterize several use-cases you may encounter and how to address them using the functionality exposed by `suricata-check`.

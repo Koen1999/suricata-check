@@ -26,11 +26,11 @@ release = suricata_check.__version__
 
 extensions = [
     "myst_parser",
-    "sphinx.ext.autodoc",
     "autoapi.extension",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_click",
+    "sphinx_sitemap",
 ]
 
 templates_path = ["_templates"]
@@ -49,45 +49,27 @@ intersphinx_mapping = {
 root_doc = "index"
 master_doc = "index"
 
+suppress_warnings = []
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
+html_theme_options = {
+    "display_version": True,
+    "prev_next_buttons_location": "both",
+    "style_external_links": True,
+}
 html_static_path = ["static"]
+html_favicon = "https://docs.readthedocs.io/favicon.ico"
 
-html_js_files = ["js/umami.js"]
+html_js_files = ["js/script.js"]
 
 # -- Options for MyST     -------------------------------------------------
 # https://myst-parser.readthedocs.io/en/latest/
 
 myst_enable_extensions = ["linkify"]
 myst_heading_anchors = 5
-
-# -- Options for Autodoc     -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
-
-autoclass_context = "both"
-autodoc_class_signature = "separated"
-autodoc_member_order = "groupwise"
-autodoc_default_flags = [
-    "members",
-    "special-members",
-    "inherited-members",
-    "show-inheritance",
-    "ignore-module-all",
-    "maxdepth",
-]
-autodoc_default_options = {
-    "member-order": "bysource",
-    "special-members": "__init__",
-    "undoc-members": False,
-    "maxdepth": 2,
-}
-autodoc_typehints = "both"
-autodoc_typehints_description_target = "all"
-
-# -- Options for AutoAPI     -------------------------------------------------
-# https://sphinx-autoapi.readthedocs.io/en/latest/
 
 autoapi_dirs = ["../suricata_check"]
 autoapi_options = [
@@ -106,3 +88,12 @@ autoapi_own_page_level = "module"
 # https://www.sphinx-doc.org/en/master/usage/extensions/viewcode.html
 
 viewcode_line_numbers = True
+
+# -- Options for sphinx-sitemap    -------------------------------------------------
+# https://sphinx-sitemap.readthedocs.io/en/latest/index.html
+
+html_baseurl = "https://suricata-check.teuwen.net/"
+sitemap_url_scheme = "{link}"
+sitemap_locales = ["en"]
+sitemap_excludes = ["search.html", "genindex.html"]
+html_extra_path = ["robots.txt"]

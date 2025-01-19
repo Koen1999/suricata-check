@@ -1,3 +1,9 @@
+---
+myst:
+    html_meta:
+        "description lang=en": "suricata-check is a command line utility to provide feedback on Suricata rules to by detecting issues through static analysis."
+        "keywords": "Suricata, rules, ruleset, suricata-check, Continuous Integration, Continuous Deployment, Workflow, Action, GitHub, GitLab, CodeClimate"
+---
 # CI/CD Integration
 
 If you maintain a large rulebase in through version-control managed platform, you may be interested in integrating `suricata-check` with your Continuous Integration and Continuous Deployment workflows.

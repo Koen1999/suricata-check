@@ -1,3 +1,9 @@
+---
+myst:
+    html_meta:
+        "description lang=en": "suricata-check is a command line utility to provide feedback on Suricata rules to by detecting issues through static analysis."
+        "keywords": "Suricata, suricata-check, Extend, Checker"
+---
 # Writing checkers
 
 ## CheckerInterface
@@ -24,7 +30,7 @@ class ExampleChecker(CheckerInterface):
 
 ## Detecting issues
 
-To detect issues, you can use utility functions provided in `suricata_check.utils.checker`. A lot of utility functions exist, and you are encouraged to check out the [Checker API Reference](./_build/html/_modules/suricata_check/utils/checker/index.html) for a complete overview. For example, it contains utility functions to check whether a Suricata option is (not) set, and enables asserting that atleast one or all option values are (not) equal to a certain value or regular expression.
+To detect issues, you can use utility functions provided in `suricata_check.utils.checker`. A lot of utility functions exist, and you are encouraged to check out the [Checker API Reference](https://suricata-check.teuwen.net/autoapi/suricata_check/utils/checker/index.html) for a complete overview. For example, it contains utility functions to check whether a Suricata option is (not) set, and enables asserting that atleast one or all option values are (not) equal to a certain value or regular expression.
 
 All you have to do to add new issue types is, to add the desired issue code (e.g. `E000`) to the `codes` field of the class, and append a new `Issue` to the list of `issues` that is returned at the end of `_check_rule` depending on the output of the utlity function called from `suricata_check.utils.checker`. For example, we can add two new issue types as follows:
 
