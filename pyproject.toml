@@ -71,6 +71,7 @@ dev = [
   "myst-parser[linkify]>=3.0.1",
   "sphinx-click>=6.0.0",
   "sphinx-autoapi>=3.4.0",
+  "sphinx-sitemap>=2.6.0",
 ]
 
 [project.urls]

@@ -30,6 +30,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_click",
+    "sphinx_sitemap",
 ]
 
 templates_path = ["_templates"]
@@ -81,3 +82,15 @@ autoapi_own_page_level = "module"
 # https://www.sphinx-doc.org/en/master/usage/extensions/viewcode.html
 
 viewcode_line_numbers = True
+
+# -- Options for sphinx-sitemap    -------------------------------------------------
+# https://sphinx-sitemap.readthedocs.io/en/latest/index.html
+
+html_baseurl = "https://suricata-check.teuwen.net/"
+sitemap_url_scheme = "{link}"
+sitemap_locales = ['en']
+sitemap_excludes = [
+    "search.html",
+    "genindex.html"
+]
+html_extra_path = ['robots.txt']
