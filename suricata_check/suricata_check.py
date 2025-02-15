@@ -13,9 +13,12 @@ from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from functools import lru_cache
 from typing import (
+    Any,
     Literal,
     Optional,
+    TypeVar,
     Union,
+    overload,
 )
 
 import click
@@ -154,18 +157,8 @@ suricata_check_extensions_imported = False
     multiple=True,
 )
 @click.help_option("-h", "--help", cls=ClickHelpOption)
-def main(  # noqa: PLR0913, PLR0915
-    rules: str = ".",
-    single_rule: Optional[str] = None,
-    out: str = ".",
-    log_level: LogLevel = "DEBUG",
-    gitlab: bool = False,
-    github: bool = False,
-    evaluate_disabled: bool = False,
-    issue_severity: LogLevel = "INFO",
-    include_all: bool = False,
-    include: tuple[str, ...] = (),
-    exclude: tuple[str, ...] = (),
+def main(  # noqa: PLR0915
+    **kwargs: dict[str, Any],
 ) -> None:
     """The `suricata-check` command processes all rules inside a rules file and outputs a list of detected issues.
 
@@ -175,6 +168,27 @@ def main(  # noqa: PLR0913, PLR0915
       RuntimeError: If no checkers could be automatically discovered.
 
     """
+    # Look for a ini file and parse it.
+
+    # Verify CLI argument types and get CLI arguments or use default arguments
+    rules: str = __get_verified_kwarg(kwargs, "rules", str, False, ".")
+    single_rule: Optional[str] = __get_verified_kwarg(
+        kwargs, "single_rule", str, True, None
+    )
+    out: str = __get_verified_kwarg(kwargs, "out", str, False, ".")
+    log_level: LogLevel = __get_verified_kwarg(kwargs, "log_level", str, False, "DEBUG")
+    gitlab: bool = __get_verified_kwarg(kwargs, "gitlab", bool, False, False)
+    github: bool = __get_verified_kwarg(kwargs, "github", bool, False, False)
+    evaluate_disabled: bool = __get_verified_kwarg(
+        kwargs, "evaluate_disabled", bool, False, False
+    )
+    issue_severity: LogLevel = __get_verified_kwarg(
+        kwargs, "issue_severity", str, False, "INFO"
+    )
+    include_all: bool = __get_verified_kwarg(kwargs, "include_all", bool, False, False)
+    include: tuple[str, ...] = __get_verified_kwarg(kwargs, "include", tuple, False, ())
+    exclude: tuple[str, ...] = __get_verified_kwarg(kwargs, "exclude", tuple, False, ())
+
     # Verify that out argument is valid
     if os.path.exists(out) and not os.path.isdir(out):
         raise click.BadParameter(f"Error: {out} is not a directory.")
@@ -278,6 +292,58 @@ def main(  # noqa: PLR0913, PLR0915
     __write_output(output, out, gitlab=gitlab, github=github, rules_file=rules)
 
     _at_exit()
+
+
+D = TypeVar("D")
+
+
+@overload
+def __get_verified_kwarg(
+    kwargs: dict[str, Any],
+    name: str,
+    expected_type: type,
+    optional: Literal[True],
+    default: D,
+) -> Optional[D]:
+    pass
+
+
+@overload
+def __get_verified_kwarg(
+    kwargs: dict[str, Any],
+    name: str,
+    expected_type: type,
+    optional: Literal[False],
+    default: D,
+) -> D:
+    pass
+
+
+def __get_verified_kwarg(
+    kwargs: dict[str, Any],
+    name: str,
+    expected_type: type,
+    optional: bool,
+    default: D,
+) -> Optional[D]:
+    if name not in kwargs:
+        return default
+
+    if kwargs[name] is None:
+        if optional:
+            return None
+        raise click.BadParameter(
+            f"Error: Argument `{name}` should have a value of type `{expected_type}` but is None instead."
+        )
+
+    if isinstance(kwargs[name], expected_type):
+        return kwargs[name]
+
+    raise click.BadParameter(
+        f"""Error: \
+Argument `{name}` should have a value of type `{expected_type}` \
+but has value {kwargs[name]} of type {kwargs[name].__class__} instead."""
+    )
 
 
 def __main_single_rule(

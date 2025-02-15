@@ -178,7 +178,7 @@ performance_impact Low, signature_severity Minor;)""",
     for sequence in sequences:
         if sequence not in expected_sequences:
             pytest.fail(
-                str(("Unexpected sequence", sequence, expected_sequences, rule["raw"]))
+                str(("Unexpected sequence", sequence, expected_sequences, ["raw"]))
             )
 
     for expected_sequence in expected_sequences:
