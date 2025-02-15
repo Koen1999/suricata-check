@@ -349,6 +349,7 @@ class PrincipleMLChecker(CheckerInterface):
         feature_vectors = []
         for rule in rules:
             parsed_rule = idstools.rule.parse(rule)
+            assert parsed_rule is not None
             feature_vectors.append(self._get_features(parsed_rule, False))
 
         return DataFrame(feature_vectors)
@@ -428,7 +429,7 @@ class PrincipleMLChecker(CheckerInterface):
         for col in self.numerical_columns:
             if col not in data:
                 continue
-            data[col + ".num"] = float(data[col])  # type: ignore reportArgumentType
+            data[col + ".num"] = float(data[col])
             data = data.drop(col)
 
         remaining_cols = (

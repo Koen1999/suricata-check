@@ -18,6 +18,7 @@ content:"test"; \
 content:"test"; \
 sid:1;)""",
     )
+    assert rule is not None
 
     for name, expected in (
         ("msg", [0]),
@@ -167,6 +168,7 @@ classtype:non-standard-protocol; priority:2; gid:1999; sid:1999012; rev:1; \
 metadata:affected_product Any, attack_target Client_Endpoint, created_at 2024_03_06, deployment Perimeter, \
 performance_impact Low, signature_severity Minor;)""",
     )
+    assert rule is not None
 
     sequences = {
         tuple(sequence)
@@ -178,7 +180,7 @@ performance_impact Low, signature_severity Minor;)""",
     for sequence in sequences:
         if sequence not in expected_sequences:
             pytest.fail(
-                str(("Unexpected sequence", sequence, expected_sequences, rule["raw"]))
+                str(("Unexpected sequence", sequence, expected_sequences, ["raw"]))
             )
 
     for expected_sequence in expected_sequences:
@@ -197,6 +199,7 @@ content:"test"; \
 content:"test"; \
 sid:1;)""",
     )
+    assert rule is not None
 
     for name, expected in (
         ("msg", 0),
@@ -217,6 +220,7 @@ content:"test"; \
 content:"test"; \
 sid:1;)""",
     )
+    assert rule is not None
 
     names = ["msg", "content", "pcre"]
     expected = [0, 1, 2]

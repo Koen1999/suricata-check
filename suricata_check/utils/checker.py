@@ -324,8 +324,6 @@ def is_rule_option_equal_to(rule: idstools.rule.Rule, name: str, value: str) -> 
     values = get_rule_options(rule, name)
 
     for val in values:
-        if value is None:
-            continue
         if val == value:
             return True
 
