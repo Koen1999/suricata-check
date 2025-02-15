@@ -8,7 +8,7 @@ myst:
 
 After having installed `suricata_check` as described in [Installation](./readme.md#installation) and having ensured it is included in the `PATH` variable (check your operating system specific instructions for this), you can invoke it using by running `suricata-check`.
 
-To get an overview of all CLI options, run `suricata-check --help`. We will go over some basic use-cases below. You can also take a look at the [CLI Reference](./cli.rst)
+To get an overview of all CLI options, run `suricata-check --help`. We will go over some basic use-cases below. You can also take a look at the [CLI Reference](./cli.rst).
 
 Consider a directory containing a rules file such as the following:
 

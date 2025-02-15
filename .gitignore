@@ -7,7 +7,7 @@ dist/
 *.egg*
 *.whl
 *.prof
-suricata-check.ini
+./suricata-check.ini
 suricata-check.log
 suricata-check.jsonl
 suricata-check-fast.log

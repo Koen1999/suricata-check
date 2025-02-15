@@ -1,7 +1,7 @@
 # The `suricata-check` project
 
 [![Static Badge](https://img.shields.io/badge/docs-suricata--check-blue)](https://suricata-check.teuwen.net/)
-[![Python Version](https://img.shields.io/pypi/pyversions/suricata-check)]([https://www.python.org](https://pypi.org/project/suricata-check))
+[![Python Version](https://img.shields.io/pypi/pyversions/suricata-check)](https://pypi.org/project/suricata-check)
 [![PyPI](https://img.shields.io/pypi/status/suricata-check)](https://pypi.org/project/suricata-check)
 [![GitHub License](https://img.shields.io/github/license/Koen1999/suricata-check)](https://github.com/Koen1999/suricata-check/blob/master/LICENSE)
 
@@ -61,8 +61,7 @@ This command will look for a file ending with `.rules` in the currrent working d
 More details regarding the command line interface can be found below:
 
 ```
-Usage: suricata-check [OPTIONS]
-
+Usage: suricata_check.py [OPTIONS]
 
   The `suricata-check` command processes all rules inside a rules file and
   outputs a list of detected issues.
@@ -72,25 +71,25 @@ Usage: suricata-check [OPTIONS]
     RuntimeError: If no checkers could be automatically discovered.
 
 Options:
+  -i, --ini TEXT          Path to suricata-check.ini file to read
+                          configuration from.
   -r, --rules TEXT        Path to Suricata rules to provide check on.
-                          [default: .]
   -s, --single-rule TEXT  A single Suricata rule to be checked
-  -o, --out TEXT          Path to suricata-check output folder.  [default: .]
+  -o, --out TEXT          Path to suricata-check output folder.
   --log-level TEXT        Verbosity level for logging. Can be one of ('DEBUG',
-                          'INFO', 'WARNING', 'ERROR')  [default: INFO]
+                          'INFO', 'WARNING', 'ERROR')
   --gitlab                Flag to create CodeClimate output report for GitLab
                           CI/CD.
   --github                Flag to write workflow commands to stdout for GitHub
                           CI/CD.
   --evaluate-disabled     Flag to evaluate disabled rules.
   --issue-severity TEXT   Verbosity level for detected issues. Can be one of
-                          ('DEBUG', 'INFO', 'WARNING', 'ERROR')  [default:
-                          INFO]
+                          ('DEBUG', 'INFO', 'WARNING', 'ERROR')
   -a, --include-all       Flag to indicate all checker codes should be
                           enabled.
   -i, --include TEXT      List of all checker codes to enable.
   -e, --exclude TEXT      List of all checker codes to disable.
-  --help                  Show this message and exit.
+  -h, --help              Show this message and exit.
 ```
 
 Usage of suricata-check as a module is currently not documented in detail, but the type hints and docstrings in the code should provide a decent start.

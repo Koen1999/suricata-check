@@ -94,7 +94,7 @@ class TestPrincipleML(suricata_check.tests.GenericChecker):
         principle_rules = pandas.read_csv(NON_LABELLED_PUBLIC_RULES_PATH)
         principle_rules["group"] = principle_rules["rule.rule"].apply(
             lambda x: suricata_check.utils.checker.get_rule_suboption(
-                idstools.rule.parse(x), "metadata", "mitre_technique_id"
+                idstools.rule.parse(x), "metadata", "mitre_technique_id"  # type: ignore reportArgumentType
             )
         )
 

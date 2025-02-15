@@ -1,6 +1,7 @@
 """The `suricata_check.suricata_check` module contains the command line utility and the main program logic."""
 
 import atexit
+import configparser
 import io
 import json
 import logging
@@ -80,9 +81,14 @@ suricata_check_extensions_imported = False
 
 @click.command()
 @click.option(
+    "--ini",
+    "-i",
+    help="Path to suricata-check.ini file to read configuration from.",
+    show_default=True,
+)
+@click.option(
     "--rules",
     "-r",
-    default=".",
     help="Path to Suricata rules to provide check on.",
     show_default=True,
 )
@@ -95,47 +101,40 @@ suricata_check_extensions_imported = False
 @click.option(
     "--out",
     "-o",
-    default=".",
     help="Path to suricata-check output folder.",
     show_default=True,
 )
 @click.option(
     "--log-level",
-    default="INFO",
     help=f"Verbosity level for logging. Can be one of {LOG_LEVELS}",
     show_default=True,
 )
 @click.option(
     "--gitlab",
-    default=False,
     help="Flag to create CodeClimate output report for GitLab CI/CD.",
     show_default=True,
     is_flag=True,
 )
 @click.option(
     "--github",
-    default=False,
     help="Flag to write workflow commands to stdout for GitHub CI/CD.",
     show_default=True,
     is_flag=True,
 )
 @click.option(
     "--evaluate-disabled",
-    default=False,
     help="Flag to evaluate disabled rules.",
     show_default=True,
     is_flag=True,
 )
 @click.option(
     "--issue-severity",
-    default="INFO",
     help=f"Verbosity level for detected issues. Can be one of {LOG_LEVELS}",
     show_default=True,
 )
 @click.option(
     "--include-all",
     "-a",
-    default=False,
     help="Flag to indicate all checker codes should be enabled.",
     show_default=True,
     is_flag=True,
@@ -143,7 +142,6 @@ suricata_check_extensions_imported = False
 @click.option(
     "--include",
     "-i",
-    default=(),
     help="List of all checker codes to enable.",
     show_default=True,
     multiple=True,
@@ -151,7 +149,6 @@ suricata_check_extensions_imported = False
 @click.option(
     "--exclude",
     "-e",
-    default=(),
     help="List of all checker codes to disable.",
     show_default=True,
     multiple=True,
@@ -169,25 +166,40 @@ def main(  # noqa: PLR0915
 
     """
     # Look for a ini file and parse it.
+    ini_kwargs = __get_ini_kwargs(
+        str(kwargs["ini"]) if kwargs["ini"] is not None else None  # type: ignore reportUnnecessaryComparison
+    )
 
     # Verify CLI argument types and get CLI arguments or use default arguments
-    rules: str = __get_verified_kwarg(kwargs, "rules", str, False, ".")
+    rules: str = __get_verified_kwarg([kwargs, ini_kwargs], "rules", str, False, ".")
     single_rule: Optional[str] = __get_verified_kwarg(
-        kwargs, "single_rule", str, True, None
+        [kwargs, ini_kwargs], "single_rule", str, True, None
     )
-    out: str = __get_verified_kwarg(kwargs, "out", str, False, ".")
-    log_level: LogLevel = __get_verified_kwarg(kwargs, "log_level", str, False, "DEBUG")
-    gitlab: bool = __get_verified_kwarg(kwargs, "gitlab", bool, False, False)
-    github: bool = __get_verified_kwarg(kwargs, "github", bool, False, False)
+    out: str = __get_verified_kwarg([kwargs, ini_kwargs], "out", str, False, ".")
+    log_level: LogLevel = __get_verified_kwarg(
+        [kwargs, ini_kwargs], "log_level", str, False, "DEBUG"
+    )
+    gitlab: bool = __get_verified_kwarg(
+        [kwargs, ini_kwargs], "gitlab", bool, False, False
+    )
+    github: bool = __get_verified_kwarg(
+        [kwargs, ini_kwargs], "github", bool, False, False
+    )
     evaluate_disabled: bool = __get_verified_kwarg(
-        kwargs, "evaluate_disabled", bool, False, False
+        [kwargs, ini_kwargs], "evaluate_disabled", bool, False, False
     )
     issue_severity: LogLevel = __get_verified_kwarg(
-        kwargs, "issue_severity", str, False, "INFO"
+        [kwargs, ini_kwargs], "issue_severity", str, False, "INFO"
     )
-    include_all: bool = __get_verified_kwarg(kwargs, "include_all", bool, False, False)
-    include: tuple[str, ...] = __get_verified_kwarg(kwargs, "include", tuple, False, ())
-    exclude: tuple[str, ...] = __get_verified_kwarg(kwargs, "exclude", tuple, False, ())
+    include_all: bool = __get_verified_kwarg(
+        [kwargs, ini_kwargs], "include_all", bool, False, False
+    )
+    include: tuple[str, ...] = __get_verified_kwarg(
+        [kwargs, ini_kwargs], "include", tuple, False, ()
+    )
+    exclude: tuple[str, ...] = __get_verified_kwarg(
+        [kwargs, ini_kwargs], "exclude", tuple, False, ()
+    )
 
     # Verify that out argument is valid
     if os.path.exists(out) and not os.path.isdir(out):
@@ -294,12 +306,64 @@ def main(  # noqa: PLR0915
     _at_exit()
 
 
+def __get_ini_kwargs(path: Optional[str]) -> dict[str, Any]:  # noqa: C901, PLR0912
+    ini_kwargs: dict[str, Any] = {}
+    if path is not None:
+        if not os.path.exists(path):
+            raise click.BadParameter(
+                f"Error: INI file provided in {path} but no options loaded"
+            )
+
+    # Use the default path if no path was provided
+    if path is None:
+        path = "suricata-check.ini"
+        if not os.path.exists(path):
+            return {}
+
+    config_parser = configparser.ConfigParser(
+        empty_lines_in_values=False,
+        default_section="suricata-check",
+        converters={"tuple": lambda x: tuple(json.loads(x))},
+    )
+    config_parser.read(path)
+    ini_kwargs = {}
+
+    if config_parser.has_option("suricata-check", "rules"):
+        ini_kwargs["rules"] = config_parser.get("suricata-check", "rules")
+    if config_parser.has_option("suricata-check", "out"):
+        ini_kwargs["out"] = config_parser.get("suricata-check", "out")
+    if config_parser.has_option("suricata-check", "log"):
+        ini_kwargs["log"] = config_parser.get("suricata-check", "log")
+    if config_parser.has_option("suricata-check", "gitlab"):
+        ini_kwargs["gitlab"] = config_parser.getboolean("suricata-check", "gitlab")
+    if config_parser.has_option("suricata-check", "github"):
+        ini_kwargs["github"] = config_parser.getboolean("suricata-check", "github")
+    if config_parser.has_option("suricata-check", "evaluate_disabled"):
+        ini_kwargs["evaluate_disabled"] = config_parser.getboolean(
+            "suricata-check", "evaluate_disabled"
+        )
+    if config_parser.has_option("suricata-check", "issue-severity"):
+        ini_kwargs["issue_severity"] = config_parser.get(
+            "suricata-check", "issue-severity"
+        )
+    if config_parser.has_option("suricata-check", "include-all"):
+        ini_kwargs["include_all"] = config_parser.getboolean(
+            "suricata-check", "include-all"
+        )
+    if config_parser.has_option("suricata-check", "include"):
+        ini_kwargs["include"] = config_parser.gettuple("suricata-check", "include")  # type: ignore reportAttributeAccessIssue
+    if config_parser.has_option("suricata-check", "exclude"):
+        ini_kwargs["exclude"] = config_parser.gettuple("suricata-check", "exclude")  # type: ignore reportAttributeAccessIssue
+
+    return ini_kwargs
+
+
 D = TypeVar("D")
 
 
 @overload
 def __get_verified_kwarg(
-    kwargs: dict[str, Any],
+    kwargss: Sequence[dict[str, Any]],
     name: str,
     expected_type: type,
     optional: Literal[True],
@@ -310,7 +374,7 @@ def __get_verified_kwarg(
 
 @overload
 def __get_verified_kwarg(
-    kwargs: dict[str, Any],
+    kwargss: Sequence[dict[str, Any]],
     name: str,
     expected_type: type,
     optional: Literal[False],
@@ -320,30 +384,29 @@ def __get_verified_kwarg(
 
 
 def __get_verified_kwarg(
-    kwargs: dict[str, Any],
+    kwargss: Sequence[dict[str, Any]],
     name: str,
     expected_type: type,
     optional: bool,
     default: D,
 ) -> Optional[D]:
-    if name not in kwargs:
-        return default
+    for kwargs in kwargss:
+        if name in kwargs:
+            if kwargs[name] is None:
+                if optional and default is not None:
+                    return None
+                return default
 
-    if kwargs[name] is None:
-        if optional:
-            return None
-        raise click.BadParameter(
-            f"Error: Argument `{name}` should have a value of type `{expected_type}` but is None instead."
-        )
+            if kwargs[name] is not default:
+                if not isinstance(kwargs[name], expected_type):
+                    raise click.BadParameter(
+                        f"""Error: \
+                Argument `{name}` should have a value of type `{expected_type}` \
+                but has value {kwargs[name]} of type {kwargs[name].__class__} instead."""
+                    )
+                return kwargs[name]
 
-    if isinstance(kwargs[name], expected_type):
-        return kwargs[name]
-
-    raise click.BadParameter(
-        f"""Error: \
-Argument `{name}` should have a value of type `{expected_type}` \
-but has value {kwargs[name]} of type {kwargs[name].__class__} instead."""
-    )
+    return default
 
 
 def __main_single_rule(

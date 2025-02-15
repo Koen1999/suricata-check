@@ -338,6 +338,24 @@ def test_main_single_rule():
 
 
 @pytest.mark.serial()
+def test_main_ini():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    with pytest.raises(SystemExit) as excinfo:
+        suricata_check.main(
+            (
+                "--rules=tests/data/test.rules",
+                "--out=tests/data/out",
+                "--log-level=DEBUG",
+                "--ini=tests/data/suricata-check.ini",
+            ),
+        )
+
+    __check_log_file()
+
+    assert excinfo.value.code == 0
+
+
+@pytest.mark.serial()
 def test_main_error():
     logging.basicConfig(level=logging.DEBUG)
     with pytest.raises(SystemExit) as excinfo:
@@ -377,6 +395,7 @@ def test_analyze_rule():
     rule = idstools.rule.parse(
         """alert ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1;)""",
     )
+    assert rule is not None
 
     suricata_check.analyze_rule(rule)
 
