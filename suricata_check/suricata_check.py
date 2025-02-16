@@ -750,9 +750,13 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
 
             comment_line: Optional[str] = None
             match = _regex_provider.compile(r"(.*) #(.*)").match(rule_line)
-            if match is not None:
+            if match is not None and (
+                __is_valid_idstools_rule(rule_line)
+                or __is_valid_idstools_rule(match.group(1).strip())
+            ):
                 rule_line = match.group(1).strip()
                 comment_line = match.group(2).strip()
+                break
 
             # Parse comment and potential ignore comment to ignore rules
             ignore = __parse_type_ignore(number, line, comment_line)
@@ -795,6 +799,18 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
     output.summary = __summarize_output(output, checkers)
 
     return output
+
+
+def __is_valid_idstools_rule(text: str) -> bool:
+    try:
+        rule: Optional[idstools.rule.Rule] = idstools.rule.parse(text)
+    except Exception:  # noqa: BLE001
+        return False
+
+    if rule is None:
+        return False
+
+    return True
 
 
 def __parse_type_ignore(

@@ -1,2 +1,3 @@
 alert ip any any -> any any (msg:"Test";)  # suricata-check: ignore M001,S.*,C.*
 alert ip any any -> any any (msg:"Test";)  # suricata-check: ignore
+alert ip any any -> any any (msg:"Should not break rules with # in msg"; sid:1;)
