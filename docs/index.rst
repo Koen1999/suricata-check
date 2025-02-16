@@ -12,6 +12,7 @@ Welcome to suricata-check's documentation!
 
    readme.md
    cli_usage.md
+   ignore.md
    ini.md
    ci_cd.md
    api_usage.md
