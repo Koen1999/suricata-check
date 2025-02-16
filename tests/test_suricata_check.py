@@ -5,7 +5,7 @@ import sys
 import tarfile
 import urllib.request
 import warnings
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import Callable
 
 import idstools.rule
@@ -385,7 +385,7 @@ def test_main_ignore():
         )
 
     __check_log_file()
-    __check_fast_file([lambda line: "M001" not in line])
+    __check_fast_file([lambda line: "M001" not in line], [lambda file: "M000" in file])
 
     assert excinfo.value.code == 0
 
@@ -451,18 +451,29 @@ def __check_log_file(checks: Iterable[Callable[[str], bool]] = []):
                 warnings.warn(RuntimeWarning(line))
 
 
-def __check_fast_file(checks: Iterable[Callable[[str], bool]] = []):
+def __check_fast_file(
+    line_checks: Sequence[Callable[[str], bool]] = [],
+    file_checks: Sequence[Callable[[str], bool]] = [],
+):
     log_file = "tests/data/out/suricata-check-fast.log"
 
     if not os.path.exists(log_file):
         pytest.fail("No fast file found.")
         return
 
-    with open(log_file) as log_fh:
-        for line in log_fh.readlines():
-            for check in checks:
-                if not check(line):
-                    pytest.fail(line)
+    if len(line_checks) > 0:
+        with open(log_file) as log_fh:
+            for line in log_fh.readlines():
+                for check in line_checks:
+                    if not check(line):
+                        pytest.fail(line)
+
+    if len(file_checks) > 0:
+        with open(log_file) as log_fh:
+            file = "\n".join(log_fh.readlines())
+            for check in file_checks:
+                if not check(file):
+                    pytest.fail(file)
 
 
 def __main__():

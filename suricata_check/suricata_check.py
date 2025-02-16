@@ -752,11 +752,10 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
             match = _regex_provider.compile(r"(.*) #(.*)").match(rule_line)
             if match is not None and (
                 __is_valid_idstools_rule(rule_line)
-                or __is_valid_idstools_rule(match.group(1).strip())
+                <= __is_valid_idstools_rule(match.group(1).strip())
             ):
                 rule_line = match.group(1).strip()
                 comment_line = match.group(2).strip()
-                break
 
             # Parse comment and potential ignore comment to ignore rules
             ignore = __parse_type_ignore(number, line, comment_line)
@@ -822,20 +821,14 @@ def __parse_type_ignore(
     match = _regex_provider.compile(r".*(suricata-check: ignore)($|\s+.*)").match(
         comment_line
     )
-    if match is not None:
-        if (match.group(2).strip()) == 0:
-            _logger.warning("Ignoring rule on line %i: %s", number, line)
-            return [".*"]
-        try:
-            return match.group(2).strip().split(",")
-        except ValueError:
-            _logger.warning(
-                "Failed to interpret `type: ignore` comment on line %i: %s",
-                number,
-                comment_line,
-            )
+    if match is None:
+        return []
 
-    return []
+    if match.group(2) is None or len(match.group(2).strip()) == 0:
+        _logger.warning("Ignoring rule on line %i: %s", number, line)
+        return [".*"]
+
+    return match.group(2).strip().split(",")
 
 
 def _import_extensions() -> None:
@@ -999,6 +992,8 @@ def analyze_rule(
         checkers = get_checkers()
 
     rule_report: RuleReport = RuleReport(rule=rule)
+
+    _logger.warning(ignore)
 
     compiled_ignore = (
         [_regex_provider.compile(r) for r in ignore] if ignore is not None else []
