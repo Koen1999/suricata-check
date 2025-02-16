@@ -668,7 +668,7 @@ def __write_output_github(output: OutputReport, rules_file: str) -> None:
             print("::endgroup::")  # noqa: T201
 
 
-def process_rules_file(  # noqa: C901, PLR0912
+def process_rules_file(  # noqa: C901, PLR0912, PLR0915
     rules: str,
     evaluate_disabled: bool,
     checkers: Optional[Sequence[CheckerInterface]] = None,
@@ -725,16 +725,15 @@ def process_rules_file(  # noqa: C901, PLR0912
             if collected_multiline_parts is not None:
                 collected_multiline_parts += line.lstrip()
 
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(
-                    collected_multiline_parts
-                )
+                rule_line = collected_multiline_parts.strip()
+
                 collected_multiline_parts = None
             # If no multiline rule is being collected process as a potential single line rule
             else:
                 if len(line.strip()) == 0:
                     continue
 
-                if line.startswith("#"):
+                if line.strip().startswith("#"):
                     if evaluate_disabled:
                         # Verify that this line is a rule and not a comment
                         if idstools.rule.parse(line) is None:
@@ -747,15 +746,34 @@ def process_rules_file(  # noqa: C901, PLR0912
                         # Skip the rule
                         continue
 
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+                rule_line = line.strip()
+
+            comment_line: Optional[str] = None
+            match = _regex_provider.compile(r"(.*) #(.*)").match(rule_line)
+            if match is not None:
+                rule_line = match.group(1).strip()
+                comment_line = match.group(2).strip()
+
+            # Parse comment and potential ignore comment to ignore rules
+            ignore = __parse_type_ignore(number, line, comment_line)
+
+            try:
+                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(rule_line)
+            except Exception:  # noqa: BLE001
+                _logger.error(
+                    "Internal error in idstools parsing rule on line %i: %s",
+                    number,
+                    rule_line,
+                )
+                rule = None
 
             # Verify that a rule was parsed correctly.
             if rule is None:
-                _logger.error("Error parsing rule on line %i: %s", number, line)
+                _logger.error("Error parsing rule on line %i: %s", number, rule_line)
                 continue
 
             if not is_valid_rule(rule):
-                _logger.error("Invalid rule on line %i: %s", number, line)
+                _logger.error("Invalid rule on line %i: %s", number, rule_line)
                 continue
 
             _logger.debug("Processing rule: %s on line %i", rule["sid"], number)
@@ -763,9 +781,11 @@ def process_rules_file(  # noqa: C901, PLR0912
             rule_report: RuleReport = analyze_rule(
                 rule,
                 checkers=checkers,
+                ignore=ignore,
             )
             rule_report.line_begin = multiline_begin_number or number
             rule_report.line_end = number
+
             output.rules.append(rule_report)
 
             multiline_begin_number = None
@@ -775,6 +795,31 @@ def process_rules_file(  # noqa: C901, PLR0912
     output.summary = __summarize_output(output, checkers)
 
     return output
+
+
+def __parse_type_ignore(
+    number: int, line: str, comment_line: Optional[str]
+) -> Optional[Sequence[str]]:
+    if comment_line is None:
+        return None
+
+    match = _regex_provider.compile(r".*(suricata-check: ignore)($|\s+.*)").match(
+        comment_line
+    )
+    if match is not None:
+        if (match.group(2).strip()) == 0:
+            _logger.warning("Ignoring rule on line %i: %s", number, line)
+            return [".*"]
+        try:
+            return match.group(2).strip().split(",")
+        except ValueError:
+            _logger.warning(
+                "Failed to interpret `type: ignore` comment on line %i: %s",
+                number,
+                comment_line,
+            )
+
+    return []
 
 
 def _import_extensions() -> None:
@@ -912,12 +957,14 @@ def __get_checker_enabled(
 def analyze_rule(
     rule: idstools.rule.Rule,
     checkers: Optional[Sequence[CheckerInterface]] = None,
+    ignore: Optional[Sequence[str]] = None,
 ) -> RuleReport:
     """Checks a rule and returns a dictionary containing the rule and a list of issues found.
 
     Args:
     rule: The rule to be checked.
     checkers: The checkers to be used to check the rule.
+    ignore: Regular expressions to match checker codes to ignore
 
     Returns:
     A list of issues found in the rule.
@@ -937,9 +984,16 @@ def analyze_rule(
 
     rule_report: RuleReport = RuleReport(rule=rule)
 
+    compiled_ignore = (
+        [_regex_provider.compile(r) for r in ignore] if ignore is not None else []
+    )
+
     for checker in checkers:
         try:
-            rule_report.add_issues(checker.check_rule(rule))
+            issues = checker.check_rule(rule)
+            for r in compiled_ignore:
+                issues = list(filter(lambda issue: r.match(issue.code) is None, issues))
+            rule_report.add_issues(issues)
         except Exception as exception:  # noqa: BLE001
             _logger.warning(
                 "Failed to run %s on rule: %s",

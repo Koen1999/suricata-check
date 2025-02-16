@@ -1,0 +1,2 @@
+alert ip any any -> any any (msg:"Test";)  # suricata-check: ignore M001,S.*,C.*
+alert ip any any -> any any (msg:"Test";)  # suricata-check: ignore

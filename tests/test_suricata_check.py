@@ -5,6 +5,8 @@ import sys
 import tarfile
 import urllib.request
 import warnings
+from collections.abc import Iterable
+from typing import Callable
 
 import idstools.rule
 import pytest
@@ -370,6 +372,24 @@ def test_main_error():
     assert excinfo.value.code == 0
 
 
+@pytest.mark.serial()
+def test_main_ignore():
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    with pytest.raises(SystemExit) as excinfo:
+        suricata_check.main(
+            (
+                "--rules=tests/data/test_ignore.rules",
+                "--out=tests/data/out",
+                "--log-level=DEBUG",
+            ),
+        )
+
+    __check_log_file()
+    __check_fast_file([lambda line: "M001" not in line])
+
+    assert excinfo.value.code == 0
+
+
 def test_get_checkers():
     logging.basicConfig(level=logging.DEBUG)
     suricata_check.get_checkers()
@@ -410,11 +430,11 @@ def test_version():
         warnings.warn(RuntimeWarning("Version is unknown."))
 
 
-def __check_log_file():
+def __check_log_file(checks: Iterable[Callable[[str], bool]] = []):
     log_file = "tests/data/out/suricata-check.log"
 
     if not os.path.exists(log_file):
-        warnings.warn(RuntimeWarning("No log file found."))
+        pytest.fail("No log file found.")
         return
 
     with open(log_file) as log_fh:
@@ -424,8 +444,25 @@ def __check_log_file():
                 line,
             ):
                 pytest.fail(line)
+            for check in checks:
+                if not check(line):
+                    pytest.fail(line)
             if _regex_provider.match(r".+ - .+ - (WARNING) - .+", line):
                 warnings.warn(RuntimeWarning(line))
+
+
+def __check_fast_file(checks: Iterable[Callable[[str], bool]] = []):
+    log_file = "tests/data/out/suricata-check-fast.log"
+
+    if not os.path.exists(log_file):
+        pytest.fail("No fast file found.")
+        return
+
+    with open(log_file) as log_fh:
+        for line in log_fh.readlines():
+            for check in checks:
+                if not check(line):
+                    pytest.fail(line)
 
 
 def __main__():
