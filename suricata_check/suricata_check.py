@@ -36,7 +36,7 @@ from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
 from suricata_check.checkers.interface.dummy import DummyChecker  # noqa: E402
 from suricata_check.utils._click import ClickHandler, ClickHelpOption  # noqa: E402
 from suricata_check.utils._path import find_rules_file  # noqa: E402
-from suricata_check.utils.checker import check_rule_option_recognition  # noqa: E402
+from suricata_check.utils.checker import check_rule_option_recognition, get_rule_suboption  # noqa: E402
 from suricata_check.utils.checker_typing import (  # noqa: E402
     EXTENSIVE_SUMMARY_TYPE,
     ISSUES_TYPE,
@@ -748,18 +748,6 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
 
                 rule_line = line.strip()
 
-            comment_line: Optional[str] = None
-            match = _regex_provider.compile(r"(.*) #(.*)").match(rule_line)
-            if match is not None and (
-                __is_valid_idstools_rule(rule_line)
-                <= __is_valid_idstools_rule(match.group(1).strip())
-            ):
-                rule_line = match.group(1).strip()
-                comment_line = match.group(2).strip()
-
-            # Parse comment and potential ignore comment to ignore rules
-            ignore = __parse_type_ignore(number, line, comment_line)
-
             try:
                 rule: Optional[idstools.rule.Rule] = idstools.rule.parse(rule_line)
             except Exception:  # noqa: BLE001
@@ -769,6 +757,9 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
                     rule_line,
                 )
                 rule = None
+
+            # Parse comment and potential ignore comment to ignore rules
+            ignore = __parse_type_ignore(rule)
 
             # Verify that a rule was parsed correctly.
             if rule is None:
@@ -813,22 +804,16 @@ def __is_valid_idstools_rule(text: str) -> bool:
 
 
 def __parse_type_ignore(
-    number: int, line: str, comment_line: Optional[str]
+    rule: Optional[idstools.rule.Rule] 
 ) -> Optional[Sequence[str]]:
-    if comment_line is None:
+    if rule is None:
         return None
 
-    match = _regex_provider.compile(r".*(suricata-check: ignore)($|\s+.*)").match(
-        comment_line
-    )
-    if match is None:
+    ignore_value = get_rule_suboption(rule, "metadata", "suricata-check")
+    if ignore_value is None:
         return []
 
-    if match.group(2) is None or len(match.group(2).strip()) == 0:
-        _logger.warning("Ignoring rule on line %i: %s", number, line)
-        return [".*"]
-
-    return match.group(2).strip().split(",")
+    return ignore_value.strip(' "').split(",")
 
 
 def _import_extensions() -> None:
