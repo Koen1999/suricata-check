@@ -36,7 +36,10 @@ from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
 from suricata_check.checkers.interface.dummy import DummyChecker  # noqa: E402
 from suricata_check.utils._click import ClickHandler, ClickHelpOption  # noqa: E402
 from suricata_check.utils._path import find_rules_file  # noqa: E402
-from suricata_check.utils.checker import check_rule_option_recognition, get_rule_suboption  # noqa: E402
+from suricata_check.utils.checker import (  # noqa: E402
+    check_rule_option_recognition,
+    get_rule_suboption,
+)
 from suricata_check.utils.checker_typing import (  # noqa: E402
     EXTENSIVE_SUMMARY_TYPE,
     ISSUES_TYPE,
@@ -803,9 +806,7 @@ def __is_valid_idstools_rule(text: str) -> bool:
     return True
 
 
-def __parse_type_ignore(
-    rule: Optional[idstools.rule.Rule] 
-) -> Optional[Sequence[str]]:
+def __parse_type_ignore(rule: Optional[idstools.rule.Rule]) -> Optional[Sequence[str]]:
     if rule is None:
         return None
 
