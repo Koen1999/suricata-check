@@ -49,7 +49,7 @@ class OrderChecker(CheckerInterface):
         1. Buffer
         2. Size
         3. Transformation
-        4. Coontent
+        4. Content
         5. Pointer movement
         6. Fast pattern
         7. Nocase
