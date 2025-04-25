@@ -4,6 +4,7 @@ from suricata_check import checkers, tests, utils
 from suricata_check._version import (
     SURICATA_CHECK_DIR,
     __version__,
+    check_for_update,
     get_dependency_versions,
 )
 from suricata_check.suricata_check import (
@@ -17,6 +18,7 @@ __all__ = (
     "SURICATA_CHECK_DIR",
     "__version__",
     "analyze_rule",
+    "check_for_update",
     "checkers",
     "get_checkers",
     "get_dependency_versions",

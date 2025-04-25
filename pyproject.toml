@@ -53,7 +53,7 @@ classifiers = [
   "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
 ]
 requires-python = ">=3.9"
-dependencies = ["click>=8.1.8", "idstools>=0.6.5", "tabulate>=0.9.0"]
+dependencies = ["click>=8.1.8", "idstools>=0.6.5", "tabulate>=0.9.0", "packaging>=25.0", "requests>=2.32.3"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
@@ -171,6 +171,7 @@ ignore = [
   "D213",
   "D401",
   "COM812",
+  "UP015",
   "UP032",
   "ICN001",
   "PD101",

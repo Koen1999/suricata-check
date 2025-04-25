@@ -21,3 +21,5 @@ numpy>=1.26.4
 pandas>=2.0.3
 scikit-learn==1.5.1
 xgboost==2.0.3
+packaging>=25.0
+requests>=2.32.3

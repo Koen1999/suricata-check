@@ -31,7 +31,11 @@ _suricata_check_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "
 if sys.path[0] != _suricata_check_path:
     sys.path.insert(0, _suricata_check_path)
 
-from suricata_check import __version__, get_dependency_versions  # noqa: E402
+from suricata_check import (  # noqa: E402
+    __version__,
+    check_for_update,
+    get_dependency_versions,
+)
 from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
 from suricata_check.checkers.interface.dummy import DummyChecker  # noqa: E402
 from suricata_check.utils._click import ClickHandler, ClickHelpOption  # noqa: E402
@@ -273,6 +277,8 @@ def main(  # noqa: PLR0915
     _logger.debug("suricata-check version: %s", __version__)
     for package, version in get_dependency_versions().items():
         _logger.debug("Dependency %s version: %s", package, version)
+
+    check_for_update()
 
     # Verify that include and exclude arguments are valid
     if include_all and len(include) > 0:

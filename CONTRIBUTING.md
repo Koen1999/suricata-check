@@ -27,7 +27,7 @@ pip install .
 To install packages required for running tests and linting, run the following command:
 
 ```bash
-pip install -r requirements.txt
+pip install -U -r requirements.txt
 ```
 
 ## Running tests
