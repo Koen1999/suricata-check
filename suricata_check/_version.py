@@ -1,10 +1,17 @@
+import datetime
+import json
 import logging
 import os
 import re
 import subprocess
 from importlib.metadata import PackageNotFoundError, requires, version
+from typing import Optional
+
+import requests
+from packaging.version import Version
 
 SURICATA_CHECK_DIR = os.path.dirname(__file__)
+UPDATE_CHECK_CACHE_PATH = os.path.expanduser("~/.suricata_check_version_check.json")
 
 _logger = logging.getLogger(__name__)
 
@@ -84,3 +91,75 @@ def get_dependency_versions() -> dict:
             d[required_package] = "unknown"
 
     return d
+
+
+def __get_latest_version() -> Optional[str]:
+    try:
+        response = requests.get("https://pypi.org/pypi/suricata-check/json", timeout=2)
+        if response.status_code == 200:  # noqa: PLR2004
+            return response.json()["info"]["version"]
+    except requests.RequestException:
+        pass
+    return None
+
+
+def __should_check_update() -> bool:
+    current_version = get_version()
+    if current_version == "unknown":
+        _logger.warning(
+            "Skipping update check because current version cannot be determined."
+        )
+        return False
+    if "dirty" in current_version:
+        _logger.warning("Skipping update check because local changes are detected.")
+        return False
+
+    if not os.path.exists(UPDATE_CHECK_CACHE_PATH):
+        return True
+
+    try:
+        with open(UPDATE_CHECK_CACHE_PATH, "r") as f:
+            data = json.load(f)
+            last_checked = datetime.datetime.fromisoformat(data["last_checked"])
+            if (
+                datetime.datetime.now(tz=datetime.timezone.utc) - last_checked
+            ).days < 1:
+                return False
+    except OSError:
+        pass
+
+    return True
+
+
+def __save_check_time() -> None:
+    with open(UPDATE_CHECK_CACHE_PATH, "w") as f:
+        json.dump(
+            {
+                "last_checked": datetime.datetime.now(
+                    tz=datetime.timezone.utc
+                ).isoformat()
+            },
+            f,
+        )
+
+
+def check_for_update() -> None:
+    if not __should_check_update():
+        return
+
+    current_version = get_version()
+    latest_version = __get_latest_version()
+
+    if latest_version and Version(latest_version) > Version(current_version):
+        _logger.warning(
+            "A new version of suricata-check is available: %s (you have %s)",
+            latest_version,
+            current_version,
+        )
+        _logger.warning("Run `pip install --upgrade suricata-check` to update.")
+        _logger.warning(
+            "You can find the full changelog of what has changed here: %s",
+            "https://github.com/Koen1999/suricata-check/releases",
+        )
+
+    __save_check_time()
