@@ -1,7 +1,7 @@
 ---
 myst:
     html_meta:
-        "description lang=en": "suricata-check is a command line utility to provide feedback on Suricata rules to by detecting issues through static analysis."
+        "description lang=en": "suricata-check uses a common interface for all checkers, making it easy to implement new or custom checks for Suricata rules."
         "keywords": "Suricata, suricata-check, Extend, Checker"
 ---
 # Writing checkers
