@@ -131,6 +131,10 @@ def __should_check_update() -> bool:
         _logger.warning(
             "Failed to decode cache file to determine last date version was checked."
         )
+    except KeyError:
+        _logger.warning(
+            "Cache file documenting the last date version was checked is malformed."
+        )
 
     return True
 
