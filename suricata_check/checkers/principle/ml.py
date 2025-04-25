@@ -173,13 +173,7 @@ class PrincipleMLChecker(CheckerInterface):
                 if not inst.__class__.__name__ == cls.__name__:
                     _logger.error("Unpickled object is not of type %s", cls)
                     inst = super().__new__(cls, *args, **kwargs)  # type: ignore reportargumentType
-                elif (
-                    not hasattr(inst, "_models")
-                    or len(
-                        inst._models  # noqa: SLF001 type: ignore reportAttributeAccess
-                    )
-                    == 0
-                ):
+                elif not hasattr(inst, "_models") or len(inst._models) == 0:
                     _logger.error("Unpickled object does not have trained models")
                     inst = super().__new__(cls, *args, **kwargs)  # type: ignore reportargumentType
                 else:

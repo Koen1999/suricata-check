@@ -227,7 +227,7 @@ def main(  # noqa: PLR0915
         level=log_level,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=(queue_handler, click_handler),
-        force=os.environ.get("SURICATA_CHECK_FORCE_LOGGING", False) == "TRUE",
+        force=os.environ.get("SURICATA_CHECK_FORCE_LOGGING", "FALSE") == "TRUE",
     )
 
     file_handler = logging.FileHandler(
