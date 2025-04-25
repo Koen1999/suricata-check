@@ -22,9 +22,7 @@ The tool can detect various issues including those covering syntax validity, int
 - [Visual Studio Code Extension](https://marketplace.visualstudio.com/items?itemName=Koen1999.suricata-check)
 - [Easily extendable with custom checkers](https://suricata-check.teuwen.net/checker.html)
 
-## Installation
-
-### From PyPI
+## Installation from PyPI
 
 To install `suricata-check` from [PyPI](https://pypi.org/project/suricata-check/), simply run the following command:
 
@@ -33,18 +31,6 @@ pip install suricata-check[performance]
 ```
 
 Installation should work out-of-the-box on any Operating System (OS) and has been tested on Windows and Linux (Fedora and Ubuntu).
-
-### From source
-
-To install `suricata-check` from source (potentially with local modifications), simply run the following commands:
-
-```bash
-git clone https://github.com/Koen1999/suricata-check
-cd suricata-check
-pip install -r requirements.txt
-pytest
-pip install .
-```
 
 This will install `suricata-check` from source, which should be fine considering it's a pure-python package.
 
@@ -162,3 +148,4 @@ If you use the source code, the tool, or otherwise draw from this work, please c
 
 **Koen T. W. Teuwen, Tom Mulders, Emmanuele Zambon, and Luca Allodi. 2025. Ruling the Unruly: Designing Effective, Low-Noise Network Intrusion Detection Rules for Security Operations Centers. In ACM Asia Conference on Computer and Communications Security (ASIA CCS ’25), August 25–29, 2025, Hanoi, Vietnam. ACM, New York, NY, USA, 14 pages. [https://doi.org/10.1145/3708821.3710823](https://doi.org/10.1145/3708821.3710823)**
 
+A publicly accessible preprint is available [here](https://koen.teuwen.net/publication/ruling-the-unruly).

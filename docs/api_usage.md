@@ -1,7 +1,7 @@
 ---
 myst:
     html_meta:
-        "description lang=en": "suricata-check is a command line utility to provide feedback on Suricata rules to by detecting issues through static analysis."
+        "description lang=en": "suricata-check offers an API that exposes more functionality than the CLI and makes it easy to extend upon the existing functionalities."
         "keywords": "Suricata, rules, ruleset, suricata-check, API, Python"
 ---
 # API Usage

@@ -1,7 +1,7 @@
 ---
 myst:
     html_meta:
-        "description lang=en": "suricata-check is a command line utility to provide feedback on Suricata rules to by detecting issues through static analysis."
+        "description lang=en": "suricata-check can be easily integrated into CI/CD pipelines of GitHub, GitLab and others to continously check Suricata rules for quality issues."
         "keywords": "Suricata, rules, ruleset, suricata-check, Continuous Integration, Continuous Deployment, Workflow, Action, GitHub, GitLab, CodeClimate"
 ---
 # CI/CD Integration
