@@ -126,21 +126,24 @@ def __should_check_update() -> bool:
             ).days < 1:
                 return False
     except OSError:
-        pass
+        _logger.warning("Failed to read last date version was checked from cache file.")
 
     return True
 
 
 def __save_check_time() -> None:
-    with open(UPDATE_CHECK_CACHE_PATH, "w") as f:
-        json.dump(
-            {
-                "last_checked": datetime.datetime.now(
-                    tz=datetime.timezone.utc
-                ).isoformat()
-            },
-            f,
-        )
+    try:
+        with open(UPDATE_CHECK_CACHE_PATH, "w") as f:
+            json.dump(
+                {
+                    "last_checked": datetime.datetime.now(
+                        tz=datetime.timezone.utc
+                    ).isoformat()
+                },
+                f,
+            )
+    except OSError:
+        _logger.warning("Failed to write current date to cache file for update checks.")
 
 
 def check_for_update() -> None:

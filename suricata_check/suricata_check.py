@@ -1157,5 +1157,4 @@ def __sort_mapping(mapping: Mapping) -> dict:
 
 
 if __name__ == "__main__":
-    check_for_update()
     main()
