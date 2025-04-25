@@ -127,6 +127,10 @@ def __should_check_update() -> bool:
                 return False
     except OSError:
         _logger.warning("Failed to read last date version was checked from cache file.")
+    except json.JSONDecodeError:
+        _logger.warning(
+            "Failed to decode cache file to determine last date version was checked."
+        )
 
     return True
 
