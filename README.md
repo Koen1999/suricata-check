@@ -123,6 +123,12 @@ Rules with _S_-type issues are likely to hint on interpretability or efficiency 
 
 ### Principle issues
 
+An [additional checker](https://suricata-check-design-principles.teuwen.net) is available to check for design issues, which can be installed by running the following command:
+
+```bash
+pip install suricata-check-design-principles
+```
+
 Rules starting with prefix _P_ indicate issues relating to rule design principles posed in the [Ruling the Unruly](https://doi.org/10.1145/3708821.3710823) paper.
 Rules with _P_-type issues can relate to a specificity and coverage.
 

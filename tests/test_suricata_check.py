@@ -424,7 +424,7 @@ def test_version():
     logging.basicConfig(level=logging.DEBUG)
     if not hasattr(suricata_check, "__version__"):
         pytest.fail("suricata_check has no attribute __version__")
-    from suricata_check._version import __version__
+    from suricata_check._version import __version__  # noqa: RUF100, PLC0415
 
     if __version__ == "unknown":
         warnings.warn(RuntimeWarning("Version is unknown."))
