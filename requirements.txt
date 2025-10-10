@@ -17,9 +17,5 @@ myst-parser[linkify]>=3.0.1
 sphinx-click>=6.0.0
 sphinx-autoapi>=3.4.0
 sphinx-sitemap>=2.6.0
-numpy>=1.26.4
-pandas>=2.0.3
-scikit-learn==1.5.1
-xgboost==2.0.3
 packaging>=25.0
 requests>=2.32.3

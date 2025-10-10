@@ -30,7 +30,7 @@ def get_version() -> str:
     git_dir = os.path.join(SURICATA_CHECK_DIR, "..", ".git")
     if os.path.exists(git_dir):
         try:
-            import setuptools_git_versioning
+            import setuptools_git_versioning  # noqa: RUF100, PLC0415
 
             v = str(
                 setuptools_git_versioning.get_version(
