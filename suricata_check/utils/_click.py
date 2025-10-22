@@ -1,16 +1,48 @@
+import gettext
 import logging
+from typing import Any, Callable, TypeVar
 
 import click
 
 from suricata_check._version import get_version
 
+_AnyCallable = Callable[..., Any]
+FC = TypeVar("FC", bound="_AnyCallable | click.Command")
 
-class ClickHelpOption(click.HelpOption):
-    @staticmethod
-    def show_help(ctx: click.Context, param: click.Parameter, value: bool) -> None:
+
+def help_option(*param_decls: str, **kwargs: dict[str, Any]) -> Callable[[FC], FC]:
+    """``--help`` option which immediately printsversion help info and exits.
+
+    :param param_decls: One or more option names. Defaults to the single
+        value ``"--help"``.
+    :param kwargs: Extra arguments are passed to :func:`option`.
+    """
+
+    def show_help(
+        ctx: click.Context, param: click.Parameter, value: bool  # noqa: ARG001
+    ) -> None:
+        """Callback that print the help page on ``<stdout>`` and exits."""
         click.echo("suricata-check {}\n".format(get_version()))
 
-        click.HelpOption.show_help(ctx, param, value)
+        if value and not ctx.resilient_parsing:
+            click.echo(ctx.get_help(), color=ctx.color)
+            ctx.exit()
+
+    if not param_decls:
+        param_decls = ("--help",)
+
+    kwargs.setdefault("is_flag", True)  # pyright: ignore[reportArgumentType]
+    kwargs.setdefault("expose_value", False)  # pyright: ignore[reportArgumentType]
+    kwargs.setdefault("is_eager", True)  # pyright: ignore[reportArgumentType]
+    kwargs.setdefault(
+        "help",
+        gettext.gettext(
+            "Show this message and exit."
+        ),  # pyright: ignore[reportArgumentType]
+    )
+    kwargs.setdefault("callback", show_help)  # pyright: ignore[reportArgumentType]
+
+    return click.option(*param_decls, **kwargs)  # pyright: ignore[reportArgumentType]
 
 
 class ClickHandler(logging.Handler):

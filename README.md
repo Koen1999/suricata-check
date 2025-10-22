@@ -57,7 +57,7 @@ Usage: suricata_check.py [OPTIONS]
     RuntimeError: If no checkers could be automatically discovered.
 
 Options:
-  -i, --ini TEXT          Path to suricata-check.ini file to read
+  --ini TEXT          Path to suricata-check.ini file to read
                           configuration from.
   -r, --rules TEXT        Path to Suricata rules to provide check on.
   -s, --single-rule TEXT  A single Suricata rule to be checked
