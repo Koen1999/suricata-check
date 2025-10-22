@@ -38,7 +38,7 @@ from suricata_check import (  # noqa: E402
 )
 from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
 from suricata_check.checkers.interface.dummy import DummyChecker  # noqa: E402
-from suricata_check.utils._click import ClickHandler, ClickHelpOption  # noqa: E402
+from suricata_check.utils._click import ClickHandler, help_option  # noqa: E402
 from suricata_check.utils._path import find_rules_file  # noqa: E402
 from suricata_check.utils.checker import (  # noqa: E402
     check_rule_option_recognition,
@@ -89,7 +89,6 @@ suricata_check_extensions_imported = False
 @click.command()
 @click.option(
     "--ini",
-    "-i",
     help="Path to suricata-check.ini file to read configuration from.",
     show_default=True,
 )
@@ -160,7 +159,7 @@ suricata_check_extensions_imported = False
     show_default=True,
     multiple=True,
 )
-@click.help_option("-h", "--help", cls=ClickHelpOption)
+@help_option("-h", "--help")
 def main(  # noqa: PLR0915
     **kwargs: dict[str, Any],
 ) -> None:
