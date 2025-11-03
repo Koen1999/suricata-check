@@ -10,6 +10,7 @@ from suricata_check._version import (
 from suricata_check.suricata_check import (
     analyze_rule,
     get_checkers,
+    get_ini_kwargs,
     main,
     process_rules_file,
 )
@@ -22,6 +23,7 @@ __all__ = (
     "checkers",
     "get_checkers",
     "get_dependency_versions",
+    "get_ini_kwargs",
     "main",
     "process_rules_file",
     "tests",
