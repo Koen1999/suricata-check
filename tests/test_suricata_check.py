@@ -40,7 +40,7 @@ def __run_around_tests():
 
 
 @pytest.mark.serial()
-def test_main_cli():
+def test_main():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
@@ -56,7 +56,7 @@ def test_main_cli():
 
 
 @pytest.mark.serial()
-def test_main_cli_single_rule():
+def test_main_single_rule():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
@@ -76,7 +76,7 @@ def test_main_cli_single_rule():
 
 
 @pytest.mark.serial()
-def test_main_cli_gitlab():
+def test_main_gitlab():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
@@ -97,7 +97,7 @@ def test_main_cli_gitlab():
 
 
 @pytest.mark.serial()
-def test_main_cli_github():
+def test_main_github():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
@@ -118,7 +118,7 @@ def test_main_cli_github():
 
 
 @pytest.mark.serial()
-def test_main_cli_evaluate_disabled():
+def test_main_evaluate_disabled():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
@@ -139,7 +139,7 @@ def test_main_cli_evaluate_disabled():
 
 
 @pytest.mark.serial()
-def test_main_cli_issue_severity():
+def test_main_issue_severity():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
@@ -160,7 +160,7 @@ def test_main_cli_issue_severity():
 
 
 @pytest.mark.serial()
-def test_main_cli_include_all():
+def test_main_include_all():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
@@ -181,7 +181,7 @@ def test_main_cli_include_all():
 
 
 @pytest.mark.serial()
-def test_main_cli_include():
+def test_main_include():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
@@ -202,7 +202,7 @@ def test_main_cli_include():
 
 
 @pytest.mark.serial()
-def test_main_cli_exclude():
+def test_main_exclude():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
     runner = CliRunner()
     result = runner.invoke(
@@ -226,7 +226,7 @@ def test_main_cli_exclude():
 @pytest.mark.serial()
 @pytest.hookimpl(trylast=True)
 @pytest.mark.parametrize(("version", "et_open_url"), ET_OPEN_URLS.items())
-def test_main_cli_integration_et_open(version, et_open_url):
+def test_main_integration_et_open(version, et_open_url):
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
 
     # Retrieve the latest ET Open rules if not present.
@@ -268,7 +268,7 @@ def test_main_cli_integration_et_open(version, et_open_url):
 @pytest.mark.slow()
 @pytest.mark.serial()
 @pytest.hookimpl(trylast=True)
-def test_main_cli_integration_snort_community():
+def test_main_integration_snort_community():
     # Retrieve the latest Snort rules if not present.
     if not os.path.exists("tests/data/snort3-community.rules"):
         if not os.path.exists("tests/data/snort3-community-rules.tar.gz"):
@@ -306,88 +306,85 @@ def test_main_cli_integration_snort_community():
 
 
 @pytest.mark.serial()
-def test_main():
-    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
-    with pytest.raises(SystemExit) as excinfo:
-        suricata_check.main(
-            (
-                "--rules=tests/data/test.rules",
-                "--out=tests/data/out",
-                "--log-level=DEBUG",
-            ),
-        )
-
-    __check_log_file()
-
-    assert excinfo.value.code == 0
-
-
-@pytest.mark.serial()
-def test_main_single_rule():
-    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
-    with pytest.raises(SystemExit) as excinfo:
-        suricata_check.main(
-            (
-                """--single-rule=alert ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1;)""",
-                "--out=tests/data/out",
-                "--log-level=DEBUG",
-            ),
-        )
-
-    __check_log_file()
-
-    assert excinfo.value.code == 0
-
-
-@pytest.mark.serial()
 def test_main_ini():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
-    with pytest.raises(SystemExit) as excinfo:
-        suricata_check.main(
-            (
-                "--rules=tests/data/test.rules",
-                "--out=tests/data/out",
-                "--log-level=DEBUG",
-                "--ini=tests/data/suricata-check.ini",
-            ),
-        )
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+            "--ini=tests/data/suricata-check.ini",
+        ),
+        catch_exceptions=False,
+    )
 
     __check_log_file()
 
-    assert excinfo.value.code == 0
+    if result.exit_code != 0:
+        pytest.fail(result.output)
 
 
 @pytest.mark.serial()
 def test_main_error():
-    logging.basicConfig(level=logging.DEBUG)
-    with pytest.raises(SystemExit) as excinfo:
-        suricata_check.main(
-            (
-                "--rules=tests/data/test_error.rules",
-                "--out=tests/data/out",
-                "--log-level=DEBUG",
-            ),
-        )
+    os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test_error.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+        ),
+        catch_exceptions=False,
+    )
 
-    assert excinfo.value.code == 0
+    if result.exit_code != 0:
+        pytest.fail(result.output)
 
 
 @pytest.mark.serial()
 def test_main_ignore():
     os.environ["SURICATA_CHECK_FORCE_LOGGING"] = "TRUE"
-    with pytest.raises(SystemExit) as excinfo:
-        suricata_check.main(
-            (
-                "--rules=tests/data/test_ignore.rules",
-                "--out=tests/data/out",
-                "--log-level=DEBUG",
-            ),
-        )
+    runner = CliRunner()
+    result = runner.invoke(
+        suricata_check.main,
+        (
+            "--rules=tests/data/test_ignore.rules",
+            "--out=tests/data/out",
+            "--log-level=DEBUG",
+        ),
+        catch_exceptions=False,
+    )
 
     __check_log_file()
     __check_fast_file([lambda line: "M001" not in line], [lambda file: "M000" in file])
 
-    assert excinfo.value.code == 0
+    if result.exit_code != 0:
+        pytest.fail(result.output)
+
+
+def test_get_ini_exclude_tuple():
+    ini = os.path.abspath(os.path.join("tests", "data", "suricata-check.ini"))
+    ini_kwargs = suricata_check.get_ini_kwargs(ini)
+
+    assert "exclude" in ini_kwargs
+    assert isinstance(ini_kwargs["exclude"], tuple)
+    for pattern in ("P.*", "Q.*"):
+        assert isinstance(pattern, str)
+    assert ini_kwargs["exclude"] == ("P.*", "Q.*")
+
+
+def test_get_ini_issue_severity_str():
+    ini = os.path.abspath(os.path.join("tests", "data", "suricata-check.ini"))
+    ini_kwargs = suricata_check.get_ini_kwargs(ini)
+
+    assert "issue_severity" in ini_kwargs
+    assert isinstance(ini_kwargs["issue_severity"], str)
+    assert not ini_kwargs["issue_severity"].startswith('"')
+    assert not ini_kwargs["issue_severity"].endswith('"')
+    assert ini_kwargs["issue_severity"] == "INFO"
 
 
 def test_get_checkers():
