@@ -10,7 +10,7 @@ from suricata_check.utils.checker import (
     is_rule_suboption_set,
 )
 from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
-from suricata_check.utils.regex import get_regex_provider
+from suricata_check.utils.regex_provider import get_regex_provider
 
 _regex_provider = get_regex_provider()
 
@@ -210,6 +210,6 @@ Consider removing non-ASCII characters.\
         if is_rule_option_equal_to_regex(rule, "msg", _MALWARE_REGEX):
             return True
 
-        _logger.debug("Rule does not describe malware: %s", rule["raw"])
+        _logger.debug("Rule does not describe malware: %s", rule.raw)
 
         return False

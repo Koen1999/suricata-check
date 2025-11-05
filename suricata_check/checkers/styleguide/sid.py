@@ -7,7 +7,7 @@ from typing import Optional
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import get_rule_option
 from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
-from suricata_check.utils.regex import get_regex_provider
+from suricata_check.utils.regex_provider import get_regex_provider
 
 SID_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
     "local": [(1000000, 1999999)],

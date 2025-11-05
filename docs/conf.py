@@ -39,7 +39,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master", None),
-    "idstools": ("https://idstools.readthedocs.io/en/latest/", None),
 }
 
 root_doc = "index"

@@ -26,9 +26,9 @@ from suricata_check.utils.regex import (
     POINTER_MOVEMENT_KEYWORDS,
     SIZE_KEYWORDS,
     TRANSFORMATION_KEYWORDS,
-    get_regex_provider,
     get_rule_body,
 )
+from suricata_check.utils.regex_provider import get_regex_provider
 
 _regex_provider = get_regex_provider()
 

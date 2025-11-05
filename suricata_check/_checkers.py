@@ -11,7 +11,7 @@ from suricata_check.checkers.interface.dummy import DummyChecker
 from suricata_check.utils.checker_typing import (
     get_all_subclasses,
 )
-from suricata_check.utils.regex import get_regex_provider
+from suricata_check.utils.regex_provider import get_regex_provider
 
 _regex_provider = get_regex_provider()
 

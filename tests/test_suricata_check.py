@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 import suricata_check
 from click.testing import CliRunner
 
-_regex_provider = suricata_check.utils.regex.get_regex_provider()
+_regex_provider = suricata_check.utils.regex_provider.get_regex_provider()
 
 ET_OPEN_URLS = {
     "v5": "https://rules.emergingthreats.net/open/suricata-5.0/emerging-all.rules.tar.gz",
@@ -408,7 +408,7 @@ def test_get_checkers_exclude():
 
 def test_analyze_rule():
     logging.basicConfig(level=logging.DEBUG)
-    rule = suricata_check.rule.parse(
+    rule = suricata_check.utils.rule.parse(
         """alert ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1;)""",
     )
     assert rule is not None

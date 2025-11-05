@@ -17,8 +17,8 @@ from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
 from suricata_check.utils.regex import (
     ALL_VARIABLES,
     CLASSTYPES,
-    get_regex_provider,
 )
+from suricata_check.utils.regex_provider import get_regex_provider
 
 _regex_provider = get_regex_provider()
 

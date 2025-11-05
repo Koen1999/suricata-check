@@ -7,7 +7,7 @@ from suricata_check.utils.checker import (
     is_rule_option_equal_to_regex,
 )
 from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
-from suricata_check.utils.regex import get_regex_provider
+from suricata_check.utils.regex_provider import get_regex_provider
 
 _regex_provider = get_regex_provider()
 

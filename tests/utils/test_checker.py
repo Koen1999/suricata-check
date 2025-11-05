@@ -2,7 +2,7 @@ import os
 import sys
 from collections.abc import Iterable
 
-# Using fully-qualified wrapper references: suricata_check.rule.Rule
+# Using fully-qualified wrapper references: suricata_check.utils.rule.Rule
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -11,7 +11,7 @@ import suricata_check
 
 @pytest.hookimpl(tryfirst=True)
 def test_get_rule_option_positions():
-    rule = suricata_check.rule.parse(
+    rule = suricata_check.utils.rule.parse(
         """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -28,7 +28,7 @@ sid:1;)""",
     ):
         result = suricata_check.utils.checker.get_rule_option_positions(rule, name)
         if tuple(sorted(result)) != tuple(sorted(expected)):
-            pytest.fail(str((name, expected, result, rule["raw"])))
+            pytest.fail(str((name, expected, result, rule.raw)))
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -134,7 +134,7 @@ sid:1;)""",
 def test_get_rule_detection_options_sequences(
     seperator_keywords: Iterable[str], expected_sequences: set[tuple[str]]
 ):
-    rule = suricata_check.rule.parse(
+    rule = suricata_check.utils.rule.parse(
         """alert tls $EXTERNAL_NET any -> $HTTP_SERVERS 443 (\
 msg:"KOEN HUNTING Inbound HTTPS (HTTP/TLS) Client Hello without Server Name Indication (SNI)"; \
 flow:established,to_server; \
@@ -186,13 +186,13 @@ performance_impact Low, signature_severity Minor;)""",
     for expected_sequence in expected_sequences:
         if expected_sequence not in sequences:
             pytest.fail(
-                str(("Sequence not found", expected_sequence, sequences, rule["raw"]))
+                str(("Sequence not found", expected_sequence, sequences, rule.raw))
             )
 
 
 @pytest.hookimpl(tryfirst=True)
 def test_get_rule_option_position():
-    rule = suricata_check.rule.parse(
+    rule = suricata_check.utils.rule.parse(
         """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -208,12 +208,12 @@ sid:1;)""",
     ):
         result = suricata_check.utils.checker.get_rule_option_position(rule, name)
         if result != expected:
-            pytest.fail(str((name, expected, result, rule["raw"])))
+            pytest.fail(str((name, expected, result, rule.raw)))
 
 
 @pytest.hookimpl(tryfirst=True)
 def test__get_rule_options_positions():
-    rule = suricata_check.rule.parse(
+    rule = suricata_check.utils.rule.parse(
         """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -227,7 +227,7 @@ sid:1;)""",
 
     result = suricata_check.utils.checker.get_rule_options_positions(rule, names)
     if tuple(sorted(result)) != tuple(sorted(expected)):
-        pytest.fail(str((names, expected, result, rule["raw"])))
+        pytest.fail(str((names, expected, result, rule.raw)))
 
 
 def __main__():
