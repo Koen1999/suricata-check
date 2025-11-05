@@ -4,11 +4,9 @@ import logging
 from collections.abc import Mapping, Sequence
 from typing import Optional
 
-import idstools.rule
-
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import get_rule_option
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
 from suricata_check.utils.regex import get_regex_provider
 
 SID_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
@@ -50,7 +48,7 @@ class SidChecker(CheckerInterface):
 
     def _check_rule(
         self: "SidChecker",
-        rule: idstools.rule.Rule,
+        rule: Rule,
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 

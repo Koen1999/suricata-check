@@ -5,8 +5,7 @@ from collections.abc import Iterable, Sequence
 from functools import lru_cache
 from typing import Optional, Union
 
-import idstools.rule
-
+from suricata_check.utils.checker_typing import Rule
 from suricata_check.utils.regex import (
     ALL_DETECTION_KEYWORDS,
     ALL_KEYWORDS,
@@ -25,7 +24,7 @@ _logger = logging.getLogger(__name__)
 _regex_provider = get_regex_provider()
 
 
-def check_rule_option_recognition(rule: idstools.rule.Rule) -> None:
+def check_rule_option_recognition(rule: Rule) -> None:
     """Checks whether all rule options and metadata options are recognized.
 
     Unrecognized options will be logged as a warning in `suricata-check.log`
@@ -49,11 +48,11 @@ def check_rule_option_recognition(rule: idstools.rule.Rule) -> None:
             )
 
 
-def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
+def is_rule_option_set(rule: Rule, name: str) -> bool:
     """Checks whether a rule has a certain option set.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (str): name of the option
 
     Returns:
@@ -64,7 +63,7 @@ def is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
 
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
-def __is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
+def __is_rule_option_set(rule: Rule, name: str) -> bool:
     if name not in (
         "action",
         "proto",
@@ -96,7 +95,7 @@ def __is_rule_option_set(rule: idstools.rule.Rule, name: str) -> bool:
 
 
 def get_rule_suboptions(
-    rule: idstools.rule.Rule, name: str, warn: bool = True
+    rule: Rule, name: str, warn: bool = True
 ) -> Sequence[tuple[str, Optional[str]]]:
     """Returns a list of suboptions set in a rule."""
     values = get_rule_options(rule, name)
@@ -135,7 +134,7 @@ def __split_suboption(
     return None
 
 
-def is_rule_suboption_set(rule: idstools.rule.Rule, name: str, sub_name: str) -> bool:
+def is_rule_suboption_set(rule: Rule, name: str, sub_name: str) -> bool:
     """Checks if a suboption within an option is set."""
     suboptions = get_rule_suboptions(rule, name)
     _logger.debug(suboptions)
@@ -146,9 +145,7 @@ def is_rule_suboption_set(rule: idstools.rule.Rule, name: str, sub_name: str) ->
     return False
 
 
-def get_rule_suboption(
-    rule: idstools.rule.Rule, name: str, sub_name: str
-) -> Optional[str]:
+def get_rule_suboption(rule: Rule, name: str, sub_name: str) -> Optional[str]:
     """Returns a suboption within an option is set."""
     suboptions = get_rule_suboptions(rule, name)
 
@@ -162,13 +159,13 @@ def get_rule_suboption(
 
 
 def count_rule_options(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: Union[str, Iterable[str]],
 ) -> int:
     """Counts how often an option is set in a rule.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (Union[str, Iterable[str]]): name or names of the option
 
     Returns:
@@ -182,7 +179,7 @@ def count_rule_options(
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __count_rule_options(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: Union[str, Iterable[str]],
 ) -> int:
     count = 0
@@ -214,13 +211,13 @@ def __count_rule_options(
     return count
 
 
-def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
+def get_rule_option(rule: Rule, name: str) -> Optional[str]:
     """Retrieves one option of a rule with a certain name.
 
     If an option is set multiple times, it returns only one indeterminately.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (str): name of the option
 
     Returns:
@@ -231,7 +228,7 @@ def get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
 
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
-def __get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
+def __get_rule_option(rule: Rule, name: str) -> Optional[str]:
     options = get_rule_options(rule, name)
 
     if len(options) == 0:
@@ -248,13 +245,13 @@ def __get_rule_option(rule: idstools.rule.Rule, name: str) -> Optional[str]:
 
 
 def get_rule_options(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: Union[str, Iterable[str]],
 ) -> Sequence[Optional[str]]:
     """Retrieves all options of a rule with a certain name.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (Union[str, Iterable[str]]): name or names of the option
 
     Returns:
@@ -268,7 +265,7 @@ def get_rule_options(
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __get_rule_options(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: Union[str, Iterable[str]],
     warn_not_found: bool = True,
 ) -> Sequence[str]:
@@ -304,13 +301,13 @@ def __get_rule_options(
     return values
 
 
-def is_rule_option_equal_to(rule: idstools.rule.Rule, name: str, value: str) -> bool:
+def is_rule_option_equal_to(rule: Rule, name: str, value: str) -> bool:
     """Checks whether a rule has a certain option set to a certain value.
 
     If the option is set multiple times, it will return True if atleast one option matches the value.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (str): name of the option
         value (str): value to check for
 
@@ -331,14 +328,14 @@ def is_rule_option_equal_to(rule: idstools.rule.Rule, name: str, value: str) -> 
 
 
 def is_rule_suboption_equal_to(
-    rule: idstools.rule.Rule, name: str, sub_name: str, value: str
+    rule: Rule, name: str, sub_name: str, value: str
 ) -> bool:
     """Checks whether a rule has a certain suboption set to a certain value.
 
     If the suboption is set multiple times, it will return True if atleast one option matches the value.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (str): name of the option
         sub_name (str): name of the suboption
         value (str): value to check for
@@ -360,7 +357,7 @@ def is_rule_suboption_equal_to(
 
 
 def is_rule_option_equal_to_regex(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: str,
     regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
 ) -> bool:
@@ -369,7 +366,7 @@ def is_rule_option_equal_to_regex(
     If the option is set multiple times, it will return True if atleast one option matches the regex.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (str): name of the option
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
@@ -392,7 +389,7 @@ def is_rule_option_equal_to_regex(
 
 
 def is_rule_suboption_equal_to_regex(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: str,
     sub_name: str,
     regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
@@ -402,7 +399,7 @@ def is_rule_suboption_equal_to_regex(
     If the option is set multiple times, it will return True if atleast one option matches the regex.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (str): name of the option
         sub_name (str): name of the suboption
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
@@ -424,7 +421,7 @@ def is_rule_suboption_equal_to_regex(
 
 
 def is_rule_option_always_equal_to_regex(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: str,
     regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
 ) -> Optional[bool]:
@@ -434,7 +431,7 @@ def is_rule_option_always_equal_to_regex(
     Returns none if the rule option is not set.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (str): name of the option
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
@@ -457,7 +454,7 @@ def is_rule_option_always_equal_to_regex(
 
 
 def is_rule_suboption_always_equal_to_regex(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: str,
     sub_name: str,
     regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
@@ -468,7 +465,7 @@ def is_rule_suboption_always_equal_to_regex(
     Returns none if the rule option is not set.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (str): name of the option
         sub_name (str): name of the suboption
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
@@ -490,7 +487,7 @@ def is_rule_suboption_always_equal_to_regex(
 
 
 def are_rule_options_equal_to_regex(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     names: Iterable[str],
     regex,  # re.Pattern or regex.Pattern  # noqa: ANN001
 ) -> bool:
@@ -499,7 +496,7 @@ def are_rule_options_equal_to_regex(
     If multiple options are set, it will return True if atleast one option matches the regex.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         names (Iterable[str]): names of the options
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
@@ -515,7 +512,7 @@ def are_rule_options_equal_to_regex(
 
 
 def is_rule_option_one_of(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: str,
     possible_values: Union[Sequence[str], set[str]],
 ) -> bool:
@@ -524,7 +521,7 @@ def is_rule_option_one_of(
     If the option is set multiple times, it will return True if atleast one option matches a value.
 
     Args:
-        rule (idstools.rule.Rule): rule to be inspected
+        rule (suricata_check.rule.Rule): rule to be inspected
         name (str): name of the option
         possible_values (Iterable[str]): values to check for
 
@@ -546,7 +543,9 @@ def is_rule_option_one_of(
     return False
 
 
-def get_rule_sticky_buffer_naming(rule: idstools.rule.Rule) -> list[tuple[str, str]]:
+def get_rule_sticky_buffer_naming(
+    rule: Rule,
+) -> list[tuple[str, str]]:
     """Returns a list of tuples containing the name of a sticky buffer, and the modifier alternative."""
     sticky_buffer_naming = []
     for option in rule["options"]:
@@ -558,13 +557,17 @@ def get_rule_sticky_buffer_naming(rule: idstools.rule.Rule) -> list[tuple[str, s
     return sticky_buffer_naming
 
 
-def get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
+def get_all_variable_groups(
+    rule: Rule,
+) -> list[str]:
     """Returns a list of variable groups such as $HTTP_SERVERS in a rule."""
     return __get_all_variable_groups(rule)
 
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
-def __get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
+def __get_all_variable_groups(
+    rule: Rule,
+) -> list[str]:
     variable_groups = []
     for name in (
         "source_addr",
@@ -582,7 +585,9 @@ def __get_all_variable_groups(rule: idstools.rule.Rule) -> list[str]:
 
 
 def get_rule_option_positions(
-    rule: idstools.rule.Rule, name: str, sequence: Optional[tuple[str, ...]] = None
+    rule: Rule,
+    name: str,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Sequence[int]:
     """Finds the positions of an option in the rule body.
 
@@ -593,7 +598,9 @@ def get_rule_option_positions(
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __get_rule_option_positions(
-    rule: idstools.rule.Rule, name: str, sequence: Optional[tuple[str, ...]] = None
+    rule: Rule,
+    name: str,
+    sequence: Optional[tuple[str, ...]] = None,
 ) -> Sequence[int]:
     provided_sequence = True
     if sequence is None:
@@ -613,7 +620,7 @@ def __get_rule_option_positions(
     return tuple(sorted(positions))
 
 
-def get_rule_option_position(rule: idstools.rule.Rule, name: str) -> Optional[int]:
+def get_rule_option_position(rule: Rule, name: str) -> Optional[int]:
     """Finds the position of an option in the rule body.
 
     Return None if the option is not set or set multiple times.
@@ -622,7 +629,7 @@ def get_rule_option_position(rule: idstools.rule.Rule, name: str) -> Optional[in
 
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
-def __get_rule_option_position(rule: idstools.rule.Rule, name: str) -> Optional[int]:
+def __get_rule_option_position(rule: Rule, name: str) -> Optional[int]:
     positions = get_rule_option_positions(rule, name)
 
     if len(positions) == 0:
@@ -642,7 +649,7 @@ def __get_rule_option_position(rule: idstools.rule.Rule, name: str) -> Optional[
     return None
 
 
-def is_rule_option_first(rule: idstools.rule.Rule, name: str) -> Optional[int]:
+def is_rule_option_first(rule: Rule, name: str) -> Optional[int]:
     """Checks if a rule option is positioned at the beginning of the body."""
     position = get_rule_option_position(rule, name)
 
@@ -656,7 +663,7 @@ def is_rule_option_first(rule: idstools.rule.Rule, name: str) -> Optional[int]:
     return False
 
 
-def is_rule_option_last(rule: idstools.rule.Rule, name: str) -> Optional[bool]:
+def is_rule_option_last(rule: Rule, name: str) -> Optional[bool]:
     """Checks if a rule option is positioned at the end of the body."""
     position = get_rule_option_position(rule, name)
 
@@ -671,7 +678,7 @@ def is_rule_option_last(rule: idstools.rule.Rule, name: str) -> Optional[bool]:
 
 
 def get_rule_options_positions(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     names: Iterable[str],
     sequence: Optional[Iterable[str]] = None,
 ) -> Iterable[int]:
@@ -683,7 +690,7 @@ def get_rule_options_positions(
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __get_rule_options_positions(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     names: Iterable[str],
     sequence: Optional[tuple[str, ...]] = None,
 ) -> Iterable[int]:
@@ -696,7 +703,7 @@ def __get_rule_options_positions(
 
 
 def is_rule_option_put_before(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
     sequence: Optional[Iterable[str]] = None,
@@ -712,7 +719,7 @@ def is_rule_option_put_before(
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __is_rule_option_put_before(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
     sequence: Optional[tuple[str, ...]] = None,
@@ -740,7 +747,7 @@ def __is_rule_option_put_before(
 
 
 def is_rule_option_always_put_before(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
     sequence: Optional[Iterable[str]] = None,
@@ -756,7 +763,7 @@ def is_rule_option_always_put_before(
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __is_rule_option_always_put_before(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     name: str,
     other_names: Union[Sequence[str], set[str]],
     sequence: Optional[tuple[str, ...]] = None,
@@ -784,7 +791,7 @@ def __is_rule_option_always_put_before(
 
 
 def are_rule_options_put_before(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     names: Union[Sequence[str], set[str]],
     other_names: Union[Sequence[str], set[str]],
     sequence: Optional[Iterable[str]] = None,
@@ -810,7 +817,7 @@ def are_rule_options_put_before(
 
 
 def are_rule_options_always_put_before(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     names: Iterable[str],
     other_names: Sequence[str],
     sequence: Optional[Iterable[str]] = None,
@@ -835,17 +842,13 @@ def are_rule_options_always_put_before(
     return True
 
 
-def select_rule_options_by_regex(
-    rule: idstools.rule.Rule, regex  # noqa: ANN001
-) -> Iterable[str]:
+def select_rule_options_by_regex(rule: Rule, regex) -> Iterable[str]:  # noqa: ANN001
     """Selects rule options present in rule matching a regular expression."""
     return __select_rule_options_by_regex(rule, regex)
 
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
-def __select_rule_options_by_regex(
-    rule: idstools.rule.Rule, regex  # noqa: ANN001
-) -> Iterable[str]:
+def __select_rule_options_by_regex(rule: Rule, regex) -> Iterable[str]:  # noqa: ANN001
     options = []
 
     for option in rule["options"]:
@@ -857,7 +860,7 @@ def __select_rule_options_by_regex(
 
 
 def get_rule_keyword_sequences(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     seperator_keywords: Iterable[str] = BUFFER_KEYWORDS,
     included_keywords: Iterable[str] = ALL_DETECTION_KEYWORDS,
 ) -> Sequence[tuple[str, ...]]:

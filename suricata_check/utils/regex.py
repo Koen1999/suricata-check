@@ -5,7 +5,7 @@ import logging
 from collections.abc import Iterable, Sequence
 from functools import lru_cache
 
-import idstools.rule
+from suricata_check.utils.checker_typing import Rule
 
 _logger = logging.getLogger(__name__)
 
@@ -608,13 +608,13 @@ def __get_variable_groups(value: str) -> Sequence[str]:
     return variable_groups
 
 
-def get_rule_body(rule: idstools.rule.Rule) -> str:
+def get_rule_body(rule: Rule) -> str:
     """Returns the body of a rule."""
     return __get_rule_body(rule)
 
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
-def __get_rule_body(rule: idstools.rule.Rule) -> str:
+def __get_rule_body(rule: Rule) -> str:
     match = _BODY_REGEX.search(rule["raw"])
 
     if match is None:
@@ -625,7 +625,7 @@ def __get_rule_body(rule: idstools.rule.Rule) -> str:
     return match.group(0)
 
 
-def is_valid_rule(rule: idstools.rule.Rule) -> bool:
+def is_valid_rule(rule: Rule) -> bool:
     """Checks if a rule is valid."""
     if _RULE_REGEX.match(rule["raw"]) is None:
         return False

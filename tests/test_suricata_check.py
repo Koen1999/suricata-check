@@ -8,7 +8,6 @@ import warnings
 from collections.abc import Iterable, Sequence
 from typing import Callable
 
-import idstools.rule
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -409,7 +408,7 @@ def test_get_checkers_exclude():
 
 def test_analyze_rule():
     logging.basicConfig(level=logging.DEBUG)
-    rule = idstools.rule.parse(
+    rule = suricata_check.rule.parse(
         """alert ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Test"; sid:1;)""",
     )
     assert rule is not None

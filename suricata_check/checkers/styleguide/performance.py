@@ -2,14 +2,12 @@
 
 import logging
 
-import idstools.rule
-
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
     get_rule_keyword_sequences,
     is_rule_option_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
 from suricata_check.utils.regex import (
     BASE64_BUFFER_KEYWORDS,
     BASE64_TRANSFORMATION_KEYWORDS,
@@ -31,7 +29,7 @@ class PerformanceChecker(CheckerInterface):
 
     def _check_rule(
         self: "PerformanceChecker",
-        rule: idstools.rule.Rule,
+        rule: Rule,
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 

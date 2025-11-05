@@ -1,12 +1,14 @@
 import os
 import sys
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-import idstools.rule
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import suricata_check
+
+if TYPE_CHECKING:
+    from suricata_check.utils.checker_typing import Rule
 
 _regex_provider = suricata_check.utils.regex.get_regex_provider()
 
@@ -16,7 +18,7 @@ def test_rule_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.rule.parse(line)
             except:
                 # If idstools cannot parse it, we assume it is not a rule
                 continue
@@ -33,7 +35,7 @@ def test_rule_regex():
 
                 # If we extracted a rule, idstools should still be able to parse it.
                 try:
-                    new_rule: Optional[idstools.rule.Rule] = idstools.rule.parse(
+                    new_rule: Optional[Rule] = suricata_check.rule.parse(
                         match.group(0),
                     )
                 except:
@@ -49,7 +51,7 @@ def test_header_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.rule.parse(line)
             except:
                 # If idstools cannot parse it, we assume it is not a rule
                 continue
@@ -78,7 +80,7 @@ def test_body_regex():
         regex = _regex_provider.compile(r"^[#a-zA-Z0-9:\$_\.\-<>\s]+(\(.*\))\s*(#.*)?$")
         for line in rules_fh.readlines():
             try:
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.rule.parse(line)
             except:
                 # If idstools cannot parse it, we assume it is not a rule
                 continue
@@ -110,7 +112,7 @@ def test_action_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.rule.parse(line)
             except:
                 # If idstools cannot parse it, we assume it is not a rule
                 continue
@@ -130,7 +132,7 @@ def test_direction_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.rule.parse(line)
             except:
                 # If idstools cannot parse it, we assume it is not a rule
                 continue
@@ -150,7 +152,7 @@ def test_addr_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.rule.parse(line)
             except:
                 # If idstools cannot parse it, we assume it is not a rule
                 continue
@@ -170,7 +172,7 @@ def test_port_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.rule.parse(line)
             except:
                 # If idstools cannot parse it, we assume it is not a rule
                 continue
@@ -190,7 +192,7 @@ def test_option_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.rule.parse(line)
             except:
                 # If idstools cannot parse it, we assume it is not a rule
                 continue

@@ -8,10 +8,8 @@ import logging
 from collections.abc import Iterable, Mapping
 from typing import Optional
 
-import idstools.rule
-
 from suricata_check.utils.checker import get_rule_option, is_rule_option_set
-from suricata_check.utils.checker_typing import ISSUES_TYPE
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Rule
 
 _logger = logging.getLogger(__name__)
 
@@ -49,7 +47,7 @@ class CheckerInterface:
 
     def check_rule(
         self: "CheckerInterface",
-        rule: idstools.rule.Rule,
+        rule: Rule,
     ) -> ISSUES_TYPE:
         """Checks a rule and returns a list of issues found."""
         self.__log_rule_processing(rule)
@@ -60,13 +58,13 @@ class CheckerInterface:
     @abc.abstractmethod
     def _check_rule(
         self: "CheckerInterface",
-        rule: idstools.rule.Rule,
+        rule: Rule,
     ) -> ISSUES_TYPE:
         """Checks a rule and returns a list of issues found."""
 
     def __log_rule_processing(
         self: "CheckerInterface",
-        rule: idstools.rule.Rule,
+        rule: Rule,
     ) -> None:
         sid: Optional[int] = None
         if is_rule_option_set(rule, "sid"):

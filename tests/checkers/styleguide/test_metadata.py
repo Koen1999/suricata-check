@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 
-import idstools.rule
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
@@ -94,7 +93,7 @@ class TestMetadata(suricata_check.tests.GenericChecker):
             # Silently skip and succeed the test
             return
 
-        rule = idstools.rule.parse(raw_rule)
+        rule = suricata_check.rule.parse(raw_rule)
 
         self._test_issue(rule, code, expected)
 
@@ -108,7 +107,7 @@ class TestMetadata(suricata_check.tests.GenericChecker):
         ],
     )
     def test_rule_good(self, code, expected, raw_rule):
-        rule = idstools.rule.parse(raw_rule)
+        rule = suricata_check.rule.parse(raw_rule)
 
         self._test_issue(rule, code, expected)
 

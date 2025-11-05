@@ -74,10 +74,10 @@ def get_dependency_versions() -> dict:
                 )
 
             _logger.debug("Detected suricata-check requirements using requirements.txt")
-    finally:
-        if requirements is None:
-            _logger.debug("Failed to detect suricata-check requirements")
-            return d
+
+    if requirements is None:
+        _logger.debug("Failed to detect suricata-check requirements")
+        return d
 
     for requirement in requirements:
         match = re.compile(r"""^([^=<>]+)(.*)$""").match(requirement)
