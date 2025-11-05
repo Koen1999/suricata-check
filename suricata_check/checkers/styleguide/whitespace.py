@@ -2,13 +2,11 @@
 
 import logging
 
-import idstools.rule
-
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
     is_rule_option_equal_to_regex,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
 from suricata_check.utils.regex import (
     HEADER_REGEX,
     get_regex_provider,
@@ -81,7 +79,7 @@ class WhitespaceChecker(CheckerInterface):
 
     def _check_rule(  # noqa: C901, PLR0912
         self: "WhitespaceChecker",
-        rule: idstools.rule.Rule,
+        rule: Rule,
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 

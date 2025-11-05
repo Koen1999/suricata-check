@@ -2,7 +2,7 @@ import os
 import sys
 from collections.abc import Iterable
 
-import idstools.rule
+# Using fully-qualified wrapper references: suricata_check.rule.Rule
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -11,7 +11,7 @@ import suricata_check
 
 @pytest.hookimpl(tryfirst=True)
 def test_get_rule_option_positions():
-    rule = idstools.rule.parse(
+    rule = suricata_check.rule.parse(
         """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -134,7 +134,7 @@ sid:1;)""",
 def test_get_rule_detection_options_sequences(
     seperator_keywords: Iterable[str], expected_sequences: set[tuple[str]]
 ):
-    rule = idstools.rule.parse(
+    rule = suricata_check.rule.parse(
         """alert tls $EXTERNAL_NET any -> $HTTP_SERVERS 443 (\
 msg:"KOEN HUNTING Inbound HTTPS (HTTP/TLS) Client Hello without Server Name Indication (SNI)"; \
 flow:established,to_server; \
@@ -192,7 +192,7 @@ performance_impact Low, signature_severity Minor;)""",
 
 @pytest.hookimpl(tryfirst=True)
 def test_get_rule_option_position():
-    rule = idstools.rule.parse(
+    rule = suricata_check.rule.parse(
         """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -213,7 +213,7 @@ sid:1;)""",
 
 @pytest.hookimpl(tryfirst=True)
 def test__get_rule_options_positions():
-    rule = idstools.rule.parse(
+    rule = suricata_check.rule.parse(
         """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \

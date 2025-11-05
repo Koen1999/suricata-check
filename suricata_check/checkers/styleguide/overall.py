@@ -2,8 +2,6 @@
 
 import logging
 
-import idstools.rule
-
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
     count_rule_options,
@@ -15,7 +13,7 @@ from suricata_check.utils.checker import (
     is_rule_option_one_of,
     is_rule_option_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
 from suricata_check.utils.regex import (
     ALL_VARIABLES,
     CLASSTYPES,
@@ -70,7 +68,7 @@ class OverallChecker(CheckerInterface):
 
     def _check_rule(  # noqa: C901
         self: "OverallChecker",
-        rule: idstools.rule.Rule,
+        rule: Rule,
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 
@@ -227,7 +225,9 @@ Consider asserting this in the head instead using {} {} {} {} {} {} {}""".format
         return issues
 
     @staticmethod
-    def __get_invented_variable_groups(rule: idstools.rule.Rule) -> list[str]:
+    def __get_invented_variable_groups(
+        rule: Rule,
+    ) -> list[str]:
         variable_groups = get_all_variable_groups(rule)
 
         invented_variable_groups = []

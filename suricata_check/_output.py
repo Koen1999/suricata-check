@@ -4,7 +4,7 @@ import logging
 import os
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union
 
 import click
 import tabulate
@@ -19,11 +19,9 @@ from suricata_check.utils.checker_typing import (
     SIMPLE_SUMMARY_TYPE,
     OutputReport,
     OutputSummary,
+    Rule,
     RuleReport,
 )
-
-if TYPE_CHECKING:
-    import idstools.rule
 
 GITLAB_SEVERITIES = {
     logging.DEBUG: "info",
@@ -73,7 +71,7 @@ def write_output(
         jsonl_fh.write("\n".join([str(rule) for rule in rules]))
 
         for rule_report in rules:
-            rule: idstools.rule.Rule = rule_report.rule
+            rule: Rule = rule_report.rule
             lines: str = (
                 "{}-{}".format(rule_report.line_begin, rule_report.line_end)
                 if rule_report.line_begin

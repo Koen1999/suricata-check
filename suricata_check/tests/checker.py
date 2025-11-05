@@ -5,11 +5,10 @@ import warnings
 from functools import lru_cache
 from typing import Optional
 
-import idstools.rule
 import pytest
 
 from suricata_check.checkers.interface.checker import CheckerInterface
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
 from suricata_check.utils.regex import get_regex_provider
 
 _regex_provider = get_regex_provider()
@@ -35,13 +34,13 @@ class GenericChecker:
     @lru_cache(maxsize=1)
     def _check_rule(
         self: "GenericChecker",
-        rule: idstools.rule.Rule,
+        rule: Rule,
     ) -> ISSUES_TYPE:
         return self.checker.check_rule(rule)
 
     def _test_issue(
         self: "GenericChecker",
-        rule: Optional[idstools.rule.Rule],
+        rule: Optional[Rule],
         code: str,
         raised: bool,
         fail: bool = True,
@@ -68,7 +67,7 @@ class GenericChecker:
 
     def check_issue(
         self: "GenericChecker",
-        rule: Optional[idstools.rule.Rule],
+        rule: Optional[Rule],
         code: str,
         raised: bool,
     ) -> tuple[Optional[bool], Optional[Issue]]:

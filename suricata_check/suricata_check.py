@@ -20,7 +20,9 @@ from typing import (
 )
 
 import click
-import idstools.rule
+
+import suricata_check
+from suricata_check.utils.checker_typing import Rule
 
 _AnyCallable = Callable[..., Any]
 _FC = TypeVar("_FC", bound=Union[_AnyCallable, click.Command])
@@ -419,7 +421,7 @@ def __get_verified_kwarg(
 def __main_single_rule(
     out: str, single_rule: str, checkers: Optional[Sequence[CheckerInterface]]
 ) -> None:
-    rule: Optional[idstools.rule.Rule] = idstools.rule.parse(single_rule)
+    rule: Optional[Rule] = suricata_check.rule.parse(single_rule)
 
     # Verify that a rule was parsed correctly.
     if rule is None:
@@ -507,7 +509,7 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
                 if line.strip().startswith("#"):
                     if evaluate_disabled:
                         # Verify that this line is a rule and not a comment
-                        if idstools.rule.parse(line) is None:
+                        if suricata_check.rule.parse(line) is None:
                             # Log the comment since it may be a invalid rule
                             _logger.warning(
                                 "Ignoring comment on line %i: %s", number, line
@@ -520,10 +522,10 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
                 rule_line = line.strip()
 
             try:
-                rule: Optional[idstools.rule.Rule] = idstools.rule.parse(rule_line)
-            except Exception:  # noqa: BLE001
+                rule: Optional[Rule] = suricata_check.rule.parse(rule_line)
+            except suricata_check.rule.ParsingError:
                 _logger.error(
-                    "Internal error in idstools parsing rule on line %i: %s",
+                    "Internal error in parsing of rule on line %i: %s",
                     number,
                     rule_line,
                 )
@@ -562,7 +564,7 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
     return output
 
 
-def __parse_type_ignore(rule: Optional[idstools.rule.Rule]) -> Optional[Sequence[str]]:
+def __parse_type_ignore(rule: Optional[Rule]) -> Optional[Sequence[str]]:
     if rule is None:
         return None
 
@@ -574,7 +576,7 @@ def __parse_type_ignore(rule: Optional[idstools.rule.Rule]) -> Optional[Sequence
 
 
 def analyze_rule(
-    rule: idstools.rule.Rule,
+    rule: Rule,
     checkers: Optional[Sequence[CheckerInterface]] = None,
     ignore: Optional[Sequence[str]] = None,
 ) -> RuleReport:

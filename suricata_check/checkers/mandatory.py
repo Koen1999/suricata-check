@@ -2,11 +2,9 @@
 
 import logging
 
-import idstools.rule
-
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import is_rule_option_set
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
 
 
 class MandatoryChecker(CheckerInterface):
@@ -22,7 +20,7 @@ class MandatoryChecker(CheckerInterface):
 
     def _check_rule(
         self: "MandatoryChecker",
-        rule: idstools.rule.Rule,
+        rule: Rule,
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 

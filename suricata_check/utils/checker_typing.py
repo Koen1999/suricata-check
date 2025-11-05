@@ -8,7 +8,7 @@ from typing import (
     TypeVar,
 )
 
-import idstools.rule
+from suricata_check.rule import Rule
 
 
 class InvalidRuleError(RuntimeError):
@@ -78,7 +78,7 @@ def get_all_subclasses(cls: type[Cls]) -> Iterable[type[Cls]]:
 class RuleReport:
     """The `RuleReport` dataclass represents a rule, together with information on its location and detected issues."""
 
-    rule: idstools.rule.Rule
+    rule: Rule
     summary: Optional[RULE_SUMMARY_TYPE] = None
     line_begin: Optional[int] = None
     line_end: Optional[int] = None

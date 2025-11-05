@@ -193,7 +193,6 @@ docstring-code-line-length = "dynamic"
 [tool.pyright]
 pythonVersion = "3.9"
 pythonPlatform = "All"
-root = ['suricata_check']
 include = ["suricata_check", "tests"]
 exclude = ["**/__pycache__"]
 typeCheckingMode = "standard"
@@ -209,4 +208,3 @@ reportImplicitStringConcatenation = "warning"
 reportUnusedExpression = "warning"
 reportUnnecessaryTypeIgnoreComment = "warning"
 reportMatchNotExhaustive = "warning"
-reportShadowedImports = "warning"

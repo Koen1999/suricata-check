@@ -12,17 +12,15 @@ All publicly exposed modules, classes, and methods are documented and typed such
 
 ## Analyze a single rule
 
-In order to analyze a single rule using the module, you first need to parse the rule using `idstools`, which is installed together with `suricata_check`.
+In order to analyze a single rule using the module, you first need to parse the rule with `suricata_check`.
 Thereafter, you can process it using `suricata_check.analyze_rule` as follows to obtain a `RuleReport`
 
 ```python
-import idstools
-import idstools.rule
 import suricata_check
 
 rule = """\
 alert ip any any -> any any (msg:"Some msg"; sid:1;)"""
-parsed_rule = idstools.rule.parse(rule)
+parsed_rule = suricata_check.utils_checker_typing.suricata_check.rule.parse(rule)
 assert parsed_rule is not None
 
 rule_report = suricata_check.analyze_rule(parsed_rule)
