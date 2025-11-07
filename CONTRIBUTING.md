@@ -1,5 +1,18 @@
 # Contributing
 
+The `suricata-check` project is actively maintained and welcomes new contributions in the form of issues and PRs. The project maintains quality-standards for the codebase using CI/CD workflows and review processes to ensure the code remains maintainable for current and future contributors.
+
+First time contributors are encouraged to check out [issues labelled as good first issue](https://github.com/Koen1999/suricata-check/labels/good%20first%20issue), which are curated for beginners. These issues do not warrant large or complex changes to a large number of components.
+
+Additionally, the project explicitly welcomes the following types of contributions:
+
+- Improving the overall quality of the codebase (e.g., refining functionality or tests)
+- Enhancing CI/CD workflows *(discuss first in an issue)*
+- Improving the existing documentation
+- [Proposing new features](https://github.com/Koen1999/suricata-check/issues) that are in-line with current project goals *(discuss first in an issue)*
+
+When in doubt whether a contribution is a good fit for the project, you are encouraged to open or comment on an issue so the maintainers can provide clarifications.
+
 If you would like to contribute, below you can find some helpful suggestions and instructions.
 
 ## Reporting bugs
@@ -30,6 +43,8 @@ To install packages required for running tests and linting, run the following co
 pip install -U -r requirements.txt
 ```
 
+Note that you may want to setup a [virtual environment (venv)](https://docs.python.org/3/library/venv.html) before installing dependencies to prevent conflicts.
+
 ## Running tests
 
 If you wish to run the majority of the tests whilst skipping the slow integration tests on large third-party rulesets, use the following command:
@@ -43,6 +58,10 @@ To run the slower integration tests at the end of your development cycle, use th
 ```bash
 pytest -m "slow" -k "not train"
 ```
+
+### Inspecting test coverage
+
+Test coverage is automatically assessed when running tests. To inspect the coverage, open `htmlcov/index.html` in your browser and navigate from there.
 
 ## Linting
 
@@ -74,6 +93,10 @@ and inspect the docs at `localhost:8000`
 ## Pull requests
 
 When you create a pull request (PR), several checks are automatically run. These include some basic code style checks, as well as running all non-slow tests. PRs that do not pass these checks will not be merged. Additionally, PRs will undergo atleast one round of feedback before merging and require approval of atleast one contributor.
+
+PRs should have a clean commit history and have a singular focus since changelogs are automatically generated from PR names. If your PR introduces new functions or classes, tests and documentation should be included where appropriate.
+
+PRs that satisfy the quality criteria of the project (e.g., pass automated CI/CD workflows) and receive one approving review from a maintainer will be merged as long as they are in-line with the current goals of the project.
 
 ## Writing Extensions
 
