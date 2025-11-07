@@ -9,9 +9,16 @@
 [![Extensive Test](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml)
 [![Release](https://github.com/Koen1999/suricata-check/actions/workflows/python-release.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-release.yml)
 
-
 `suricata-check` is a command line utility to provide feedback on [Suricata](https://github.com/OISF/suricata) rules.
 The tool can detect various issues including those covering syntax validity, interpretability, rule specificity, rule coverage, and efficiency.
+
+> ## **_Looking for new contributions and feedback_**
+>
+> Since `suricata-check` is still in beta, we are actively looking for feedback on the existing functionality, and the way this functionality is exposed to users through the CLI/API.
+> If you have suggestions that would improve your user experience, please do not hesitate to open an [issue](https://github.com/Koen1999/suricata-check/issues/new/choose)!
+>
+> Please check out our [contributing guidelines](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md) if you would like to help with more than just feedback/ideas.
+> Interested contributors are also invited to join the project as a co-maintainer to further shape the project's direction.
 
 ## Features
 
@@ -140,6 +147,8 @@ You can propose your own community type issues that should be checked for in the
 
 ## Contributing
 
+### **_We are actively looking for new contributors to join our project!_**
+
 If you would like to contribute, please check out [CONTRIBUTING.md](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md) some helpful suggestions and instructions.
 
 ## License
@@ -150,6 +159,7 @@ Note that extensions may be licensed under another license as detailed in [CONTR
 For example, the [suricata-check-extension-example](https://github.com/Koen1999/suricata-check-extension-example) project is licensed under the [Apache 2.0 license](https://github.com/Koen1999/suricata-check-extension-example/blob/master/LICENSE).
 
 ## Citations
+
 If you use the source code, the tool, or otherwise draw from this work, please cite the following paper:
 
 **Koen T. W. Teuwen, Tom Mulders, Emmanuele Zambon, and Luca Allodi. 2025. Ruling the Unruly: Designing Effective, Low-Noise Network Intrusion Detection Rules for Security Operations Centers. In ACM Asia Conference on Computer and Communications Security (ASIA CCS ’25), August 25–29, 2025, Hanoi, Vietnam. ACM, New York, NY, USA, 14 pages. [https://doi.org/10.1145/3708821.3710823](https://doi.org/10.1145/3708821.3710823)**
