@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import subprocess
+from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, requires, version
 from typing import Optional
 
@@ -55,6 +56,8 @@ def get_version() -> str:
 
 __version__: str = get_version()
 
+__user_agent = f"suricata-check/{__version__} (+https://suricata-check.teuwen.net/)"
+
 
 def get_dependency_versions() -> dict:
     d = {}
@@ -94,17 +97,70 @@ def get_dependency_versions() -> dict:
 
 
 def __get_latest_version() -> Optional[str]:
+    cached_data = __get_saved_check_update()
+    headers = {"User-Agent": __user_agent}
+    if cached_data is not None:
+        if (
+            "response_headers" in cached_data
+            and "etag" in cached_data["response_headers"]
+        ):
+            headers["If-None-Match"] = cached_data["response_headers"]["etag"]
+        if "last_checked" in cached_data:
+            headers["If-Modified-Since"] = datetime.datetime.fromisoformat(
+                cached_data["last_checked"]
+            ).strftime("%a, %d %b %Y %H:%M:%S GMT")
+
     try:
-        response = requests.get("https://pypi.org/pypi/suricata-check/json", timeout=2)
-        if response.status_code == 200:  # noqa: PLR2004
-            return response.json()["info"]["version"]
+        response = requests.get(
+            "https://pypi.org/pypi/suricata-check/json", headers=headers, timeout=5
+        )
+
+        if response.status_code == requests.codes.ok:
+            pypi_json = response.json()
+            __save_check_update(
+                pypi_json, {k.lower(): v for k, v in response.headers.items()}
+            )
+            return pypi_json["info"]["version"]
+
+        if response.status_code == requests.codes.not_modified:
+            assert cached_data is not None
+            _logger.debug("Using cached PyPI response data for update check.")
+            return cached_data["pypi_json"]["info"]["version"]
     except requests.RequestException:
-        pass
+        _logger.warning("Failed to perform update check.")
     return None
 
 
+@lru_cache(maxsize=1)
+def __get_saved_check_update() -> Optional[dict]:
+    if not os.path.exists(UPDATE_CHECK_CACHE_PATH):
+        return None
+
+    try:
+        with open(UPDATE_CHECK_CACHE_PATH, "r") as f:
+            data = json.load(f)
+    except OSError:
+        _logger.warning("Failed to read last date version was checked from cache file.")
+        os.remove(UPDATE_CHECK_CACHE_PATH)
+        return None
+    except json.JSONDecodeError:
+        _logger.warning(
+            "Failed to decode cache file to determine last date version was checked."
+        )
+        return None
+
+    if not isinstance(data, dict):
+        _logger.warning(
+            "Cache file documenting the last date version was checked is malformed."
+        )
+        os.remove(UPDATE_CHECK_CACHE_PATH)
+        return None
+
+    return data
+
+
 def __should_check_update() -> bool:
-    current_version = get_version()
+    current_version = __version__
     if current_version == "unknown":
         _logger.warning(
             "Skipping update check because current version cannot be determined."
@@ -117,20 +173,14 @@ def __should_check_update() -> bool:
     if not os.path.exists(UPDATE_CHECK_CACHE_PATH):
         return True
 
+    data = __get_saved_check_update()
+    if data is None:
+        return True
+
     try:
-        with open(UPDATE_CHECK_CACHE_PATH, "r") as f:
-            data = json.load(f)
-            last_checked = datetime.datetime.fromisoformat(data["last_checked"])
-            if (
-                datetime.datetime.now(tz=datetime.timezone.utc) - last_checked
-            ).days < 1:
-                return False
-    except OSError:
-        _logger.warning("Failed to read last date version was checked from cache file.")
-    except json.JSONDecodeError:
-        _logger.warning(
-            "Failed to decode cache file to determine last date version was checked."
-        )
+        last_checked = datetime.datetime.fromisoformat(data["last_checked"])
+        if (datetime.datetime.now(tz=datetime.timezone.utc) - last_checked).days < 1:
+            return False
     except KeyError:
         _logger.warning(
             "Cache file documenting the last date version was checked is malformed."
@@ -139,14 +189,16 @@ def __should_check_update() -> bool:
     return True
 
 
-def __save_check_time() -> None:
+def __save_check_update(pypi_json: dict, response_headers: dict) -> None:
     try:
         with open(UPDATE_CHECK_CACHE_PATH, "w") as f:
             json.dump(
                 {
                     "last_checked": datetime.datetime.now(
                         tz=datetime.timezone.utc
-                    ).isoformat()
+                    ).isoformat(),
+                    "pypi_json": pypi_json,
+                    "response_headers": response_headers,
                 },
                 f,
             )
@@ -158,10 +210,14 @@ def check_for_update() -> None:
     if not __should_check_update():
         return
 
-    current_version = get_version()
+    current_version = __version__
     latest_version = __get_latest_version()
 
-    if latest_version and Version(latest_version) > Version(current_version):
+    if latest_version is None:
+        _logger.warning("Failed to check for updates of suricata-check.")
+        return
+
+    if Version(latest_version) > Version(current_version):
         _logger.warning(
             "A new version of suricata-check is available: %s (you have %s)",
             latest_version,
@@ -172,5 +228,8 @@ def check_for_update() -> None:
             "You can find the full changelog of what has changed here: %s",
             "https://github.com/Koen1999/suricata-check/releases",
         )
+        return
 
-    __save_check_time()
+    _logger.info(
+        "You are using the latest version of suricata-check (%s).", __version__
+    )

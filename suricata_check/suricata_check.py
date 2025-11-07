@@ -9,6 +9,7 @@ import logging.handlers
 import multiprocessing
 import os
 import sys
+import threading
 from collections.abc import Sequence
 from typing import (
     Any,
@@ -275,7 +276,7 @@ def main(**kwargs: dict[str, Any]) -> None:  # noqa: C901, PLR0915
     )
     logging.basicConfig(
         level=log_level,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        format="%(asctime)s - %(name)s - %(levelname)s - %(threadName)s - %(message)s",
         handlers=(queue_handler, click_handler),
         force=os.environ.get("SURICATA_CHECK_FORCE_LOGGING", "FALSE") == "TRUE",
     )
@@ -315,7 +316,9 @@ def main(**kwargs: dict[str, Any]) -> None:  # noqa: C901, PLR0915
     for package, version in get_dependency_versions().items():
         _logger.debug("Dependency %s version: %s", package, version)
 
-    check_for_update()
+    threading.Thread(
+        target=check_for_update,
+    ).start()
 
     # Verify that include and exclude arguments are valid
     if include_all and len(include) > 0:
