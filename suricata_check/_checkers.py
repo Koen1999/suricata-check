@@ -30,11 +30,14 @@ def _import_extensions() -> None:
         if module.name.startswith("suricata_check_"):
             try:
                 imported_module = __import__(module.name)
+                version = getattr(imported_module, "__version__", "unknown")
                 _logger.info(
                     "Detected and successfully imported suricata-check extension %s with version %s.",
                     module.name.replace("_", "-"),
-                    getattr(imported_module, "__version__"),
+                    version,
                 )
+                print(f"Extension '{module.name.replace('_', '-')}' version: {version}")
+       
             except ImportError:
                 _logger.warning(
                     "Detected potential suricata-check extension %s but failed to import it.",
