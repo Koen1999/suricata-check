@@ -9,7 +9,7 @@
 [![Extensive Test](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-push.yml)
 [![Release](https://github.com/Koen1999/suricata-check/actions/workflows/python-release.yml/badge.svg)](https://github.com/Koen1999/suricata-check/actions/workflows/python-release.yml)
 
-`suricata-check` is a command line utility to provide feedback on [Suricata](https://github.com/OISF/suricata) rules.
+`suricata-check` is   a   command line  utility to provide feedback on [Suricata](https://github.com/OISF/suricata) rules.
 The tool can detect various issues including those covering syntax validity, interpretability, rule specificity, rule coverage, and efficiency.
 
 > ## **_Looking for new contributions and feedback_**
