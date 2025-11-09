@@ -11,6 +11,28 @@ concurrency:
 
 
 jobs:
+  comment:
+    name: Comment
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}
+
+    steps:
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            :wave: Thank you for contributing this pull request!
+
+            This repository uses GitHub Actions to automatically run tests, build the project, and check code quality on each pull request.
+            Please address _all_ issues found by these checks to ensure a smooth review process.
+
+            Please review our [Contribution Guidelines](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md) to learn everything you should know about contributing to our project!
+            
+            Note that for first time contributors, action workflows have to be approved first by the maintainers before they can run.
+            Please be patient, and a maintainer will review your PR soon! :pray:
+
   test:
     name: Quick Test
     runs-on: ${{ matrix.os }}
