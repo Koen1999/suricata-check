@@ -37,9 +37,7 @@ To install `suricata-check` from [PyPI](https://pypi.org/project/suricata-check/
 pip install suricata-check[performance]
 ```
 
-Installation should work out-of-the-box on any Operating System (OS) and has been tested on Windows and Linux (Fedora and Ubuntu).
-
-This will install `suricata-check` from source, which should be fine considering it's a pure-python package.
+Installation should work out-of-the-box on any Operating System (OS) and is tested for each release using CI/CD on Windows, Linux (Ubuntu), and MacOS.
 
 ## Usage
 
