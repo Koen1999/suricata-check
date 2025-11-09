@@ -31,7 +31,7 @@ jobs:
             Please review our [Contribution Guidelines](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md) to learn everything you should know about contributing to our project!
             
             Note that for first time contributors, action workflows have to be approved first by the maintainers before they can run.
-            Please be patient, and a maintainer will review your PR soon! :pray:"
+            Please be patient, and a maintainer will review your PR soon! :pray:
 
   test:
     name: Quick Test
