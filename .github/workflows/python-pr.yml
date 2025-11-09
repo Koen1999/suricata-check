@@ -120,7 +120,7 @@ jobs:
           ruff check --output-format=github .
 
   markdownlint:
-    name: Run Markdownlint
+    name: Markdownlint
     runs-on: ubuntu-latest
     needs:
       - lint
