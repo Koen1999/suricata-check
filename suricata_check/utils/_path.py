@@ -7,7 +7,10 @@ _logger = logging.getLogger(__name__)
 
 
 def find_rules_file(root: str) -> str:
-    """Find the Suricata rules file in the given directory."""
+    """Find the Suricata rules file in the given directory.
+
+    Returns an absolute path to the rules file.
+    """
     if not os.path.exists(root):
         msg = f"Error: {root} does not exist."
         _logger.critical(msg)
@@ -26,17 +29,17 @@ def find_rules_file(root: str) -> str:
         _logger.info("Searching for Suricata rules file in %s", full_path)
 
         rules_files: list[str] = []
-        for path, _, files in os.walk(root):
+        for path, _, files in os.walk(full_path):
             for file in files:
                 if file.endswith(".rules"):
                     rules_files.append(os.path.join(path, file))
 
         if len(rules_files) == 0:
-            msg = f"No Suricata rules file found in {root}"
+            msg = f"No Suricata rules file found in {full_path}"
             _logger.critical(msg)
             raise click.BadParameter(f"Error: {msg}")
         if len(rules_files) > 1:
-            msg = f"Multiple Suricata rules files found in {root}\n" + "\n".join(
+            msg = f"Multiple Suricata rules files found in {full_path}\n" + "\n".join(
                 rules_files,
             )
             _logger.critical(msg)
