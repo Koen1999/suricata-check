@@ -211,7 +211,9 @@ def __add_options_to_rule(rule_text: str, rule: "Rule", options: str) -> None:
         __add_option_to_rule(rule, name, val)
 
 
-def __add_option_to_rule(rule: "Rule", name: str, val: Optional[str]) -> None:  # noqa: C901, PLR0912
+def __add_option_to_rule(  # noqa: C901, PLR0912
+    rule: "Rule", name: str, val: Optional[str]
+) -> None:
     if val is not None and not isinstance(
         val, str
     ):  # pyright: ignore[reportUnnecessaryIsInstance]
