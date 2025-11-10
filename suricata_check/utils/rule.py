@@ -168,7 +168,7 @@ def parse(buffer: str) -> Optional["Rule"]:
     else:
         rule.enabled = True
 
-    header_vals = rule.header.split(" ")
+    header_vals = _regex_provider.split(r"\s+", rule.header)
     # 7 is the number of expected header fields
     if len(header_vals) != 7:  # noqa: PLR2004
         return None
