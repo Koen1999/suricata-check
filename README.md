@@ -12,7 +12,7 @@
 `suricata-check` is a command line utility to provide feedback on [Suricata](https://github.com/OISF/suricata) rules.
 The tool can detect various issues including those covering syntax validity, interpretability, rule specificity, rule coverage, and efficiency.
 
-> ## **_Looking for new contributions and feedback_**
+> ## ***Looking for new contributions and feedback***
 >
 > Since `suricata-check` is still in beta, we are actively looking for feedback on the existing functionality, and the way this functionality is exposed to users through the CLI/API.
 > If you have suggestions that would improve your user experience, please do not hesitate to open an [issue](https://github.com/Koen1999/suricata-check/issues/new/choose)!
@@ -51,7 +51,7 @@ This command will look for a file ending with `.rules` in the currrent working d
 
 More details regarding the command line interface can be found below:
 
-```
+```text
 Usage: suricata_check.py [OPTIONS]
 
   The `suricata-check` command processes all rules inside a rules file and
@@ -95,11 +95,11 @@ The output of `suricata-check` is collected in a folder and spread across severa
 
 `suricata-check-stats.log` contains a very condensed overview of all issues found by `suricata-check` across all rules and is useful when reviewing the quality of an entire ruleset.
 
-`suricata-check.jsonl` is a jsonlines log file containing all the issues presented in `suricata-check-fast.log` together with parsed versions of _all_ rules and is useful for programatically further processing output of `suricata-check`. An example use-case could be to selectively disable rules affected by certain issues to prevent low-quality rules inducing additional workload in Security Operations Centers.
+`suricata-check.jsonl` is a jsonlines log file containing all the issues presented in `suricata-check-fast.log` together with parsed versions of *all* rules and is useful for programatically further processing output of `suricata-check`. An example use-case could be to selectively disable rules affected by certain issues to prevent low-quality rules inducing additional workload in Security Operations Centers.
 
 ## Issue codes
 
-`suricata-check` employs various checkers, each emitting one or more _issue codes_.
+`suricata-check` employs various checkers, each emitting one or more *issue codes*.
 The issue codes are grouped into several ranges, depending on the category of the checker.
 Each issue group is explained in detail below.
 For details regarding specific issues, we recommend you check the message of the issue as well as the test example rules under `tests/checkers`.
@@ -115,16 +115,16 @@ For details regarding specific issues, we recommend you check the message of the
 
 ### Mandatory issues
 
-Rules starting with prefix _M_ indicate issues pertaining to the validity of Suricata rules.
-Rules with _M_-type issues will most probably not be used by Suricata due to invalid syntax or missing fields.
+Rules starting with prefix *M* indicate issues pertaining to the validity of Suricata rules.
+Rules with *M*-type issues will most probably not be used by Suricata due to invalid syntax or missing fields.
 
-Not all invalid rules wlll be reported through _M_-type issues as some rules can simply not be parsed to the point where these issues are detected.
+Not all invalid rules wlll be reported through *M*-type issues as some rules can simply not be parsed to the point where these issues are detected.
 Instead, you can detect these rules through the `ERROR` messages in `suricata-check.log`.
 
 ### Suricata Style Guide issues
 
-Rules starting with prefix _S_ indicate issues pertaining to the adherence to the [Suricata Style Guide](https://github.com/sidallocation/suricata-style-guide).
-Rules with _S_-type issues are likely to hint on interpretability or efficiency issues.
+Rules starting with prefix *S* indicate issues pertaining to the adherence to the [Suricata Style Guide](https://github.com/sidallocation/suricata-style-guide).
+Rules with *S*-type issues are likely to hint on interpretability or efficiency issues.
 
 ### Principle issues
 
@@ -134,18 +134,18 @@ An [additional checker](https://suricata-check-design-principles.teuwen.net) is 
 pip install suricata-check-design-principles
 ```
 
-Rules starting with prefix _P_ indicate issues relating to rule design principles posed in the [Ruling the Unruly](https://doi.org/10.1145/3708821.3710823) paper.
-Rules with _P_-type issues can relate to a specificity and coverage.
+Rules starting with prefix *P* indicate issues relating to rule design principles posed in the [Ruling the Unruly](https://doi.org/10.1145/3708821.3710823) paper.
+Rules with *P*-type issues can relate to a specificity and coverage.
 
 ### Community issues
 
-Rules starting with prefix _C_ indicate issues posed by the community and are an extension on top of the other issue groups.
-Rules with _C_-type issues can relate to a wide variety of issues.
+Rules starting with prefix *C* indicate issues posed by the community and are an extension on top of the other issue groups.
+Rules with *C*-type issues can relate to a wide variety of issues.
 You can propose your own community type issues that should be checked for in the [issues](https://github.com/Koen1999/suricata-check/issues) section.
 
 ## Contributing
 
-### **_We are actively looking for new contributors to join our project!_**
+### ***We are actively looking for new contributors to join our project!***
 
 If you would like to contribute, please check out [CONTRIBUTING.md](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md) some helpful suggestions and instructions.
 
@@ -160,6 +160,6 @@ For example, the [suricata-check-extension-example](https://github.com/Koen1999/
 
 If you use the source code, the tool, or otherwise draw from this work, please cite the following paper:
 
-**Koen T. W. Teuwen, Tom Mulders, Emmanuele Zambon, and Luca Allodi. 2025. Ruling the Unruly: Designing Effective, Low-Noise Network Intrusion Detection Rules for Security Operations Centers. In ACM Asia Conference on Computer and Communications Security (ASIA CCS ’25), August 25–29, 2025, Hanoi, Vietnam. ACM, New York, NY, USA, 14 pages. [https://doi.org/10.1145/3708821.3710823](https://doi.org/10.1145/3708821.3710823)**
+**Koen T. W. Teuwen, Tom Mulders, Emmanuele Zambon, and Luca Allodi. 2025. Ruling the Unruly: Designing Effective, Low-Noise Network Intrusion Detection Rules for Security Operations Centers. In ACM Asia Conference on Computer and Communications Security (ASIA CCS ’25), August 25–29, 2025, Hanoi, Vietnam. ACM, New York, NY, USA, 14 pages. <https://doi.org/10.1145/3708821.3710823>**
 
-A publicly accessible preprint is available [here](https://koen.teuwen.net/publication/ruling-the-unruly).
+A [publicly accessible preprint](https://koen.teuwen.net/publication/ruling-the-unruly) is available.

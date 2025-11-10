@@ -11,6 +11,7 @@ The CLI options mentioned in [CLI Reference](./cli.rst) can also be configured u
 The default `.ini` is called `suricata-check.ini` and should be located in the project directory or common working directory. If the default name and location are used, the configuration will be automatically discovered when you run `suricata-check`.
 
 The contents of `suricata-check.ini` can be configured as follows:
+
 ```ini
 [suricata-check]
 issue-severity="INFO"
