@@ -8,7 +8,7 @@ myst:
 
 ## CheckerInterface
 
-In order to write a new checker, you must extend the `suricata_check.checkers.interface.CheckerInterface` and implement the `_check_rule` function, which takes a rule (`suricata_check.rule.Rule`) as input and returns a collection of issues (`suricata.check.typing.IssuesType`). The most minimal checker, looks as follows:
+In order to write a new checker, you must extend the `suricata_check.checkers.interface.CheckerInterface` and implement the `_check_rule` function, which takes a rule (`suricata_check.utils.rule.Rule`) as input and returns a collection of issues (`suricata.check.typing.IssuesType`). The most minimal checker, looks as follows:
 
 ```python
 from suricata_check.checkers.interface import CheckerInterface
@@ -20,7 +20,7 @@ class ExampleChecker(CheckerInterface):
 
     def _check_rule(
         self: "ExampleChecker",
-        rule: suricata_check.rule.Rule,
+        rule: suricata_check.utils.rule.Rule,
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 
@@ -48,7 +48,7 @@ class ExampleChecker(CheckerInterface):
 
     def _check_rule(
         self: "ExampleChecker",
-        rule: suricata_check.rule.Rule,
+        rule: suricata_check.utils.rule.Rule,
     ) -> ISSUES_TYPE:
         issues: ISSUES_TYPE = []
 
@@ -106,7 +106,7 @@ Out of the box, no rules are actually tested but the structure of the codes prov
 
 ### Asserting expected issues for rules
 
-Usually, it is desirable to have atleast two tests for each issue type, i.e. one rule for which the issue is present and one rule for which it is not. To write a test, create a `suricata_check.rule.Rule` object by using `suricata_check.rule.parse` and pass this rule object to `self._test_issue` while also providing the issue code to check for and a boolean to indicate whether the issue should (not) be raised. The `GenericChecker._test_issue` function will under the hood perform various assertions, in addition to whether the issue is raised or not such as checking whether any undocumented issue codes are emitted, and whether the raised issue has the required metadata to describe the checker that raised the code. For example, to write tests for the two issues we created earlier, we can use the following code:
+Usually, it is desirable to have atleast two tests for each issue type, i.e. one rule for which the issue is present and one rule for which it is not. To write a test, create a `suricata_check.utils.rule.Rule` object by using `suricata_check.utils.rule.parse` and pass this rule object to `self._test_issue` while also providing the issue code to check for and a boolean to indicate whether the issue should (not) be raised. The `GenericChecker._test_issue` function will under the hood perform various assertions, in addition to whether the issue is raised or not such as checking whether any undocumented issue codes are emitted, and whether the raised issue has the required metadata to describe the checker that raised the code. For example, to write tests for the two issues we created earlier, we can use the following code:
 
 ```python
 import logging
@@ -127,28 +127,28 @@ class TestExample(GenericChecker):
         self.checker = suricata_check_extension_example.checkers.ExampleChecker()
 
     def test_e000_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip any any -> any any (msg:"Test"; sid:1;)""",
         )
 
         self._test_issue(rule, "E000", True)
 
     def test_e000_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip any any -> any any (sid:1;)""",
         )
 
         self._test_issue(rule, "E000", False)
 
     def test_e001_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip any any -> any any (msg:"Test"; sid:1234;)""",
         )
 
         self._test_issue(rule, "E001", True)
 
     def test_e001_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip any any -> any any (msg:"Test"; sid:20101234;)""",
         )
 

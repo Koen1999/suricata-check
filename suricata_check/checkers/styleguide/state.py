@@ -11,7 +11,7 @@ from suricata_check.utils.checker import (
     is_rule_suboption_set,
 )
 from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
-from suricata_check.utils.regex import get_regex_provider
+from suricata_check.utils.regex_provider import get_regex_provider
 
 _regex_provider = get_regex_provider()
 

@@ -15,26 +15,28 @@ class TestMandatory(suricata_check.tests.GenericChecker):
         self.checker = suricata_check.checkers.MandatoryChecker()
 
     def test_m000_bad(self):
-        rule = suricata_check.rule.parse("""alert ip any any -> any any (sid:1;)""")
+        rule = suricata_check.utils.rule.parse(
+            """alert ip any any -> any any (sid:1;)"""
+        )
 
         self._test_issue(rule, "M000", True)
 
     def test_m000_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip any any -> any any (msg:"Test"; sid:1;)""",
         )
 
         self._test_issue(rule, "M000", False)
 
     def test_m001_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip any any -> any any (msg:"Test";)"""
         )
 
         self._test_issue(rule, "M001", True)
 
     def test_m001_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip any any -> any any (msg:"Test"; sid:1;)""",
         )
 

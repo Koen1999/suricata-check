@@ -1,25 +1,17 @@
 """The `suricata_check.utils.regex` module contains regular expressions for matching various parts of rules."""
 
-import importlib.util
 import logging
 from collections.abc import Iterable, Sequence
 from functools import lru_cache
 
-from suricata_check.utils.checker_typing import Rule
+from suricata_check.utils.regex_provider import Pattern
+from suricata_check.utils.regex_provider import (
+    get_regex_provider as _get_regex_provider,
+)
+from suricata_check.utils.rule import Rule
 
 _logger = logging.getLogger(__name__)
-
-# Import the fastest regex provider available:
-if importlib.util.find_spec("regex") is not None:
-    _logger.info("Detected regex module as installed, using it.")
-    import regex as _regex_provider
-else:
-    _logger.warning(
-        """Did not detect regex module as installed, using re instead.
-To increase suricata-check processing speed, consider isntalling the regex module \
-by running `pip install suricata-check[performance]`.""",
-    )
-    import re as _regex_provider
+_regex_provider = _get_regex_provider()
 
 LRU_CACHE_SIZE = 10
 
@@ -514,15 +506,6 @@ _RULE_REGEX = _regex_provider.compile(
 )
 
 
-def get_regex_provider():  # noqa: ANN201
-    """Returns the regex provider to be used.
-
-    If `regex` is installed, it will return that module.
-    Otherwise, it will return the `re` module instead.
-    """
-    return _regex_provider
-
-
 @lru_cache(maxsize=LRU_CACHE_SIZE)
 def __escape_regex(s: str) -> str:
     # Escape the escape character first
@@ -547,13 +530,13 @@ def __escape_regex(s: str) -> str:
     return s  # noqa: RET504
 
 
-def get_options_regex(options: Iterable[str]) -> _regex_provider.Pattern:
+def get_options_regex(options: Iterable[str]) -> Pattern:
     """Returns a regular expression that can match any of the provided options."""
     return __get_options_regex(tuple(sorted(options)))
 
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
-def __get_options_regex(options: Sequence[str]) -> _regex_provider.Pattern:
+def __get_options_regex(options: Sequence[str]) -> Pattern:
     return _regex_provider.compile(
         "(" + "|".join([__escape_regex(option) for option in options]) + ")",
     )
@@ -615,10 +598,10 @@ def get_rule_body(rule: Rule) -> str:
 
 @lru_cache(maxsize=LRU_CACHE_SIZE)
 def __get_rule_body(rule: Rule) -> str:
-    match = _BODY_REGEX.search(rule["raw"])
+    match = _BODY_REGEX.search(rule.raw)
 
     if match is None:
-        msg = f"Could not extract rule body from rule: {rule['raw']}"
+        msg = f"Could not extract rule body from rule: {rule.raw}"
         _logger.critical(msg)
         raise RuntimeError(msg)
 
@@ -627,7 +610,7 @@ def __get_rule_body(rule: Rule) -> str:
 
 def is_valid_rule(rule: Rule) -> bool:
     """Checks if a rule is valid."""
-    if _RULE_REGEX.match(rule["raw"]) is None:
+    if _RULE_REGEX.match(rule.raw) is None:
         return False
 
     return True

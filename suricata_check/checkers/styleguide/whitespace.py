@@ -9,8 +9,8 @@ from suricata_check.utils.checker import (
 from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
 from suricata_check.utils.regex import (
     HEADER_REGEX,
-    get_regex_provider,
 )
+from suricata_check.utils.regex_provider import get_regex_provider
 
 _regex_provider = get_regex_provider()
 
@@ -85,7 +85,7 @@ class WhitespaceChecker(CheckerInterface):
 
         if (
             REGEX_S100.match(
-                rule["raw"].strip(),
+                rule.raw.strip(),
             )
             is not None
         ):
@@ -99,7 +99,7 @@ Consider removing the unneccessary whitespace.""",
 
         if (
             REGEX_S101.match(
-                rule["raw"].strip(),
+                rule.raw.strip(),
             )
             is not None
         ):
@@ -113,7 +113,7 @@ Consider removing the unneccessary whitespace.""",
 
         if (
             REGEX_S102.match(
-                rule["raw"].strip(),
+                rule.raw.strip(),
             )
             is not None
         ):
@@ -127,7 +127,7 @@ Consider removing the unneccessary whitespace.""",
 
         if (
             REGEX_S103.match(
-                rule["raw"].strip(),
+                rule.raw.strip(),
             )
             is not None
         ):
@@ -141,7 +141,7 @@ Consider removing the unneccessary whitespace.""",
 
         if (
             REGEX_S104.match(
-                rule["raw"].strip(),
+                rule.raw.strip(),
             )
             is not None
         ):
@@ -155,7 +155,7 @@ Consider removing the unneccessary whitespace.""",
 
         if (
             REGEX_S105.match(
-                rule["raw"].strip(),
+                rule.raw.strip(),
             )
             is not None
         ):
@@ -182,7 +182,7 @@ Consider replacing the unneccessary whitespace by a single space.""",
 
         if (
             REGEX_S110.match(
-                rule["raw"].strip(),
+                rule.raw.strip(),
             )
             is not None
         ):

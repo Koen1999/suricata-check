@@ -5,16 +5,16 @@ from collections.abc import Iterable, Sequence
 from functools import lru_cache
 from typing import Optional, Union
 
-from suricata_check.utils.checker_typing import Rule
 from suricata_check.utils.regex import (
     ALL_DETECTION_KEYWORDS,
     ALL_KEYWORDS,
     ALL_METADATA_KEYWORDS,
     BUFFER_KEYWORDS,
     STICKY_BUFFER_NAMING,
-    get_regex_provider,
     get_variable_groups,
 )
+from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.rule import Rule
 
 _LRU_CACHE_SIZE = 10
 
@@ -29,22 +29,22 @@ def check_rule_option_recognition(rule: Rule) -> None:
 
     Unrecognized options will be logged as a warning in `suricata-check.log`
     """
-    for option in rule["options"]:
-        name = option["name"]
+    for option in rule.options:
+        name = option.name
         if name not in ALL_KEYWORDS:
             _logger.warning(
                 "Option %s from rule %s is not recognized.",
                 name,
-                rule["sid"],
+                get_rule_option(rule, "sid"),
             )
 
-    for option in rule["metadata"]:
+    for option in rule.metadata:
         name = _regex_provider.split(r"\s+", option)[0]
         if name not in ALL_METADATA_KEYWORDS:
             _logger.warning(
                 "Metadata option %s from rule %s is not recognized.",
                 name,
-                rule["sid"],
+                get_rule_option(rule, "sid"),
             )
 
 
@@ -52,7 +52,7 @@ def is_rule_option_set(rule: Rule, name: str) -> bool:
     """Checks whether a rule has a certain option set.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (str): name of the option
 
     Returns:
@@ -76,19 +76,19 @@ def __is_rule_option_set(rule: Rule, name: str) -> bool:
         if name not in ALL_KEYWORDS:
             _logger.warning("Requested a non-recognized keyword: %s", name)
 
-        for option in rule["options"]:
-            if option["name"] == name:
+        for option in rule.options:
+            if option.name == name:
                 return True
 
         return False
 
-    if name not in rule:
+    if not hasattr(rule, name):
         return False
 
-    if rule[name] is None:
+    if getattr(rule, name) is None:
         return False
 
-    if rule[name] == "":
+    if getattr(rule, name) == "":
         return False
 
     return True
@@ -165,7 +165,7 @@ def count_rule_options(
     """Counts how often an option is set in a rule.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (Union[str, Iterable[str]]): name or names of the option
 
     Returns:
@@ -201,8 +201,8 @@ def __count_rule_options(
         if name not in ALL_KEYWORDS:
             _logger.warning("Requested a non-recognized keyword: %s", name)
 
-        for option in rule["options"]:
-            if option["name"] == name:
+        for option in rule.options:
+            if option.name == name:
                 count += 1
 
     if count == 0 and is_rule_option_set(rule, name):
@@ -217,7 +217,7 @@ def get_rule_option(rule: Rule, name: str) -> Optional[str]:
     If an option is set multiple times, it returns only one indeterminately.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (str): name of the option
 
     Returns:
@@ -251,7 +251,7 @@ def get_rule_options(
     """Retrieves all options of a rule with a certain name.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (Union[str, Iterable[str]]): name or names of the option
 
     Returns:
@@ -288,11 +288,11 @@ def __get_rule_options(
         if name not in ALL_KEYWORDS:
             _logger.warning("Requested a non-recognized keyword: %s", name)
 
-        for option in rule["options"]:
-            if option["name"] == name:
-                values.append(option["value"])
-    elif name in rule:
-        values.append(rule[name])
+        for option in rule.options:
+            if option.name == name:
+                values.append(option.value)
+    elif hasattr(rule, name):
+        values.append(getattr(rule, name))
 
     if warn_not_found and len(values) == 0:
         msg = f"Option {name} not found in rule {rule}."
@@ -307,7 +307,7 @@ def is_rule_option_equal_to(rule: Rule, name: str, value: str) -> bool:
     If the option is set multiple times, it will return True if atleast one option matches the value.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (str): name of the option
         value (str): value to check for
 
@@ -335,7 +335,7 @@ def is_rule_suboption_equal_to(
     If the suboption is set multiple times, it will return True if atleast one option matches the value.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (str): name of the option
         sub_name (str): name of the suboption
         value (str): value to check for
@@ -366,7 +366,7 @@ def is_rule_option_equal_to_regex(
     If the option is set multiple times, it will return True if atleast one option matches the regex.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (str): name of the option
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
@@ -399,7 +399,7 @@ def is_rule_suboption_equal_to_regex(
     If the option is set multiple times, it will return True if atleast one option matches the regex.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (str): name of the option
         sub_name (str): name of the suboption
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
@@ -431,7 +431,7 @@ def is_rule_option_always_equal_to_regex(
     Returns none if the rule option is not set.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (str): name of the option
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
@@ -465,7 +465,7 @@ def is_rule_suboption_always_equal_to_regex(
     Returns none if the rule option is not set.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (str): name of the option
         sub_name (str): name of the suboption
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
@@ -496,7 +496,7 @@ def are_rule_options_equal_to_regex(
     If multiple options are set, it will return True if atleast one option matches the regex.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         names (Iterable[str]): names of the options
         regex (Union[re.Pattern, regex.Pattern]): regex to check for
 
@@ -521,7 +521,7 @@ def is_rule_option_one_of(
     If the option is set multiple times, it will return True if atleast one option matches a value.
 
     Args:
-        rule (suricata_check.rule.Rule): rule to be inspected
+        rule (suricata_check.utils.rule.Rule): rule to be inspected
         name (str): name of the option
         possible_values (Iterable[str]): values to check for
 
@@ -548,10 +548,10 @@ def get_rule_sticky_buffer_naming(
 ) -> list[tuple[str, str]]:
     """Returns a list of tuples containing the name of a sticky buffer, and the modifier alternative."""
     sticky_buffer_naming = []
-    for option in rule["options"]:
-        if option["name"] in STICKY_BUFFER_NAMING:
+    for option in rule.options:
+        if option.name in STICKY_BUFFER_NAMING:
             sticky_buffer_naming.append(
-                (option["name"], STICKY_BUFFER_NAMING[option["name"]]),
+                (option.name, STICKY_BUFFER_NAMING[option.name]),
             )
 
     return sticky_buffer_naming
@@ -604,7 +604,7 @@ def __get_rule_option_positions(
 ) -> Sequence[int]:
     provided_sequence = True
     if sequence is None:
-        sequence = tuple(option["name"] for option in rule["options"])
+        sequence = tuple(option.name for option in rule.options)
         provided_sequence = False
 
     positions = []
@@ -671,7 +671,7 @@ def is_rule_option_last(rule: Rule, name: str) -> Optional[bool]:
         _logger.debug("Cannot unambiguously determine if option %s last.", name)
         return None
 
-    if position == len(rule["options"]) - 1:
+    if position == len(rule.options) - 1:
         return True
 
     return False
@@ -851,8 +851,8 @@ def select_rule_options_by_regex(rule: Rule, regex) -> Iterable[str]:  # noqa: A
 def __select_rule_options_by_regex(rule: Rule, regex) -> Iterable[str]:  # noqa: ANN001
     options = []
 
-    for option in rule["options"]:
-        name = option["name"]
+    for option in rule.options:
+        name = option.name
         if _regex_provider.match(regex, name):
             options.append(name)
 
@@ -870,8 +870,8 @@ def get_rule_keyword_sequences(
     # Relies on the assumption that the order of options in the rule is preserved while parsing
     sequence_i = -1
     first_seperator_seen = False
-    for option in rule["options"]:
-        name = option["name"]
+    for option in rule.options:
+        name = option.name
         if name in seperator_keywords:
             if not first_seperator_seen:
                 if len(sequences) > 0:
@@ -893,7 +893,7 @@ def get_rule_keyword_sequences(
         _logger.debug(
             "No sequences found separated by %s in rule %s",
             seperator_keywords,
-            rule["raw"],
+            rule.raw,
         )
         return ()
 
@@ -906,7 +906,7 @@ def get_rule_keyword_sequences(
         "Detected sequences %s separated by %s in rule %s",
         result,
         seperator_keywords,
-        rule["raw"],
+        rule.raw,
     )
 
     return result

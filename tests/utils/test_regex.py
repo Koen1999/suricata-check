@@ -8,9 +8,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 import suricata_check
 
 if TYPE_CHECKING:
-    from suricata_check.utils.checker_typing import Rule
+    from suricata_check.utils.rule import Rule
 
-_regex_provider = suricata_check.utils.regex.get_regex_provider()
+_regex_provider = suricata_check.utils.regex_provider.get_regex_provider()
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -18,24 +18,24 @@ def test_rule_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[Rule] = suricata_check.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.utils.rule.parse(line)
             except:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             if rule is None:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             # Ensure our regular expressions are correct
-            for raw in (line, rule["raw"]):
+            for raw in (line, rule.raw):
                 match = suricata_check.utils.regex._RULE_REGEX.match(raw)  # type: ignore reportPrivateUsage # noqa: SLF001
                 if match is None:
                     pytest.fail(raw)
 
-                # If we extracted a rule, idstools should still be able to parse it.
+                # If we extracted a rule, suricata-check should still be able to parse it.
                 try:
-                    new_rule: Optional[Rule] = suricata_check.rule.parse(
+                    new_rule: Optional[Rule] = suricata_check.utils.rule.parse(
                         match.group(0),
                     )
                 except:
@@ -51,17 +51,17 @@ def test_header_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[Rule] = suricata_check.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.utils.rule.parse(line)
             except:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             if rule is None:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             # Ensure our regular expressions are correct
-            for raw in (line, rule["raw"]):
+            for raw in (line, rule.raw):
                 match = regex.match(raw)
                 assert match is not None
                 extracted = match.group(2).strip()
@@ -80,17 +80,17 @@ def test_body_regex():
         regex = _regex_provider.compile(r"^[#a-zA-Z0-9:\$_\.\-<>\s]+(\(.*\))\s*(#.*)?$")
         for line in rules_fh.readlines():
             try:
-                rule: Optional[Rule] = suricata_check.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.utils.rule.parse(line)
             except:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             if rule is None:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             # Ensure our regular expressions are correct
-            for raw in (line, rule["raw"]):
+            for raw in (line, rule.raw):
                 match = regex.match(
                     raw,
                 )
@@ -112,17 +112,17 @@ def test_action_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[Rule] = suricata_check.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.utils.rule.parse(line)
             except:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             if rule is None:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             # Ensure our regular expressions are correct
-            raw = rule["action"]
+            raw = rule.action
             if suricata_check.utils.regex._ACTION_REGEX.match(raw) is None:  # type: ignore reportPrivateUsage # noqa: SLF001
                 pytest.fail(raw)
 
@@ -132,17 +132,17 @@ def test_direction_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[Rule] = suricata_check.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.utils.rule.parse(line)
             except:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             if rule is None:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             # Ensure our regular expressions are correct
-            raw = rule["direction"]
+            raw = rule.direction
             if suricata_check.utils.regex._DIRECTION_REGEX.match(raw) is None:  # type: ignore reportPrivateUsage # noqa: SLF001
                 pytest.fail(raw)
 
@@ -152,17 +152,17 @@ def test_addr_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[Rule] = suricata_check.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.utils.rule.parse(line)
             except:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             if rule is None:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             # Ensure our regular expressions are correct
-            for raw in (rule["source_addr"], rule["dest_addr"]):
+            for raw in (rule.source_addr, rule.dest_addr):
                 if suricata_check.utils.regex._ADDR_REGEX.match(raw) is None:  # type: ignore reportPrivateUsage # noqa: SLF001
                     pytest.fail(raw)
 
@@ -172,17 +172,17 @@ def test_port_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[Rule] = suricata_check.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.utils.rule.parse(line)
             except:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             if rule is None:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             # Ensure our regular expressions are correct
-            for raw in (rule["source_port"], rule["dest_port"]):
+            for raw in (rule.source_port, rule.dest_port):
                 if suricata_check.utils.regex._PORT_REGEX.match(raw) is None:  # type: ignore reportPrivateUsage # noqa: SLF001
                     pytest.fail(raw)
 
@@ -192,22 +192,22 @@ def test_option_regex():
     with (open(os.path.normpath("tests/data/test.rules")) as rules_fh,):
         for line in rules_fh.readlines():
             try:
-                rule: Optional[Rule] = suricata_check.rule.parse(line)
+                rule: Optional[Rule] = suricata_check.utils.rule.parse(line)
             except:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             if rule is None:
-                # If idstools cannot parse it, we assume it is not a rule
+                # If suricata-check cannot parse it, we assume it is not a rule
                 continue
 
             # Ensure our regular expressions are correct
-            for name, value in [t.values() for t in rule["options"]]:
+            for option in rule.options:
                 for raw in (
-                    f"{name}: {value};",
-                    f"{name}:{value};",
-                    f"{name}:{value} ;",
-                    f"{name}: {value} ;",
+                    f"{option.name}: {option.value};",
+                    f"{option.name}:{option.value};",
+                    f"{option.name}:{option.value} ;",
+                    f"{option.name}: {option.value} ;",
                 ):
                     match = suricata_check.utils.regex._OPTION_REGEX.match(raw)  # type: ignore reportPrivateUsage # noqa: SLF001
                     if match is None:

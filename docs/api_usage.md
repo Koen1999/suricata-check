@@ -20,13 +20,13 @@ import suricata_check
 
 rule = """\
 alert ip any any -> any any (msg:"Some msg"; sid:1;)"""
-parsed_rule = suricata_check.utils_checker_typing.suricata_check.rule.parse(rule)
+parsed_rule = suricata_check.utils_checker_typing.suricata_check.utils.rule.parse(rule)
 assert parsed_rule is not None
 
 rule_report = suricata_check.analyze_rule(parsed_rule)
 ```
 
-Note that `parsed_rule` may be `None` if it is unparseable for `idstools`. Parseable rules need not be valid Suricata rules. If `suricata_check` cannot parse the rule, a `InvalidRuleError` will be raised.
+Note that `parsed_rule` may be `None` if it is unparseable. Parseable rules need not be valid Suricata rules. If `suricata_check` cannot parse the rule, a `InvalidRuleError` will be raised.
 
 You can further inspect the rule report, which is implemented as a dataclass, by treating it as a dictionary.
 

@@ -9,7 +9,8 @@ from collections.abc import Iterable, Mapping
 from typing import Optional
 
 from suricata_check.utils.checker import get_rule_option, is_rule_option_set
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE
+from suricata_check.utils.rule import Rule
 
 _logger = logging.getLogger(__name__)
 

@@ -9,7 +9,7 @@ import pytest
 
 from suricata_check.checkers.interface.checker import CheckerInterface
 from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
-from suricata_check.utils.regex import get_regex_provider
+from suricata_check.utils.regex_provider import get_regex_provider
 
 _regex_provider = get_regex_provider()
 
@@ -57,7 +57,7 @@ class GenericChecker:
         if correct is not True:
             msg = f"""\
 {'Unexpected' if not raised else 'Missing'} code {code}.
-{rule['raw']}
+{rule.raw}
 {issue}\
 """
             if fail:

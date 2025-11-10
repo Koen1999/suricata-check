@@ -22,9 +22,6 @@ from typing import (
 
 import click
 
-import suricata_check
-from suricata_check.utils.checker_typing import Rule
-
 _AnyCallable = Callable[..., Any]
 _FC = TypeVar("_FC", bound=Union[_AnyCallable, click.Command])
 
@@ -35,22 +32,23 @@ _suricata_check_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "
 if sys.path[0] != _suricata_check_path:
     sys.path.insert(0, _suricata_check_path)
 
-from suricata_check import (  # noqa: E402
-    __version__,
-    check_for_update,
-    get_dependency_versions,
-)
 from suricata_check._checkers import get_checkers  # noqa: E402
 from suricata_check._output import (  # noqa: E402
     summarize_output,
     summarize_rule,
     write_output,
 )
+from suricata_check._version import (  # noqa: E402
+    __version__,
+    check_for_update,
+    get_dependency_versions,
+)
 from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
 from suricata_check.utils._click import ClickHandler, help_option  # noqa: E402
 from suricata_check.utils._path import find_rules_file  # noqa: E402
 from suricata_check.utils.checker import (  # noqa: E402
     check_rule_option_recognition,
+    get_rule_option,
     get_rule_suboption,
 )
 from suricata_check.utils.checker_typing import (  # noqa: E402
@@ -58,7 +56,9 @@ from suricata_check.utils.checker_typing import (  # noqa: E402
     OutputReport,
     RuleReport,
 )
-from suricata_check.utils.regex import get_regex_provider, is_valid_rule  # noqa: E402
+from suricata_check.utils.regex import is_valid_rule  # noqa: E402
+from suricata_check.utils.regex_provider import get_regex_provider  # noqa: E402
+from suricata_check.utils.rule import ParsingError, Rule, parse  # noqa: E402
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
@@ -424,7 +424,7 @@ def __get_verified_kwarg(
 def __main_single_rule(
     out: str, single_rule: str, checkers: Optional[Sequence[CheckerInterface]]
 ) -> None:
-    rule: Optional[Rule] = suricata_check.rule.parse(single_rule)
+    rule: Optional[Rule] = parse(single_rule)
 
     # Verify that a rule was parsed correctly.
     if rule is None:
@@ -437,7 +437,7 @@ def __main_single_rule(
         _logger.critical(msg)
         raise click.BadParameter(f"Error: {msg}")
 
-    _logger.debug("Processing rule: %s", rule["sid"])
+    _logger.debug("Processing rule: %s", get_rule_option(rule, "sid"))
 
     rule_report = analyze_rule(rule, checkers=checkers)
 
@@ -512,7 +512,7 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
                 if line.strip().startswith("#"):
                     if evaluate_disabled:
                         # Verify that this line is a rule and not a comment
-                        if suricata_check.rule.parse(line) is None:
+                        if parse(line) is None:
                             # Log the comment since it may be a invalid rule
                             _logger.warning(
                                 "Ignoring comment on line %i: %s", number, line
@@ -525,8 +525,8 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
                 rule_line = line.strip()
 
             try:
-                rule: Optional[Rule] = suricata_check.rule.parse(rule_line)
-            except suricata_check.rule.ParsingError:
+                rule: Optional[Rule] = parse(rule_line)
+            except ParsingError:
                 _logger.error(
                     "Internal error in parsing of rule on line %i: %s",
                     number,
@@ -546,7 +546,9 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
                 _logger.error("Invalid rule on line %i: %s", number, rule_line)
                 continue
 
-            _logger.debug("Processing rule: %s on line %i", rule["sid"], number)
+            _logger.debug(
+                "Processing rule: %s on line %i", get_rule_option(rule, "sid"), number
+            )
 
             rule_report: RuleReport = analyze_rule(
                 rule,
@@ -599,7 +601,7 @@ def analyze_rule(
 
     """
     if not is_valid_rule(rule):
-        raise InvalidRuleError(rule["raw"])
+        raise InvalidRuleError(rule.raw)
 
     check_rule_option_recognition(rule)
 
@@ -624,7 +626,7 @@ def analyze_rule(
             _logger.warning(
                 "Failed to run %s on rule: %s",
                 checker.__class__.__name__,
-                rule["raw"],
+                rule.raw,
                 extra={"exception": exception},
             )
 

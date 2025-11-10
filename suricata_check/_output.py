@@ -11,6 +11,7 @@ import tabulate
 
 from suricata_check._checkers import get_checkers
 from suricata_check.checkers.interface.checker import CheckerInterface
+from suricata_check.utils.checker import get_rule_option
 from suricata_check.utils.checker_typing import (
     EXTENSIVE_SUMMARY_TYPE,
     ISSUES_TYPE,
@@ -89,7 +90,7 @@ def write_output(
                     code,
                     f" ({severity})" if severity else "",
                     lines,
-                    rule["sid"],
+                    get_rule_option(rule, "sid"),
                     issue_msg,
                 )
                 fast_fh.write(msg + "\n")

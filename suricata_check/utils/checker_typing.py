@@ -8,7 +8,7 @@ from typing import (
     TypeVar,
 )
 
-from suricata_check.rule import Rule
+from suricata_check.utils.rule import Rule
 
 
 class InvalidRuleError(RuntimeError):
@@ -102,7 +102,7 @@ class RuleReport:
     def to_dict(self: "RuleReport") -> dict[str, str]:
         """Returns the RuleReport represented as a dictionary."""
         d = {
-            "rule": self.rule["raw"],
+            "rule": self.rule.raw,
             "issues": [issue.to_dict() for issue in self.issues],
         }
 

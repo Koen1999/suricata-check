@@ -159,7 +159,7 @@ class TestState(suricata_check.tests.GenericChecker):
             # Silently skip and succeed the test
             return
 
-        rule = suricata_check.rule.parse(raw_rule)
+        rule = suricata_check.utils.rule.parse(raw_rule)
 
         self._test_issue(rule, code, expected)
 
@@ -173,7 +173,7 @@ class TestState(suricata_check.tests.GenericChecker):
         ],
     )
     def test_rule_good(self, code, expected, raw_rule):
-        rule = suricata_check.rule.parse(raw_rule)
+        rule = suricata_check.utils.rule.parse(raw_rule)
 
         self._test_issue(rule, code, expected)
 

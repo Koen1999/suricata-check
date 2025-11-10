@@ -15,7 +15,7 @@ class TestOrder(suricata_check.tests.GenericChecker):
         self.checker = suricata_check.checkers.OrderChecker()
 
     def test_s200_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 content:"test"; \
 msg:"Test"; \
@@ -29,7 +29,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S200", True)
 
     def test_s200_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -43,7 +43,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S200", False)
 
     def test_s201_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 reference:url,foo.bar; \
@@ -57,7 +57,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S201", True)
 
     def test_s201_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -71,7 +71,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S201", False)
 
     def test_s202_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -85,7 +85,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S202", True)
 
     def test_s202_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -99,7 +99,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S202", False)
 
     def test_s203_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 classtype:bad-unknown; \
@@ -113,7 +113,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S203", True)
 
     def test_s203_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -127,7 +127,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S203", False)
 
     def test_s204_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -141,7 +141,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S204", True)
 
     def test_s204_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -155,7 +155,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S204", False)
 
     def test_s205_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -169,7 +169,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S205", True)
 
     def test_s205_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -183,7 +183,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S205", False)
 
     def test_s206_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 sid:1; \
@@ -197,7 +197,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S206", True)
 
     def test_s206_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -211,7 +211,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S206", False)
 
     def test_s207_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -225,7 +225,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S207", True)
 
     def test_s207_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -239,7 +239,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S207", False)
 
     def test_s208_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -253,7 +253,7 @@ rev:1;)""",
         self._test_issue(rule, "S208", True)
 
     def test_s208_bad2(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -267,7 +267,7 @@ rev:1;)""",
         self._test_issue(rule, "S208", True)
 
     def test_s208_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -281,7 +281,7 @@ metadata:performance_impact Low;)""",
         self._test_issue(rule, "S208", False)
 
     def test_s210_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test1"; \
@@ -293,7 +293,7 @@ sid:1;)""",
         self._test_issue(rule, "S210", True)
 
     def test_s210_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test2"; \
@@ -305,7 +305,7 @@ sid:1;)""",
         self._test_issue(rule, "S210", False)
 
     def test_s211_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test0"; \
@@ -318,7 +318,7 @@ sid:1;)""",
         self._test_issue(rule, "S211", True)
 
     def test_s211_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test0"; \
@@ -331,7 +331,7 @@ sid:1;)""",
         self._test_issue(rule, "S211", False)
 
     def test_s212_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test0"; \
@@ -344,7 +344,7 @@ sid:1;)""",
         self._test_issue(rule, "S212", True)
 
     def test_s212_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert ip $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test0"; \
@@ -357,7 +357,7 @@ sid:1;)""",
         self._test_issue(rule, "S212", False)
 
     def test_s220_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 content:"test"; \
@@ -368,7 +368,7 @@ sid:1;)""",
         self._test_issue(rule, "S220", True)
 
     def test_s220_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 flow:established; \
@@ -379,7 +379,7 @@ sid:1;)""",
         self._test_issue(rule, "S220", False)
 
     def test_s221_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 flow.age:3; \
@@ -391,7 +391,7 @@ sid:1;)""",
         self._test_issue(rule, "S221", True)
 
     def test_s221_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 flow:established; \
@@ -403,7 +403,7 @@ sid:1;)""",
         self._test_issue(rule, "S221", False)
 
     def test_s222_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 flow:established; \
@@ -415,7 +415,7 @@ sid:1;)""",
         self._test_issue(rule, "S222", True)
 
     def test_s222_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert tcp $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"Test"; \
 flow:established; \
@@ -428,7 +428,7 @@ sid:1;)""",
 
     def test_s223_bad(self):
         # Example taken from https://docs.suricata.io/en/latest/rules/http-keywords.html#urilen
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 urilen:11; \
@@ -441,7 +441,7 @@ classtype:bad-unknown; sid:40; rev:1;)""",
 
     def test_s223_good(self):
         # Example taken from https://docs.suricata.io/en/latest/rules/http-keywords.html#urilen
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -454,7 +454,7 @@ classtype:bad-unknown; sid:40; rev:1;)""",
 
     def test_s224_bad(self):
         # Example taken from https://docs.suricata.io/en/latest/rules/http-keywords.html#urilen
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -467,7 +467,7 @@ classtype:bad-unknown; sid:40; rev:1;)""",
 
     def test_s224_good(self):
         # Example taken from https://docs.suricata.io/en/latest/rules/http-keywords.html#urilen
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -479,7 +479,7 @@ classtype:bad-unknown; sid:40; rev:1;)""",
         self._test_issue(rule, "S224", False)
 
     def test_s230_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -495,7 +495,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S230", True)
 
     def test_s230_bad2(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -510,7 +510,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S230", True)
 
     def test_s230_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -526,7 +526,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S230", False)
 
     def test_s230_good2(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -542,7 +542,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S230", False)
 
     def test_s231_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -558,7 +558,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S231", True)
 
     def test_s231_bad2(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -573,7 +573,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S231", True)
 
     def test_s231_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -589,7 +589,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S231", False)
 
     def test_s232_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -605,7 +605,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S232", True)
 
     def test_s232_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -621,7 +621,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S232", False)
 
     def test_s233_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -637,7 +637,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S233", True)
 
     def test_s233_bad2(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -652,7 +652,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S233", True)
 
     def test_s233_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -668,7 +668,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S233", False)
 
     def test_s234_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -684,7 +684,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S234", True)
 
     def test_s234_bad2(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -699,7 +699,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S234", True)
 
     def test_s234_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -715,7 +715,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S234", False)
 
     def test_s235_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -732,7 +732,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S235", True)
 
     def test_s235_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -749,7 +749,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S235", False)
 
     def test_s236_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -767,7 +767,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S236", True)
 
     def test_s236_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -785,7 +785,7 @@ sid:1; rev:1;)""",
         self._test_issue(rule, "S236", False)
 
     def test_s240_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -798,7 +798,7 @@ rev:1;)""",
         self._test_issue(rule, "S240", True)
 
     def test_s240_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -811,7 +811,7 @@ rev:1;)""",
         self._test_issue(rule, "S240", False)
 
     def test_s241_bad(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \
@@ -824,7 +824,7 @@ rev:1;)""",
         self._test_issue(rule, "S241", True)
 
     def test_s241_good(self):
-        rule = suricata_check.rule.parse(
+        rule = suricata_check.utils.rule.parse(
             """alert http $HOME_NET any -> $EXTERNAL_NET any (\
 msg:"HTTP Request"; \
 flow:established,to_server; \

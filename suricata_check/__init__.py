@@ -1,6 +1,6 @@
 """`suricata_check` is a module and command line utility to provide feedback on Suricata rules."""
 
-from suricata_check import checkers, rule, tests, utils
+from suricata_check import checkers, tests, utils
 from suricata_check._checkers import get_checkers
 from suricata_check._version import (
     SURICATA_CHECK_DIR,
@@ -26,7 +26,6 @@ __all__ = (
     "get_ini_kwargs",
     "main",
     "process_rules_file",
-    "rule",
     "tests",
     "utils",
 )
