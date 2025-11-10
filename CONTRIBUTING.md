@@ -73,6 +73,20 @@ ruff check . --fix
 pyright
 ```
 
+### Markdownlint
+
+If you made changes to `.md` file and want to lint them locally, you have to install `markdownlint` using `npm`.
+
+```bash
+npm install -g markdownlint-cli2
+```
+
+Now you can lint markdown files using to automatically detect all issues and fix some:
+
+```bash
+markdownlint-cli2 --fix "**/*.md"
+```
+
 ## Docs
 
 To automatically generate the documentation from the code, run the following commands:
