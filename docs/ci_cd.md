@@ -48,7 +48,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel build
+          python -m pip install --upgrade pip
           python -m pip install "suricata-check[performance]>=0.3.0beta0"
 
       - name: Test with suricata-check

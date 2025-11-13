@@ -64,8 +64,8 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-performance = ["regex>=2023.10.3"]
-test = ["pytest>=9.0.0", "pytest-cov>=6.0.0", "toml>=0.6.5", "colorama>=0.4.4"]
+performance = ["regex>=2024.5.10"]
+test = ["pytest>=8.0.0", "pytest-cov>=6.0.0"]
 docs = [
   "sphinx>=7.3.7",
   "sphinx-rtd-theme>=3.0.0",
