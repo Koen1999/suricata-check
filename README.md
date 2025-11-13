@@ -108,12 +108,12 @@ For details regarding specific issues, we recommend you check the message of the
 
 ### Overview
 
-| Issue identifier format | Description                                                 |
-| ----------------------- | ----------------------------------------------------------- |
-| M000                    | Rules pertaining to the detection of valid Suricata syntax. |
-| S000                    | Rules derived from the Suricata Style Guide.                |
-| P000,Q000                    | Rules based [Ruling the Unruly](https://doi.org/10.1145/3708821.3710823).                          |
-| C000                    | Rules based on community issues, such as this GitHub.       |
+| Issue identifier format | Description                                                               |
+| ----------------------- | ------------------------------------------------------------------------- |
+| M000                    | Rules pertaining to the detection of valid Suricata syntax.               |
+| S000                    | Rules derived from the Suricata Style Guide.                              |
+| P000,Q000               | Rules based [Ruling the Unruly](https://doi.org/10.1145/3708821.3710823). |
+| C000                    | Rules based on community issues, such as this GitHub.                     |
 
 ### Mandatory issues
 

@@ -70,7 +70,9 @@ def get_dependency_versions() -> dict:
         for extra in dist.metadata.get_all("Provides-Extra") or []:
             extra_requirements = dist.metadata.get_all(f"Requires-Dist-{extra}")
             if extra_requirements:
-                requirements.extend(extra_requirements) # pyright: ignore[reportOptionalMemberAccess]
+                requirements.extend(  # pyright: ignore[reportOptionalMemberAccess]
+                    extra_requirements
+                )
 
         _logger.debug("Detected suricata-check requirements using importlib")
     except PackageNotFoundError:
@@ -79,8 +81,12 @@ def get_dependency_versions() -> dict:
             with open(pyproject_path, "rb") as f:
                 toml_content = tomllib.load(f)
                 requirements = toml_content.get("project", {}).get("dependencies", [])
-                for extra_requirements in toml_content.get("project", {}).get("optional-dependencies", []):
-                    requirements.extend(extra_requirements) # pyright: ignore[reportOptionalMemberAccess]
+                for extra_requirements in toml_content.get("project", {}).get(
+                    "optional-dependencies", []
+                ):
+                    requirements.extend(  # pyright: ignore[reportOptionalMemberAccess]
+                        extra_requirements
+                    )
 
             _logger.debug("Detected suricata-check requirements using pyproject.toml")
 
