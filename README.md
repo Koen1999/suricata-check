@@ -12,6 +12,8 @@
 `suricata-check` is a command line utility to provide feedback on [Suricata](https://github.com/OISF/suricata) rules.
 The tool can detect various issues including those covering syntax validity, interpretability, rule specificity, rule coverage, and efficiency.
 
+![suricata-check-gif](docs/static/gif/suricata-check.gif)
+
 > ## ***Looking for new contributions and feedback***
 >
 > Since `suricata-check` is still in beta, we are actively looking for feedback on the existing functionality, and the way this functionality is exposed to users through the CLI/API.

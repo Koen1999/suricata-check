@@ -5,4 +5,5 @@ myst:
         "keywords": "Suricata, rules, ruleset, suricata-check"
 ---
 ```{include} ../README.md
+:relative-images:
 ```

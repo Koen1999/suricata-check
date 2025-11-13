@@ -20,7 +20,7 @@ For example, when integrated with GitHub, issues can be highlighted in a pull re
 
 For GitHub, you can copy [this workflow](https://github.com/Koen1999/suricata-check-action/blob/main/.github/workflows/suricata-check.yml) and modify it to your needs.
 
-```yml
+```yaml
 name: Suricata Check
 
 on:
