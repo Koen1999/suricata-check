@@ -55,8 +55,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel build pip-tools
-          python -m pip install pytest
-          pip-compile -o requirements.txt pyproject.toml
+          pip-compile --extra test -o requirements.txt pyproject.toml
           pip install -U -r requirements.txt
 
       - name: Test using pytest
@@ -65,7 +64,7 @@ jobs:
 
       - name: Install optional performance dependencies
         run: |
-          pip-compile --extra performance -o requirements-performance.txt pyproject.toml
+          pip-compile --extra test --extra performance -o requirements-performance.txt pyproject.toml
           pip install -U -r requirements-performance.txt
 
       - name: Test using pytest with optional performance dependencies
@@ -123,8 +122,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel build pip-tools
-          python -m pip install flake8 pyright black ruff
-          pip-compile --extra dev -o requirements-dev.txt pyproject.toml
+          pip-compile --all-extras -o requirements-dev.txt pyproject.toml
           pip install -U -r requirements-dev.txt
 
       - name: Lint with flake8
@@ -167,7 +165,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel build uv
-          python -m pip install pytest
           uv pip compile pyproject.toml --resolution lowest --only-binary :all: --extra test -o requirements-minimal.txt
           pip install -r requirements-minimal.txt
 

@@ -41,7 +41,7 @@ To install packages required for running tests and linting, run the following co
 ```bash
 pip install pip-tools
 pip-compile --all-extras -o requirements-dev.txt pyproject.toml
-pip install -U -r requirements-dev.txt
+pip install -r requirements-dev.txt
 ```
 
 Note that you may want to setup a [virtual environment (venv)](https://docs.python.org/3/library/venv.html) before installing dependencies to prevent conflicts.
