@@ -20,8 +20,10 @@ keywords = [
   "network intrusion detection",
 ]
 readme = "README.md"
-license = { file = "LICENSE" }
+license = 'EUPL-1.2'
+license-files = ["LICENSE"]
 authors = [{ name = "Koen Teuwen" }]
+maintainers = [{ name = "Koen Teuwen" }]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Science/Research",
@@ -51,7 +53,6 @@ classifiers = [
   "Operating System :: Microsoft :: Windows",
   "Operating System :: MacOS",
   "Framework :: Pytest",
-  "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
 ]
 requires-python = ">=3.9"
 dependencies = [
