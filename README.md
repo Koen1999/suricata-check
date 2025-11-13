@@ -16,11 +16,11 @@ The tool can detect various issues including those covering syntax validity, int
 
 > ## ***Looking for new contributions and feedback***
 >
-> Since `suricata-check` is still in beta, we are actively looking for feedback on the existing functionality, and the way this functionality is exposed to users through the CLI/API.
-> If you have suggestions that would improve your user experience, please do not hesitate to open an [issue](https://github.com/Koen1999/suricata-check/issues/new/choose)!
+> *Since `suricata-check` is still in beta, we are actively looking for feedback on the existing functionality, and the way this functionality is exposed to users through the CLI/API.*
+> *If you have suggestions that would improve your user experience, please do not hesitate to open an [issue](https://github.com/Koen1999/suricata-check/issues/new/choose)!*
 >
-> Please check out our [contributing guidelines](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md) if you would like to help with more than just feedback/ideas.
-> Interested contributors are also invited to join the project as a co-maintainer to further shape the project's direction.
+> *Please check out our [contributing guidelines](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md) if you would like to help with more than just feedback/ideas.*
+> *Interested contributors are also invited to join the project as a co-maintainer to further shape the project's direction.*
 
 ## Features
 
