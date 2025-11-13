@@ -17,3 +17,4 @@ suricata-check-gitlab.json
 cov.*
 coverage.*
 htmlcov
+requirements*.txt

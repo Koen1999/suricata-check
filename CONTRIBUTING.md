@@ -40,7 +40,7 @@ To install packages required for running tests and linting, run the following co
 
 ```bash
 pip install pip-tools
-pip-compile --extra performance --extra test --extra lint --extra docs -o requirements-dev.txt pyproject.toml
+pip-compile --all-extras -o requirements-dev.txt pyproject.toml
 pip install -U -r requirements-dev.txt
 ```
 
