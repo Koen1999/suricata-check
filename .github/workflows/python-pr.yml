@@ -54,19 +54,59 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel build
+          python -m pip install --upgrade pip setuptools wheel build pip-tools
           python -m pip install pytest
-          pip install -r requirements.txt
+          pip-compile -o requirements.txt pyproject.toml
+          pip install -U -r requirements.txt
 
-      - name: Test with pytest
+      - name: Test using pytest
         run: |
           pytest
 
-      - name: Remove regex module
+      - name: Install optional performance dependencies
         run: |
-          pip uninstall regex --yes
+          pip-compile --extra performance -o requirements-performance.txt pyproject.toml
+          pip install -U -r requirements-performance.txt
 
-      - name: Test with pytest without regex module
+      - name: Test using pytest with optional performance dependencies
+        run: |
+          pytest
+
+  test-minimal:
+    name: Minimal Dependency Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.9", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel build uv
+          python -m pip install pytest
+          uv pip compile pyproject.toml --resolution lowest --only-binary :all: --extra test -o requirements-minimal.txt
+          pip install -r requirements-minimal.txt
+
+      - name: Test using pytest
+        run: |
+          pytest
+
+      - name: Install optional performance dependencies
+        run: |
+          uv pip compile pyproject.toml --resolution lowest --only-binary :all: --extra test --extra performance -o requirements-minimal-performance.txt
+          pip install -r requirements-minimal-performance.txt
+
+      - name: Test using pytest with optional performance dependencies
         run: |
           pytest
 
@@ -99,6 +139,10 @@ jobs:
         run: |
           pip install .
 
+      - name: Build wheel with optional performance dependencies and install with pip
+        run: |
+          pip install .[performance]
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -116,9 +160,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel build
+          python -m pip install --upgrade pip setuptools wheel build pip-tools
           python -m pip install flake8 pyright black ruff
-          pip install -r requirements.txt
+          pip-compile --extra dev -o requirements-dev.txt pyproject.toml
+          pip install -U -r requirements-dev.txt
 
       - name: Lint with flake8
         run: |
@@ -182,8 +227,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel build
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip setuptools wheel build pip-tools
+          pip-compile --extra dev -o requirements-dev.txt pyproject.toml
+          pip install -U -r requirements-dev.txt
 
       - name: Generate docs with sphinx
         run: |

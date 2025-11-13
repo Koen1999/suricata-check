@@ -5,10 +5,11 @@ import os
 import re
 import subprocess
 from functools import lru_cache
-from importlib.metadata import PackageNotFoundError, requires, version
+from importlib.metadata import PackageNotFoundError, distribution, version
 from typing import Optional
 
 import requests
+import tomllib
 from packaging.version import Version
 
 SURICATA_CHECK_DIR = os.path.dirname(__file__)
@@ -62,28 +63,33 @@ __user_agent = f"suricata-check/{__version__} (+https://suricata-check.teuwen.ne
 def get_dependency_versions() -> dict:
     d = {}
 
-    requirements = None
+    requirements: Optional[list[str]] = None
     try:
-        requirements = requires("suricata-check")
+        dist = distribution("suricata-check")
+        requirements = dist.requires
+        for extra in dist.metadata.get_all("Provides-Extra") or []:
+            extra_requirements = dist.metadata.get_all(f"Requires-Dist-{extra}")
+            if extra_requirements:
+                requirements.extend(extra_requirements) # pyright: ignore[reportOptionalMemberAccess]
+
         _logger.debug("Detected suricata-check requirements using importlib")
     except PackageNotFoundError:
-        requirements_path = os.path.join(SURICATA_CHECK_DIR, "..", "requirements.txt")
-        if os.path.exists(requirements_path):
-            with open(requirements_path) as fh:
-                requirements = fh.readlines()
-                requirements = filter(
-                    lambda x: len(x.strip()) == 0 or x.strip().startswith("#"),
-                    requirements,
-                )
+        pyproject_path = os.path.join(SURICATA_CHECK_DIR, "..", "pyproject.toml")
+        if os.path.exists(pyproject_path):
+            with open(pyproject_path, "rb") as f:
+                toml_content = tomllib.load(f)
+                requirements = toml_content.get("project", {}).get("dependencies", [])
+                for extra_requirements in toml_content.get("project", {}).get("optional-dependencies", []):
+                    requirements.extend(extra_requirements) # pyright: ignore[reportOptionalMemberAccess]
 
-            _logger.debug("Detected suricata-check requirements using requirements.txt")
+            _logger.debug("Detected suricata-check requirements using pyproject.toml")
 
     if requirements is None:
         _logger.debug("Failed to detect suricata-check requirements")
         return d
 
     for requirement in requirements:
-        match = re.compile(r"""^([^=<>]+)(.*)$""").match(requirement)
+        match = re.compile(r"""^([^=<>\[\]]+)(.*)$""").match(requirement)
         if match is None:
             _logger.debug("Failed to parse requirement: %s", requirement)
             continue

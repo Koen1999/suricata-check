@@ -30,9 +30,8 @@ To install `suricata-check` from source (potentially with local modifications), 
 ```bash
 git clone https://github.com/Koen1999/suricata-check
 cd suricata-check
-pip install -r requirements.txt
-pytest
 pip install .
+pytest
 ```
 
 ## Preparing the development environment
@@ -40,7 +39,9 @@ pip install .
 To install packages required for running tests and linting, run the following command:
 
 ```bash
-pip install -U -r requirements.txt
+pip install pip-tools
+pip-compile --extra performance --extra test --extra lint --extra docs -o requirements-dev.txt pyproject.toml
+pip install -U -r requirements-dev.txt
 ```
 
 Note that you may want to setup a [virtual environment (venv)](https://docs.python.org/3/library/venv.html) before installing dependencies to prevent conflicts.
