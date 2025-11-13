@@ -27,9 +27,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel build pip-tools
+          python -m pip install --upgrade --upgrade-strategy eager pip pip-tools
           pip-compile --extra test --extra performance -o requirements-performance.txt pyproject.toml
-          pip install -U -r requirements-performance.txt
+          pip install -r requirements-performance.txt
 
       - name: Test with pytest - Fast
         run: |
@@ -58,9 +58,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel build pip-tools
+          python -m pip install --upgrade --upgrade-strategy eager pip pip-tools
           pip-compile --extra test --extra performance -o requirements-performance.txt pyproject.toml
-          pip install -U -r requirements-performance.txt
+          pip install -r requirements-performance.txt
 
       - name: Test with pytest - Integration ET OPEN v7
         run: |

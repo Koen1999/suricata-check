@@ -26,9 +26,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel build pip-tools
+          python -m pip install --upgrade --upgrade-strategy eager pip pip-tools
           pip-compile --extra test --extra performance -o requirements-performance.txt pyproject.toml
-          pip install -U -r requirements-performance.txt
+          pip install -r requirements-performance.txt
 
       - name: Test with pytest (fast)
         run: |
@@ -59,8 +59,8 @@ jobs:
 
       - name: Install most recent build dependencies
         run: |
-          python -m pip install --upgrade pip --upgrade-strategy eager
-          python -m pip install --upgrade build pipdeptree --upgrade-strategy eager
+          python -m pip install --upgrade --upgrade-strategy eager pip
+          python -m pip install --upgrade --upgrade-strategy eager build pipdeptree
 
       - name: Output installed packages
         run: |

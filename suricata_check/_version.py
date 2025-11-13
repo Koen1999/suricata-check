@@ -4,12 +4,12 @@ import logging
 import os
 import re
 import subprocess
+import sys
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, distribution, version
 from typing import Optional
 
 import requests
-import tomllib
 from packaging.version import Version
 
 SURICATA_CHECK_DIR = os.path.dirname(__file__)
@@ -65,30 +65,11 @@ def get_dependency_versions() -> dict:
 
     requirements: Optional[list[str]] = None
     try:
-        dist = distribution("suricata-check")
-        requirements = dist.requires
-        for extra in dist.metadata.get_all("Provides-Extra") or []:
-            extra_requirements = dist.metadata.get_all(f"Requires-Dist-{extra}")
-            if extra_requirements:
-                requirements.extend(  # pyright: ignore[reportOptionalMemberAccess]
-                    extra_requirements
-                )
-
-        _logger.debug("Detected suricata-check requirements using importlib")
+        requirements = __get_importlib_requirements()
     except PackageNotFoundError:
-        pyproject_path = os.path.join(SURICATA_CHECK_DIR, "..", "pyproject.toml")
-        if os.path.exists(pyproject_path):
-            with open(pyproject_path, "rb") as f:
-                toml_content = tomllib.load(f)
-                requirements = toml_content.get("project", {}).get("dependencies", [])
-                for extra_requirements in toml_content.get("project", {}).get(
-                    "optional-dependencies", []
-                ):
-                    requirements.extend(  # pyright: ignore[reportOptionalMemberAccess]
-                        extra_requirements
-                    )
-
-            _logger.debug("Detected suricata-check requirements using pyproject.toml")
+        pass
+    if requirements is None:
+        requirements = __get_pyproject_requirements()
 
     if requirements is None:
         _logger.debug("Failed to detect suricata-check requirements")
@@ -106,6 +87,49 @@ def get_dependency_versions() -> dict:
             d[required_package] = "unknown"
 
     return d
+
+
+def __get_importlib_requirements() -> Optional[list[str]]:
+    dist = distribution("suricata-check")
+    requirements = dist.requires
+
+    if requirements is None:
+        return None
+
+    for extra in dist.metadata.get_all("Provides-Extra") or []:
+        extra_requirements = dist.metadata.get_all(f"Requires-Dist-{extra}")
+        if extra_requirements:
+            requirements.extend(  # pyright: ignore[reportOptionalMemberAccess]
+                extra_requirements
+            )
+
+    _logger.debug("Detected suricata-check requirements using importlib")
+
+    return requirements
+
+
+def __get_pyproject_requirements() -> Optional[list[str]]:
+    pyproject_path = os.path.join(SURICATA_CHECK_DIR, "..", "pyproject.toml")
+    if not os.path.exists(pyproject_path):
+        return None
+    if sys.version_info < (3, 11):
+        return None
+
+    import tomllib  # noqa: PLC0415
+
+    with open(pyproject_path, "rb") as f:
+        toml_content = tomllib.load(f)
+        requirements = toml_content.get("project", {}).get("dependencies", [])
+        for extra_requirements in toml_content.get("project", {}).get(
+            "optional-dependencies", []
+        ):
+            requirements.extend(  # pyright: ignore[reportOptionalMemberAccess]
+                extra_requirements
+            )
+
+    _logger.debug("Detected suricata-check requirements using pyproject.toml")
+
+    return requirements
 
 
 def __get_latest_version() -> Optional[str]:
