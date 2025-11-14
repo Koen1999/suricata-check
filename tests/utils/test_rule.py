@@ -13,4 +13,4 @@ def test_parse_too_much_whitespace():
     rule = suricata_check.utils.rule.parse(rule_str)
 
     if rule is None:
-        pytest.fail("Failed to parse rule: {}".format(rule_str))
+        pytest.fail(f"Failed to parse rule: {rule_str}")

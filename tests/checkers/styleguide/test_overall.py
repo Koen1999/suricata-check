@@ -12,7 +12,7 @@ class TestOverall(suricata_check.tests.GenericChecker):
     @pytest.fixture(autouse=True)
     def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)
-        self.checker = suricata_check.checkers.OverallChecker()
+        self.checker = suricata_check.checkers.styleguide.OverallChecker()
 
     def test_s000_bad(self):
         rule = suricata_check.utils.rule.parse(

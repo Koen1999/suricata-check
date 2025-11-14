@@ -18,6 +18,7 @@ The tool can detect various issues including those covering syntax validity, int
 >
 > *Since `suricata-check` is still in beta, we are actively looking for feedback on the existing functionality, and the way this functionality is exposed to users through the CLI/API.*
 > *If you have suggestions that would improve your user experience, please do not hesitate to open an [issue](https://github.com/Koen1999/suricata-check/issues/new/choose)!*
+> *For general discussion around the tool or writing Suricata rules, you are also welcome to open a new [discussion](https://github.com/Koen1999/suricata-check/discussions/new/choose)*
 >
 > *Please check out our [contributing guidelines](https://github.com/Koen1999/suricata-check/blob/master/CONTRIBUTING.md) if you would like to help with more than just feedback/ideas.*
 > *Interested contributors are also invited to join the project as a co-maintainer to further shape the project's direction.*
@@ -43,7 +44,7 @@ Installation should work out-of-the-box on any Operating System (OS) and is test
 
 ## Usage
 
-After installing `suricata-check`, you can use it from the command line:
+After installing `suricata-check`, you can immediately start to lint Suricata rules from the command line:
 
 ```bash
 suricata-check
@@ -51,38 +52,41 @@ suricata-check
 
 This command will look for a file ending with `.rules` in the currrent working directory, and write output to the current working directory.
 
-More details regarding the command line interface can be found below:
+More details regarding the command line interface can be viewed using the `--help` option and are also shown below:
 
 ```text
-Usage: suricata_check.py [OPTIONS]
+Usage: suricata-check [OPTIONS]
 
   The `suricata-check` command processes all rules inside a rules file and
   outputs a list of detected issues.
 
-  Raises:   BadParameter: If provided arguments are invalid.
-
-    RuntimeError: If no checkers could be automatically discovered.
+  Check the CLI usage documentation for a full overview of how to use the CLI:
+  https://suricata-check.teuwen.net/cli_usage.html
 
 Options:
-  --ini TEXT          Path to suricata-check.ini file to read
+  -h, --help              Show this message and exit.
+  --ini TEXT              Path to suricata-check.ini file to read
                           configuration from.
   -r, --rules TEXT        Path to Suricata rules to provide check on.
+                          [default: .]
   -s, --single-rule TEXT  A single Suricata rule to be checked
-  -o, --out TEXT          Path to suricata-check output folder.
+  -o, --out TEXT          Path to suricata-check output folder.  [default: .]
   --log-level TEXT        Verbosity level for logging. Can be one of ('DEBUG',
-                          'INFO', 'WARNING', 'ERROR')
+                          'INFO', 'WARNING', 'ERROR')  [default: INFO]
   --gitlab                Flag to create CodeClimate output report for GitLab
                           CI/CD.
   --github                Flag to write workflow commands to stdout for GitHub
                           CI/CD.
   --evaluate-disabled     Flag to evaluate disabled rules.
   --issue-severity TEXT   Verbosity level for detected issues. Can be one of
-                          ('DEBUG', 'INFO', 'WARNING', 'ERROR')
+                          ('DEBUG', 'INFO', 'WARNING', 'ERROR')  [default:
+                          INFO]
   -a, --include-all       Flag to indicate all checker codes should be
                           enabled.
-  -i, --include TEXT      List of all checker codes to enable.
-  -e, --exclude TEXT      List of all checker codes to disable.
-  -h, --help              Show this message and exit.
+  -i, --include TEXT      List of all checker codes to enable. Regexes can be
+                          provided.
+  -e, --exclude TEXT      List of all checker codes to disable. Regexes can be
+                          provided.
 ```
 
 Usage of suricata-check as a module is currently not documented in detail, but the type hints and docstrings in the code should provide a decent start.

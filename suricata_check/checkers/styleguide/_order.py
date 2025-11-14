@@ -1,6 +1,7 @@
 """`OrderChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
@@ -13,7 +14,7 @@ from suricata_check.utils.checker import (
     is_rule_option_put_before,
     is_rule_option_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex import (
     ALL_DETECTION_KEYWORDS,
     ALL_TRANSFORMATION_KEYWORDS,
@@ -29,6 +30,7 @@ from suricata_check.utils.regex import (
     get_rule_body,
 )
 from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.rule import Rule
 
 _regex_provider = get_regex_provider()
 
@@ -64,34 +66,36 @@ class OrderChecker(CheckerInterface):
     Codes S240-S249 report on the non-standard ordering of threshold options.
     """
 
-    codes = {
-        "S200": {"severity": logging.INFO},
-        "S201": {"severity": logging.INFO},
-        "S202": {"severity": logging.INFO},
-        "S203": {"severity": logging.INFO},
-        "S204": {"severity": logging.INFO},
-        "S205": {"severity": logging.INFO},
-        "S206": {"severity": logging.INFO},
-        "S207": {"severity": logging.INFO},
-        "S208": {"severity": logging.INFO},
-        "S210": {"severity": logging.INFO},
-        "S211": {"severity": logging.INFO},
-        "S212": {"severity": logging.INFO},
-        "S220": {"severity": logging.INFO},
-        "S221": {"severity": logging.INFO},
-        "S222": {"severity": logging.INFO},
-        "S223": {"severity": logging.INFO},
-        "S224": {"severity": logging.INFO},
-        "S230": {"severity": logging.INFO},
-        "S231": {"severity": logging.INFO},
-        "S232": {"severity": logging.INFO},
-        "S233": {"severity": logging.INFO},
-        "S234": {"severity": logging.INFO},
-        "S235": {"severity": logging.INFO},
-        "S236": {"severity": logging.INFO},
-        "S240": {"severity": logging.INFO},
-        "S241": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "S200": {"severity": logging.INFO},
+            "S201": {"severity": logging.INFO},
+            "S202": {"severity": logging.INFO},
+            "S203": {"severity": logging.INFO},
+            "S204": {"severity": logging.INFO},
+            "S205": {"severity": logging.INFO},
+            "S206": {"severity": logging.INFO},
+            "S207": {"severity": logging.INFO},
+            "S208": {"severity": logging.INFO},
+            "S210": {"severity": logging.INFO},
+            "S211": {"severity": logging.INFO},
+            "S212": {"severity": logging.INFO},
+            "S220": {"severity": logging.INFO},
+            "S221": {"severity": logging.INFO},
+            "S222": {"severity": logging.INFO},
+            "S223": {"severity": logging.INFO},
+            "S224": {"severity": logging.INFO},
+            "S230": {"severity": logging.INFO},
+            "S231": {"severity": logging.INFO},
+            "S232": {"severity": logging.INFO},
+            "S233": {"severity": logging.INFO},
+            "S234": {"severity": logging.INFO},
+            "S235": {"severity": logging.INFO},
+            "S236": {"severity": logging.INFO},
+            "S240": {"severity": logging.INFO},
+            "S241": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(  # noqa: C901, PLR0912, PLR0915
         self: "OrderChecker",
@@ -107,7 +111,7 @@ class OrderChecker(CheckerInterface):
                     code="S200",
                     message="""The rule body does not have msg as the first option.
 Consider reording to make msg the first option.""",
-                )
+                ),
             )
 
         if is_rule_option_put_before(rule, "reference", ("content", "pcre")) is True:
@@ -116,7 +120,7 @@ Consider reording to make msg the first option.""",
                     code="S201",
                     message="""The rule body contains the reference option before the detection logic.
 Consider reording to put the detection logic directly after the msg option.""",
-                )
+                ),
             )
 
         if is_rule_option_put_before(rule, "classtype", ("reference",)) is True:
@@ -125,7 +129,7 @@ Consider reording to put the detection logic directly after the msg option.""",
                     code="S202",
                     message="""The rule body contains the classtype option before the reference option.
 Consider reording to put the classtype option directly after the reference option.""",
-                )
+                ),
             )
 
         if is_rule_option_put_before(rule, "classtype", ("content", "pcre")) is True:
@@ -134,7 +138,7 @@ Consider reording to put the classtype option directly after the reference optio
                     code="S203",
                     message="""The rule body contains the classtype option before the detection logic.
 Consider reording to put the classtype option directly after the detection logic.""",
-                )
+                ),
             )
 
         if is_rule_option_put_before(rule, "sid", ("classtype",)) is True:
@@ -143,7 +147,7 @@ Consider reording to put the classtype option directly after the detection logic
                     code="S204",
                     message="""The rule body contains the sid option before the classtype option.
 Consider reording to put the sid option directly after the classtype option.""",
-                )
+                ),
             )
 
         if is_rule_option_put_before(rule, "sid", ("reference",)) is True:
@@ -152,7 +156,7 @@ Consider reording to put the sid option directly after the classtype option.""",
                     code="S205",
                     message="""The rule body contains the sid option before the reference option.
 Consider reording to put the sid option directly after the reference option.""",
-                )
+                ),
             )
 
         if is_rule_option_put_before(rule, "sid", ("content", "pcre")) is True:
@@ -161,7 +165,7 @@ Consider reording to put the sid option directly after the reference option.""",
                     code="S206",
                     message="""The rule body contains the sid option before the detection logic.
 Consider reording to put the sid option directly after the detection logic.""",
-                )
+                ),
             )
 
         if is_rule_option_put_before(rule, "rev", ("sid",)) is True:
@@ -170,7 +174,7 @@ Consider reording to put the sid option directly after the detection logic.""",
                     code="S207",
                     message="""The rule body contains the rev option before the sid option.
 Consider reording to put the rev option directly after the sid option.""",
-                )
+                ),
             )
 
         if is_rule_option_put_before(rule, "metadata", ("sid", "rev")) is True:
@@ -179,7 +183,7 @@ Consider reording to put the rev option directly after the sid option.""",
                     code="S208",
                     message="""The rule body contains does not have the metadata option as the last option.
 Consider making metadata the last option.""",
-                )
+                ),
             )
 
         if (
@@ -194,7 +198,7 @@ Consider making metadata the last option.""",
                     message="""The rule body contains a content matches modified by depth or offset \
 that is not the first content match.
 Consider moving the modified content match to the beginning of the detection options.""",
-                )
+                ),
             )
 
         if count_rule_options(rule, "depth") > 1:
@@ -203,7 +207,7 @@ Consider moving the modified content match to the beginning of the detection opt
                     code="S211",
                     message="""The rule body contains more than one content matche modified by depth.
 Consider making the second content match relative to the first using the within option.""",
-                )
+                ),
             )
 
         if count_rule_options(rule, "offset") > 1:
@@ -212,7 +216,7 @@ Consider making the second content match relative to the first using the within 
                     code="S212",
                     message="""The rule body contains more than one content matche modified by offset.
 Consider making the second content match relative to the first using the distance option.""",
-                )
+                ),
             )
 
         if (
@@ -224,7 +228,7 @@ Consider making the second content match relative to the first using the distanc
                     code="S220",
                     message="""The rule flow option is set but not directly following the msg option.
 Consider moving the flow option to directly after the msg option.""",
-                )
+                ),
             )
 
         if (
@@ -240,7 +244,7 @@ Consider moving the flow option to directly after the msg option.""",
                     code="S221",
                     message="""The rule contains flow or stream keywords before the flow option in the rule body.
 Consider moving the flow option to before the flow and/or stream keywords.""",
-                )
+                ),
             )
 
         if (
@@ -256,7 +260,7 @@ Consider moving the flow option to before the flow and/or stream keywords.""",
                     code="S222",
                     message="""The rule contains flow or stream keywords after content buffers or detection logic.
 Consider moving the flow and/or stream keywords to before content buffers and detection options.""",
-                )
+                ),
             )
 
         if (
@@ -272,7 +276,7 @@ Consider moving the flow and/or stream keywords to before content buffers and de
                     code="S223",
                     message="""The rule contains the urilen option before the flow or stream keywords in the rule body.
 Consider moving the urilen option to after the flow and/or stream keywords.""",
-                )
+                ),
             )
 
         if (
@@ -288,12 +292,13 @@ Consider moving the urilen option to after the flow and/or stream keywords.""",
                     code="S224",
                     message="""The rule contains the urilen option after content buffers or detection logic.
 Consider moving the urilen option to before content buffers and detection options.""",
-                )
+                ),
             )
 
         # Detects pointer movement before any content or buffer option or between a buffer and a content option.
         for sequence in get_rule_keyword_sequences(
-            rule, seperator_keywords=CONTENT_KEYWORDS
+            rule,
+            seperator_keywords=CONTENT_KEYWORDS,
         ):
             if (
                 are_rule_options_put_before(
@@ -309,14 +314,15 @@ Consider moving the urilen option to before content buffers and detection option
                         code="S230",
                         message="""The rule contains pointer movement before the content option in sequence {}.
 Consider moving the pointer movement options to after the content option.""".format(
-                            sequence
+                            sequence,
                         ),
-                    )
+                    ),
                 )
 
         # Detects fast_pattern before any content or buffer option or between a buffer and a content option.
         for sequence in get_rule_keyword_sequences(
-            rule, seperator_keywords=CONTENT_KEYWORDS
+            rule,
+            seperator_keywords=CONTENT_KEYWORDS,
         ):
             if (
                 is_rule_option_put_before(
@@ -337,14 +343,15 @@ Consider moving the pointer movement options to after the content option.""".for
 size options, transformation options, the content option or pointer movement options in sequence {}.
 Consider moving the fast_pattern option to after \
 size options, transformation options, the content option or pointer movement options.""".format(
-                            sequence
+                            sequence,
                         ),
-                    )
+                    ),
                 )
 
         # Detects no_case before any content or buffer option or between a buffer and a content option.
         for sequence in get_rule_keyword_sequences(
-            rule, seperator_keywords=CONTENT_KEYWORDS
+            rule,
+            seperator_keywords=CONTENT_KEYWORDS,
         ):
             if (
                 is_rule_option_put_before(
@@ -366,14 +373,15 @@ size options, transformation options, the content option or pointer movement opt
 size options, transformation options, the content option, pointer movement options, or fast_pattern option in sequence {}.
 Consider moving the nocase option to after \
 size options, transformation options, the content option, pointer movement options, or fast_pattern option.""".format(
-                            sequence
+                            sequence,
                         ),
-                    )
+                    ),
                 )
 
         # Detects modifier options before any content or buffer option or between a buffer and a content option.
         for sequence in get_rule_keyword_sequences(
-            rule, seperator_keywords=CONTENT_KEYWORDS
+            rule,
+            seperator_keywords=CONTENT_KEYWORDS,
         ):
             if (
                 are_rule_options_put_before(
@@ -389,12 +397,13 @@ size options, transformation options, the content option, pointer movement optio
                         code="S233",
                         message="""The rule contains modifier options before the content option.
 Consider moving the modifier options to after the content option.""",
-                    )
+                    ),
                 )
 
         # Detects other detection options before any content or buffer option or between a buffer and a content option.
         for sequence in get_rule_keyword_sequences(
-            rule, seperator_keywords=CONTENT_KEYWORDS
+            rule,
+            seperator_keywords=CONTENT_KEYWORDS,
         ):
             if (
                 are_rule_options_put_before(
@@ -412,12 +421,13 @@ Consider moving the modifier options to after the content option.""",
 size options, transformation options, the content option, pointer movement options, nocase option, or fast_pattern option.
 Consider moving the other detection options to after \
 size options, transformation options,  the content option, pointer movement options, nocase option, or fast_pattern option.""",
-                    )
+                    ),
                 )
 
         # Detects size options after any transformation options, content option or other detection options.
         for sequence in get_rule_keyword_sequences(
-            rule, seperator_keywords=CONTENT_KEYWORDS
+            rule,
+            seperator_keywords=CONTENT_KEYWORDS,
         ):
             if (
                 are_rule_options_put_before(
@@ -436,12 +446,13 @@ size options, transformation options,  the content option, pointer movement opti
                         message="""The rule contains other size options after \
 any transformation options, content option or other detection options.
 Consider moving the size options to after any transformation options, content option or other detection options""",
-                    )
+                    ),
                 )
 
         # Detects transformation options after any content option or other detection options.
         for sequence in get_rule_keyword_sequences(
-            rule, seperator_keywords=CONTENT_KEYWORDS
+            rule,
+            seperator_keywords=CONTENT_KEYWORDS,
         ):
             if (
                 are_rule_options_put_before(
@@ -458,7 +469,7 @@ Consider moving the size options to after any transformation options, content op
                         message="""The rule contains other transformation options after \
 any content option or other detection options.
 Consider moving the transformation options to after any content option or other detection options""",
-                    )
+                    ),
                 )
 
         if (
@@ -474,7 +485,7 @@ Consider moving the transformation options to after any content option or other 
                     code="S240",
                     message="""The rule contains the threshold option before some detection option.
 Consider moving the threshold option to after the detection options.""",
-                )
+                ),
             )
 
         if (
@@ -490,7 +501,7 @@ Consider moving the threshold option to after the detection options.""",
                     code="S241",
                     message="""The rule contains the threshold option after the reference and/or sid option.
 Consider moving the threshold option to before the reference and sid options.""",
-                )
+                ),
             )
 
         return issues

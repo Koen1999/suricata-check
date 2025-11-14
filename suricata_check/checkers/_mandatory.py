@@ -1,10 +1,12 @@
 """`MandatoryChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import is_rule_option_set
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.rule import Rule
 
 
 class MandatoryChecker(CheckerInterface):
@@ -13,10 +15,12 @@ class MandatoryChecker(CheckerInterface):
     Codes M000-M009 report on missing mandatory rule options.
     """
 
-    codes = {
-        "M000": {"severity": logging.ERROR},
-        "M001": {"severity": logging.ERROR},
-    }
+    codes = MappingProxyType(
+        {
+            "M000": {"severity": logging.ERROR},
+            "M001": {"severity": logging.ERROR},
+        },
+    )
 
     def _check_rule(
         self: "MandatoryChecker",
@@ -29,7 +33,7 @@ class MandatoryChecker(CheckerInterface):
                 Issue(
                     code="M000",
                     message="The rule did not specify a msg, which is a mandatory field.",
-                )
+                ),
             )
 
         if not is_rule_option_set(rule, "sid"):
@@ -37,7 +41,7 @@ class MandatoryChecker(CheckerInterface):
                 Issue(
                     code="M001",
                     message="The rule did not specify a sid, which is a mandatory field.",
-                )
+                ),
             )
 
         return issues

@@ -1,4 +1,4 @@
-"""The `suricata_check.suricata_check` module contains the command line utility and the main program logic."""
+"""The `suricata_check._suricata_check` module contains the command line utility and the main program logic."""
 
 import atexit
 import configparser
@@ -24,41 +24,6 @@ import click
 
 _AnyCallable = Callable[..., Any]
 _FC = TypeVar("_FC", bound=Union[_AnyCallable, click.Command])
-
-LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
-
-# Add suricata-check to the front of the PATH, such that the version corresponding to the CLI is used.
-_suricata_check_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if sys.path[0] != _suricata_check_path:
-    sys.path.insert(0, _suricata_check_path)
-
-from suricata_check._checkers import get_checkers  # noqa: E402
-from suricata_check._output import (  # noqa: E402
-    summarize_output,
-    summarize_rule,
-    write_output,
-)
-from suricata_check._version import (  # noqa: E402
-    __version__,
-    check_for_update,
-    get_dependency_versions,
-)
-from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
-from suricata_check.utils._click import ClickHandler, help_option  # noqa: E402
-from suricata_check.utils._path import find_rules_file  # noqa: E402
-from suricata_check.utils.checker import (  # noqa: E402
-    check_rule_option_recognition,
-    get_rule_option,
-    get_rule_suboption,
-)
-from suricata_check.utils.checker_typing import (  # noqa: E402
-    InvalidRuleError,
-    OutputReport,
-    RuleReport,
-)
-from suricata_check.utils.regex import is_valid_rule  # noqa: E402
-from suricata_check.utils.regex_provider import get_regex_provider  # noqa: E402
-from suricata_check.utils.rule import ParsingError, Rule, parse  # noqa: E402
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
@@ -94,7 +59,7 @@ CLI_ARGUMENTS: dict[str, dict[str, Any]] = {
         "show_default": True,
         "type": str,
         "required": False,
-        "default": "DEBUG",
+        "default": "INFO",
     },
     "gitlab": {
         "help": "Flag to create CodeClimate output report for GitLab CI/CD.",
@@ -137,7 +102,7 @@ CLI_ARGUMENTS: dict[str, dict[str, Any]] = {
         "cli_options": ["-a"],
     },
     "include": {
-        "help": "List of all checker codes to enable.",
+        "help": "List of all checker codes to enable. Regexes can be provided.",
         "show_default": True,
         "type": tuple,
         "required": False,
@@ -146,7 +111,7 @@ CLI_ARGUMENTS: dict[str, dict[str, Any]] = {
         "cli_options": ["-i"],
     },
     "exclude": {
-        "help": "List of all checker codes to disable.",
+        "help": "List of all checker codes to disable. Regexes can be provided.",
         "show_default": True,
         "type": tuple,
         "required": False,
@@ -156,6 +121,39 @@ CLI_ARGUMENTS: dict[str, dict[str, Any]] = {
     },
 }
 CLI_ARGUMENT_TYPE = Optional[Union[str, bool, tuple]]
+
+# Add suricata-check to the front of the PATH, such that the version corresponding to the CLI is used.
+_suricata_check_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if sys.path[0] != _suricata_check_path:
+    sys.path.insert(0, _suricata_check_path)
+
+from suricata_check._checkers import get_checkers  # noqa: E402
+from suricata_check._output import (  # noqa: E402
+    summarize_output,
+    summarize_rule,
+    write_output,
+)
+from suricata_check._version import (  # noqa: E402
+    __version__,
+    check_for_update,
+    get_dependency_versions,
+)
+from suricata_check.checkers.interface import CheckerInterface  # noqa: E402
+from suricata_check.utils._click import ClickHandler, help_option  # noqa: E402
+from suricata_check.utils._path import find_rules_file  # noqa: E402
+from suricata_check.utils.checker import (  # noqa: E402
+    check_rule_option_recognition,
+    get_rule_option,
+    get_rule_suboption,
+)
+from suricata_check.utils.checker_typing import (  # noqa: E402
+    InvalidRuleError,
+    OutputReport,
+    RuleReport,
+)
+from suricata_check.utils.regex import is_valid_rule  # noqa: E402
+from suricata_check.utils.regex_provider import get_regex_provider  # noqa: E402
+from suricata_check.utils.rule import ParsingError, Rule, parse  # noqa: E402
 
 _logger = logging.getLogger(__name__)
 
@@ -197,7 +195,7 @@ def __main_decorators() -> Callable[[Callable], click.Command]:
         )(command)
 
         # Apply options from CLI_ARGUMENTS
-        for name, props in reversed(CLI_ARGUMENTS.items()):
+        for name, props in CLI_ARGUMENTS.items():
             command = __create_click_option(name, props)(command)
 
         return command
@@ -209,50 +207,57 @@ def __main_decorators() -> Callable[[Callable], click.Command]:
 def main(**kwargs: dict[str, Any]) -> None:  # noqa: C901, PLR0915
     """The `suricata-check` command processes all rules inside a rules file and outputs a list of detected issues.
 
-    Raises:
-      BadParameter: If provided arguments are invalid.
-
-      RuntimeError: If no checkers could be automatically discovered.
-
+    Check the CLI usage documentation for a full overview of how to use the CLI: https://suricata-check.teuwen.net/cli_usage.html
     """
     # Look for a ini file and parse it.
     ini_kwargs = get_ini_kwargs(
-        str(kwargs["ini"]) if kwargs["ini"] is not None else None  # type: ignore reportUnnecessaryComparison
+        str(kwargs["ini"]) if kwargs["ini"] is not None else None,  # type: ignore reportUnnecessaryComparison
     )
 
     # Verify CLI argument types and get CLI arguments or use default arguments
     rules: str = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "rules"
+        [kwargs, ini_kwargs],
+        "rules",
     )  # pyright: ignore[reportAssignmentType]
     single_rule: Optional[str] = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "single_rule"
+        [kwargs, ini_kwargs],
+        "single_rule",
     )  # pyright: ignore[reportAssignmentType]
     out: str = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "out"
+        [kwargs, ini_kwargs],
+        "out",
     )  # pyright: ignore[reportAssignmentType]
     log_level: LogLevel = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "log_level"
+        [kwargs, ini_kwargs],
+        "log_level",
     )  # pyright: ignore[reportAssignmentType]
     gitlab: bool = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "gitlab"
+        [kwargs, ini_kwargs],
+        "gitlab",
     )  # pyright: ignore[reportAssignmentType]
     github: bool = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "github"
+        [kwargs, ini_kwargs],
+        "github",
     )  # pyright: ignore[reportAssignmentType]
     evaluate_disabled: bool = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "evaluate_disabled"
+        [kwargs, ini_kwargs],
+        "evaluate_disabled",
     )  # pyright: ignore[reportAssignmentType]
     issue_severity: LogLevel = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "issue_severity"
+        [kwargs, ini_kwargs],
+        "issue_severity",
     )  # pyright: ignore[reportAssignmentType]
     include_all: bool = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "include_all"
+        [kwargs, ini_kwargs],
+        "include_all",
     )  # pyright: ignore[reportAssignmentType]
     include: tuple[str, ...] = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "include"
+        [kwargs, ini_kwargs],
+        "include",
     )  # pyright: ignore[reportAssignmentType]
     exclude: tuple[str, ...] = __get_verified_kwarg(
-        [kwargs, ini_kwargs], "exclude"
+        [kwargs, ini_kwargs],
+        "exclude",
     )  # pyright: ignore[reportAssignmentType]
 
     # Verify that out argument is valid
@@ -272,7 +277,8 @@ def main(**kwargs: dict[str, Any]) -> None:  # noqa: C901, PLR0915
     queue_handler = logging.handlers.QueueHandler(queue)
 
     click_handler = ClickHandler(
-        github=github, github_level=getattr(logging, log_level)
+        github=github,
+        github_level=getattr(logging, log_level),
     )
     logging.basicConfig(
         level=log_level,
@@ -306,7 +312,7 @@ def main(**kwargs: dict[str, Any]) -> None:  # noqa: C901, PLR0915
     # Log the arguments:
     _logger.info("Running suricata-check with the following arguments:")
     for arg in CLI_ARGUMENTS:
-        _logger.info("%s: %s", arg, locals().get(arg))
+        _logger.debug("%s: %s", arg, locals().get(arg))
 
     # Log the environment:
     _logger.debug("Platform: %s", sys.platform)
@@ -323,7 +329,7 @@ def main(**kwargs: dict[str, Any]) -> None:  # noqa: C901, PLR0915
     # Verify that include and exclude arguments are valid
     if include_all and len(include) > 0:
         raise click.BadParameter(
-            "Error: Cannot use --include-all and --include together."
+            "Error: Cannot use --include-all and --include together.",
         )
     if include_all:
         include = (".*",)
@@ -331,11 +337,13 @@ def main(**kwargs: dict[str, Any]) -> None:  # noqa: C901, PLR0915
     # Verify that issue_severity argument is valid
     if issue_severity not in LOG_LEVELS:
         raise click.BadParameter(
-            f"Error: {issue_severity} is not a valid issue severity or log level."
+            f"Error: {issue_severity} is not a valid issue severity or log level.",
         )
 
     checkers = get_checkers(
-        include, exclude, issue_severity=getattr(logging, issue_severity)
+        include,
+        exclude,
+        issue_severity=getattr(logging, issue_severity),
     )
 
     if single_rule is not None:
@@ -360,7 +368,7 @@ def get_ini_kwargs(path: Optional[str]) -> dict[str, Any]:
     ini_kwargs: dict[str, Any] = {}
     if path is not None and not os.path.exists(path):
         raise click.BadParameter(
-            f"Error: INI file provided in {path} but no options loaded"
+            f"Error: INI file provided in {path} but no options loaded",
         )
 
     # Use the default path if no path was provided
@@ -414,7 +422,7 @@ def __get_verified_kwarg(
                     raise click.BadParameter(
                         f"""Error: \
                 Argument `{name}` should have a value of type `{CLI_ARGUMENTS[name]["type"]}` \
-                but has value {kwargs[name]} of type {kwargs[name].__class__} instead."""
+                but has value {kwargs[name]} of type {kwargs[name].__class__} instead.""",
                     )
                 return kwargs[name]
 
@@ -422,7 +430,9 @@ def __get_verified_kwarg(
 
 
 def __main_single_rule(
-    out: str, single_rule: str, checkers: Optional[Sequence[CheckerInterface]]
+    out: str,
+    single_rule: str,
+    checkers: Optional[Sequence[CheckerInterface]],
 ) -> None:
     rule: Optional[Rule] = parse(single_rule)
 
@@ -515,7 +525,9 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
                         if parse(line) is None:
                             # Log the comment since it may be a invalid rule
                             _logger.warning(
-                                "Ignoring comment on line %i: %s", number, line
+                                "Ignoring comment on line %i: %s",
+                                number,
+                                line,
                             )
                             continue
                     else:
@@ -547,7 +559,9 @@ def process_rules_file(  # noqa: C901, PLR0912, PLR0915
                 continue
 
             _logger.debug(
-                "Processing rule: %s on line %i", get_rule_option(rule, "sid"), number
+                "Processing rule: %s on line %i",
+                get_rule_option(rule, "sid"),
+                number,
             )
 
             rule_report: RuleReport = analyze_rule(
@@ -609,8 +623,6 @@ def analyze_rule(
         checkers = get_checkers()
 
     rule_report: RuleReport = RuleReport(rule=rule)
-
-    _logger.warning(ignore)
 
     compiled_ignore = (
         [_regex_provider.compile(r) for r in ignore] if ignore is not None else []

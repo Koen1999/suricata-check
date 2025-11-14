@@ -8,7 +8,7 @@ myst:
 
 ## CheckerInterface
 
-In order to write a new checker, you must extend the `suricata_check.checkers.interface.CheckerInterface` and implement the `_check_rule` function, which takes a rule (`suricata_check.utils.rule.Rule`) as input and returns a collection of issues (`suricata.check.typing.IssuesType`). The most minimal checker, looks as follows:
+In order to write a new checker, you must extend the {py:obj}`suricata_check.checkers.interface.CheckerInterface` and implement the `_check_rule` function, which takes a rule ({py:obj}`suricata_check.utils.rule.Rule`) as input and returns a collection of issues ({py:obj}`suricata.check.utils.typing.IssuesType`). The most minimal checker, looks as follows:
 
 ```python
 from suricata_check.checkers.interface import CheckerInterface
@@ -29,9 +29,9 @@ class ExampleChecker(CheckerInterface):
 
 ## Detecting issues
 
-To detect issues, you can use utility functions provided in `suricata_check.utils.checker`. A lot of utility functions exist, and you are encouraged to check out the [Checker API Reference](https://suricata-check.teuwen.net/autoapi/suricata_check/utils/checker/index.html) for a complete overview. For example, it contains utility functions to check whether a Suricata option is (not) set, and enables asserting that atleast one or all option values are (not) equal to a certain value or regular expression.
+To detect issues, you can use utility functions provided in {py:obj}`suricata_check.utils.checker`. A lot of utility functions exist, and you are encouraged to check out the [Checker API Reference](https://suricata-check.teuwen.net/autoapi/suricata_check/utils/checker/index.html) for a complete overview. For example, it contains utility functions to check whether a Suricata option is (not) set, and enables asserting that atleast one or all option values are (not) equal to a certain value or regular expression.
 
-All you have to do to add new issue types is, to add the desired issue code (e.g. `E000`) to the `codes` field of the class, and append a new `Issue` to the list of `issues` that is returned at the end of `_check_rule` depending on the output of the utlity function called from `suricata_check.utils.checker`. For example, we can add two new issue types as follows:
+All you have to do to add new issue types is, to add the desired issue code (e.g. `E000`) to the {py:obj}`suricata_check.checkers.interface.CheckerInterface.codes` field of the class, and append a new {py:obj}`suricata_check.utils.typing.Issue` to the list of `issues` that is returned at the end of `_check_rule` depending on the output of the utlity function called from {py:obj}`suricata_check.utils.checker`. For example, we can add two new issue types as follows:
 
 ```python
 import logging
@@ -77,7 +77,7 @@ In order to use your newly written checker, you should either install the packag
 
 ## Testing checkers
 
-To make testing of checkers easier, we have provided the `suricata_check.tests.GenericChecker` class that one can inherit in a test suite to write a new checker. The minimal change required is that `__run_around_tests` si implemented to set the `checker` field of the `GenericChecker` class to an instance of the checker being tested.
+To make testing of checkers easier, we have provided the {py:obj}`suricata_check.tests.GenericChecker` class that one can inherit in a test suite to write a new checker. The minimal change required is that `__run_around_tests` si implemented to set the `checker` field of the {py:obj}`suricata_check.tests.GenericChecker` class to an instance of the checker being tested.
 
 ```python
 import logging
@@ -106,7 +106,7 @@ Out of the box, no rules are actually tested but the structure of the codes prov
 
 ### Asserting expected issues for rules
 
-Usually, it is desirable to have atleast two tests for each issue type, i.e. one rule for which the issue is present and one rule for which it is not. To write a test, create a `suricata_check.utils.rule.Rule` object by using `suricata_check.utils.rule.parse` and pass this rule object to `self._test_issue` while also providing the issue code to check for and a boolean to indicate whether the issue should (not) be raised. The `GenericChecker._test_issue` function will under the hood perform various assertions, in addition to whether the issue is raised or not such as checking whether any undocumented issue codes are emitted, and whether the raised issue has the required metadata to describe the checker that raised the code. For example, to write tests for the two issues we created earlier, we can use the following code:
+Usually, it is desirable to have atleast two tests for each issue type, i.e. one rule for which the issue is present and one rule for which it is not. To write a test, create a `suricata_check.utils.rule.Rule` object by using {py:obj}`suricata_check.utils.rule.parse` and pass this rule object to `self._test_issue` while also providing the issue code to check for and a boolean to indicate whether the issue should (not) be raised. The `_test_issue` function of the {py:obj}`suricata_check.tests.GenericChecker` class will under the hood perform various assertions, in addition to whether the issue is raised or not such as checking whether any undocumented issue codes are emitted, and whether the raised issue has the required metadata to describe the checker that raised the code. For example, to write tests for the two issues we created earlier, we can use the following code:
 
 ```python
 import logging
@@ -163,4 +163,4 @@ def __main__():
 
 It is possible to extend `suricata-check` with additional checkers and release them in a seperate package. An example of such an extension is given in the [suricata-check-extension-example](https://github.com/Koen1999/suricata-check-extension-example) project.
 
-Note that for extensions to be automatically discovered by the CLI, their module name should begin with `suricata_check_`, they should expose `suricata_check_extension.__version__`, and their checkers should implement the `CheckerInterface`.
+Note that for extensions to be automatically discovered by the CLI, their module name should begin with `suricata_check_`, they should expose `suricata_check_extension.__version__`, and their checkers should implement the {py:obj}`suricata_check.checkers.interface.CheckerInterface`.

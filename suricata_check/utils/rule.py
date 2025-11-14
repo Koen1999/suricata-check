@@ -10,10 +10,12 @@ from typing import Optional
 
 from suricata_check.utils.regex_provider import get_regex_provider
 
+__all__ = ["ParsingError", "Rule", "RuleOption", "parse"]
+
 _regex_provider = get_regex_provider()
 
 RULE_PATTERN = _regex_provider.compile(
-    r"^(?P<enabled>#)*[\s#]*(?P<raw>(?P<header>[^()]+)\((?P<options>.*)\)$)"
+    r"^(?P<enabled>#)*[\s#]*(?P<raw>(?P<header>[^()]+)\((?P<options>.*)\)$)",
 )
 
 RULE_ACTIONS = (
@@ -74,16 +76,22 @@ class Rule:
         """
         if inspect.stack()[1].function != "parse":
             raise RuntimeError(
-                "Rule instances must be created using suricata_check.utils.rule.parse()"
+                "Rule instances must be created using suricata_check.utils.rule.parse()",
             )
         super().__init__(*args, **kwargs)
+
+
+    def __str__(self) -> str:
+        """Returns the raw rule as a string."""
+        return self.raw
 
     def add_option(self, name: str, value: Optional[str]) -> None:
         """Adds an option in the rule's options list."""
         if not isinstance(name, str):  # pyright: ignore[reportUnnecessaryIsInstance]
             raise TypeError("Option name must be a string")
         if value is not None and not isinstance(
-            value, str
+            value,
+            str,
         ):  # pyright: ignore[reportUnnecessaryIsInstance]
             raise TypeError("Option value must be a string")
 
@@ -93,7 +101,8 @@ class Rule:
         """Adds metadata options in the rule's metadata list."""
         for value in values:
             if not isinstance(
-                value, str
+                value,
+                str,
             ):  # pyright: ignore[reportUnnecessaryIsInstance]
                 raise TypeError("Metadata option value must be a string")
         self.metadata = (*self.metadata, *values)
@@ -198,7 +207,7 @@ def __add_options_to_rule(rule_text: str, rule: "Rule", options: str) -> None:
             break
         index = __find_opt_end(options)
         if index < 0:
-            raise ParsingError("end of option not found: {}".format(rule_text))
+            raise ParsingError(f"end of option not found: {rule_text}")
         option = options[:index].strip()
         options = options[index + 1 :].strip()
 
@@ -212,10 +221,13 @@ def __add_options_to_rule(rule_text: str, rule: "Rule", options: str) -> None:
 
 
 def __add_option_to_rule(  # noqa: C901, PLR0912
-    rule: "Rule", name: str, val: Optional[str]
+    rule: "Rule",
+    name: str,
+    val: Optional[str],
 ) -> None:
     if val is not None and not isinstance(
-        val, str
+        val,
+        str,
     ):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ParsingError(f"Invalid option value type ({type(val)}): {val}")
     rule.add_option(name, val)

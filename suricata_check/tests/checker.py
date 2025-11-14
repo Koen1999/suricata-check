@@ -7,9 +7,10 @@ from typing import Optional
 
 import pytest
 
-from suricata_check.checkers.interface.checker import CheckerInterface
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.checkers.interface import CheckerInterface
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.rule import Rule
 
 _regex_provider = get_regex_provider()
 
@@ -123,19 +124,13 @@ class GenericChecker:
         for issue in issues:
             if not hasattr(issue, "checker"):
                 pytest.fail(
-                    "Issue with code {} did not specify checker.".format(
-                        str(issue.code)
-                    )
+                    f"Issue with code {issue.code!s} did not specify checker.",
                 )
             if not hasattr(issue, "severity"):
                 pytest.fail(
-                    "Issue with code {} did not specify severity.".format(
-                        str(issue.code)
-                    )
+                    f"Issue with code {issue.code!s} did not specify severity.",
                 )
             if issue.message.strip() != issue.message:
                 pytest.fail(
-                    'Issue with code {} starts with or ends with whitespace in message: """{}"""'.format(
-                        str(issue.code), str(issue.message)
-                    )
+                    f'Issue with code {issue.code!s} starts with or ends with whitespace in message: """{issue.message!s}"""',
                 )

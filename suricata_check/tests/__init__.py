@@ -15,7 +15,7 @@ except ModuleNotFoundError:
         import logging as _logging
 
         _logger = _logging.getLogger(__name__)
-        _logger.warning(
+        _logger.debug(
             """Failed to initialize `suricata_check.tests.checker.GenericChecker` due to failed imports. \
     Ensure all necessary development dependencies are installed if you need to run tests.""",
         )

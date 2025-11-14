@@ -12,7 +12,7 @@ class TestOrder(suricata_check.tests.GenericChecker):
     @pytest.fixture(autouse=True)
     def __run_around_tests(self):
         logging.basicConfig(level=logging.DEBUG)
-        self.checker = suricata_check.checkers.OrderChecker()
+        self.checker = suricata_check.checkers.styleguide.OrderChecker()
 
     def test_s200_bad(self):
         rule = suricata_check.utils.rule.parse(

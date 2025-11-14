@@ -132,7 +132,8 @@ sid:1;)""",
     ],
 )
 def test_get_rule_detection_options_sequences(
-    seperator_keywords: Iterable[str], expected_sequences: set[tuple[str]]
+    seperator_keywords: Iterable[str],
+    expected_sequences: set[tuple[str]],
 ):
     rule = suricata_check.utils.rule.parse(
         """alert tls $EXTERNAL_NET any -> $HTTP_SERVERS 443 (\
@@ -173,20 +174,21 @@ performance_impact Low, signature_severity Minor;)""",
     sequences = {
         tuple(sequence)
         for sequence in suricata_check.utils.checker.get_rule_keyword_sequences(
-            rule, seperator_keywords=seperator_keywords
+            rule,
+            seperator_keywords=seperator_keywords,
         )
     }
 
     for sequence in sequences:
         if sequence not in expected_sequences:
             pytest.fail(
-                str(("Unexpected sequence", sequence, expected_sequences, ["raw"]))
+                str(("Unexpected sequence", sequence, expected_sequences, ["raw"])),
             )
 
     for expected_sequence in expected_sequences:
         if expected_sequence not in sequences:
             pytest.fail(
-                str(("Sequence not found", expected_sequence, sequences, rule.raw))
+                str(("Sequence not found", expected_sequence, sequences, rule.raw)),
             )
 
 

@@ -1,6 +1,7 @@
 """`BestChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
@@ -8,7 +9,8 @@ from suricata_check.utils.checker import (
     is_rule_option_set,
     is_rule_suboption_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.rule import Rule
 
 
 class BestChecker(CheckerInterface):
@@ -17,11 +19,13 @@ class BestChecker(CheckerInterface):
     Codes C100-C110 report on missing fields that should be set.
     """
 
-    codes = {
-        "C100": {"severity": logging.INFO},
-        "C101": {"severity": logging.INFO},
-        "C102": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "C100": {"severity": logging.INFO},
+            "C101": {"severity": logging.INFO},
+            "C102": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(
         self: "BestChecker",

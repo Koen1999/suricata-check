@@ -1,16 +1,14 @@
-"""The `suricata_check.suricata_check` module contains the command line utility and the main program logic."""
+"""The `suricata_check._checkers` module contains functionality for selecting checkers."""
 
 import logging
 import logging.handlers
 import pkgutil
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from functools import lru_cache
+from typing import TypeVar
 
 from suricata_check.checkers.interface import CheckerInterface
-from suricata_check.checkers.interface.dummy import DummyChecker
-from suricata_check.utils.checker_typing import (
-    get_all_subclasses,
-)
+from suricata_check.checkers.interface._dummy import DummyChecker
 from suricata_check.utils.regex_provider import get_regex_provider
 
 _regex_provider = get_regex_provider()
@@ -59,7 +57,7 @@ def get_checkers(
     _import_extensions()
 
     checkers: list[CheckerInterface] = []
-    for checker in get_all_subclasses(CheckerInterface):
+    for checker in __get_all_subclasses(CheckerInterface):
         if checker.__name__ == DummyChecker.__name__:
             continue
 
@@ -68,7 +66,10 @@ def get_checkers(
             checker()
 
         enabled, relevant_codes = __get_checker_enabled(
-            checker, include, exclude, issue_severity
+            checker,
+            include,
+            exclude,
+            issue_severity,
         )
 
         if enabled:
@@ -83,7 +84,7 @@ def get_checkers(
     )
     if len(checkers) == 0:
         _logger.warning(
-            "No checkers were enabled. Check the include and exclude arguments."
+            "No checkers were enabled. Check the include and exclude arguments.",
         )
 
     # Perform a uniqueness check on the codes emmitted by the checkers
@@ -118,12 +119,12 @@ def __get_checker_enabled(
                 set(
                     filter(
                         lambda code: _regex_provider.compile("^" + regex + "$").match(
-                            code
+                            code,
                         )
                         is not None,
                         checker.codes.keys(),
-                    )
-                )
+                    ),
+                ),
             )
 
         if len(relevant_codes) > 0:
@@ -136,7 +137,7 @@ def __get_checker_enabled(
                 lambda code: _regex_provider.compile("^" + regex + "$").match(code)
                 is None,
                 relevant_codes,
-            )
+            ),
         )
 
     # Now filter out irrelevant codes based on severity
@@ -144,10 +145,24 @@ def __get_checker_enabled(
         filter(
             lambda code: checker.codes[code]["severity"] >= issue_severity,
             relevant_codes,
-        )
+        ),
     )
 
     if len(relevant_codes) == 0:
         enabled = False
 
     return enabled, relevant_codes
+
+
+Cls = TypeVar("Cls")
+
+
+def __get_all_subclasses(cls: type[Cls]) -> Iterable[type[Cls]]:
+    """Returns all class types that subclass the provided type."""
+    all_subclasses = []
+
+    for subclass in cls.__subclasses__():
+        all_subclasses.append(subclass)
+        all_subclasses.extend(__get_all_subclasses(subclass))
+
+    return all_subclasses

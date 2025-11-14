@@ -1,17 +1,19 @@
 """`PerformanceChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
     get_rule_keyword_sequences,
     is_rule_option_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex import (
     BASE64_BUFFER_KEYWORDS,
     BASE64_TRANSFORMATION_KEYWORDS,
 )
+from suricata_check.utils.rule import Rule
 
 
 class PerformanceChecker(CheckerInterface):
@@ -20,12 +22,14 @@ class PerformanceChecker(CheckerInterface):
     Codes S900-910 report on usage of options that can slow the detection engine.
     """
 
-    codes = {
-        "S900": {"severity": logging.INFO},
-        "S901": {"severity": logging.INFO},
-        "S902": {"severity": logging.INFO},
-        "S903": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "S900": {"severity": logging.INFO},
+            "S901": {"severity": logging.INFO},
+            "S902": {"severity": logging.INFO},
+            "S903": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(
         self: "PerformanceChecker",
