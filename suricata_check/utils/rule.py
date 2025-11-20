@@ -80,7 +80,6 @@ class Rule:
             )
         super().__init__(*args, **kwargs)
 
-
     def __str__(self) -> str:
         """Returns the raw rule as a string."""
         return self.raw

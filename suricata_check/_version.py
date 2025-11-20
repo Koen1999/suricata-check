@@ -222,7 +222,9 @@ def __should_check_update() -> bool:
 
     try:
         last_checked = datetime.datetime.fromisoformat(data["last_checked"])
-        if (datetime.datetime.now(tz=datetime.timezone.utc) - last_checked).days < UPDATE_CHECK_FREQUENCY:
+        if (
+            datetime.datetime.now(tz=datetime.timezone.utc) - last_checked
+        ).days < UPDATE_CHECK_FREQUENCY:
             return False
     except KeyError:
         _logger.warning(

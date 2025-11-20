@@ -4,10 +4,12 @@ import json
 from collections.abc import MutableMapping, MutableSequence
 from dataclasses import dataclass, field
 from typing import (
+    TYPE_CHECKING,
     Optional,
 )
 
-from suricata_check.utils.rule import Rule as __Rule
+if TYPE_CHECKING:
+    from suricata_check.utils.rule import Rule as __Rule
 
 
 class InvalidRuleError(RuntimeError):
@@ -68,7 +70,7 @@ EXTENSIVE_SUMMARY_TYPE = MutableMapping[str, SIMPLE_SUMMARY_TYPE]
 class RuleReport:
     """The `RuleReport` dataclass represents a rule, together with information on its location and detected issues."""
 
-    rule: __Rule
+    rule: "__Rule"
     summary: Optional[RULE_SUMMARY_TYPE] = None
     line_begin: Optional[int] = None
     line_end: Optional[int] = None
