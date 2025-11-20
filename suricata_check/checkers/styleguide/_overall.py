@@ -1,6 +1,7 @@
 """`OverallChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
@@ -13,12 +14,13 @@ from suricata_check.utils.checker import (
     is_rule_option_one_of,
     is_rule_option_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex import (
     ALL_VARIABLES,
     CLASSTYPES,
 )
 from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.rule import Rule
 
 _regex_provider = get_regex_provider()
 
@@ -51,20 +53,22 @@ class OverallChecker(CheckerInterface):
     Codes S031-S039 report on issues pertaining to the inappropriate usage of options.
     """
 
-    codes = {
-        "S000": {"severity": logging.INFO},
-        "S001": {"severity": logging.INFO},
-        "S002": {"severity": logging.INFO},
-        "S010": {"severity": logging.INFO},
-        "S011": {"severity": logging.INFO},
-        "S012": {"severity": logging.INFO},
-        "S013": {"severity": logging.INFO},
-        "S014": {"severity": logging.INFO},
-        "S020": {"severity": logging.INFO},
-        "S021": {"severity": logging.INFO},
-        "S030": {"severity": logging.INFO},
-        "S031": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "S000": {"severity": logging.INFO},
+            "S001": {"severity": logging.INFO},
+            "S002": {"severity": logging.INFO},
+            "S010": {"severity": logging.INFO},
+            "S011": {"severity": logging.INFO},
+            "S012": {"severity": logging.INFO},
+            "S013": {"severity": logging.INFO},
+            "S014": {"severity": logging.INFO},
+            "S020": {"severity": logging.INFO},
+            "S021": {"severity": logging.INFO},
+            "S030": {"severity": logging.INFO},
+            "S031": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(  # noqa: C901
         self: "OverallChecker",
@@ -81,7 +85,7 @@ class OverallChecker(CheckerInterface):
                     code="S000",
                     message="""The rule did not specificy an inbound or outbound direction.
 Consider constraining the rule to a specific direction such as INBOUND or OUTBOUND traffic.""",
-                )
+                ),
             )
 
         if is_rule_option_set(rule, "dns.query") and not is_rule_option_equal_to(
@@ -95,7 +99,7 @@ Consider constraining the rule to a specific direction such as INBOUND or OUTBOU
                     message="""The rule detects certain dns queries and has dest_addr not set to any \
 causing the rule to be specific to either local or external resolvers.
 Consider setting dest_addr to any.""",
-                )
+                ),
             )
 
         if (
@@ -113,7 +117,7 @@ Consider setting dest_addr to any.""",
 without specifying the direction in the rule msg. \
 Consider setting `src_addr` and `dest_addr` to any to also account for lateral movement scenarios. \
 Alternatively, you can specify the direction (i.e., `Internal` or `Inbound`) in the rule `msg`.""",
-                )
+                ),
             )
 
         # In the suricata style guide, this is mentioned as `packet_data`
@@ -124,7 +128,7 @@ Alternatively, you can specify the direction (i.e., `Internal` or `Inbound`) in 
                     message="""The rule uses the pkt_data option, \
 which resets the inspection pointer resulting in confusing and disjoint logic.
 Consider replacing the detection logic.""",
-                )
+                ),
             )
 
         if is_rule_option_set(rule, "priority"):
@@ -133,7 +137,7 @@ Consider replacing the detection logic.""",
                     code="S011",
                     message="""The rule uses priority option, which overrides operator tuning via classification.conf.
 Consider removing the option.""",
-                )
+                ),
             )
 
         for sticky_buffer, modifier_alternative in get_rule_sticky_buffer_naming(rule):
@@ -142,7 +146,7 @@ Consider removing the option.""",
                     code="S012",
                     message=f"""The rule uses sticky buffer naming in the {sticky_buffer} option, which is complicated.
 Consider using the {modifier_alternative} option instead.""",
-                )
+                ),
             )
 
         for variable_group in self.__get_invented_variable_groups(rule):
@@ -152,11 +156,13 @@ Consider using the {modifier_alternative} option instead.""",
                     message=f"""The rule uses a self-invented variable group ({variable_group}), \
 which may be undefined in many environments.
 Consider using the a standard variable group instead.""",
-                )
+                ),
             )
 
         if is_rule_option_set(rule, "classtype") and not is_rule_option_one_of(
-            rule, "classtype", CLASSTYPES
+            rule,
+            "classtype",
+            CLASSTYPES,
         ):
             issues.append(
                 Issue(
@@ -164,7 +170,7 @@ Consider using the a standard variable group instead.""",
                     message=f"""The rule uses a self-invented classtype ({get_rule_option(rule, 'classtype')}), \
 which may be undefined in many environments.
 Consider using the a standard classtype instead.""",
-                )
+                ),
             )
 
         if not is_rule_option_set(rule, "content"):
@@ -174,7 +180,7 @@ Consider using the a standard classtype instead.""",
                     message="""The detection logic does not use the content option, \
 which is can cause significant runtime overhead.
 Consider adding a content match.""",
-                )
+                ),
             )
 
         if (
@@ -186,7 +192,7 @@ Consider adding a content match.""",
                     code="S021",
                     message="""The rule has multiple content matches but does not use fast_pattern.
 Consider assigning fast_pattern to the most unique content match.""",
-                )
+                ),
             )
 
         if is_rule_option_equal_to_regex(
@@ -207,7 +213,7 @@ Consider asserting this in the head instead using {} {} {} {} {} {} {}""".format
                         get_rule_option(rule, "dest_addr"),
                         get_rule_option(rule, "dest_port"),
                     ),
-                )
+                ),
             )
 
         if is_rule_option_equal_to_regex(
@@ -219,7 +225,7 @@ Consider asserting this in the head instead using {} {} {} {} {} {} {}""".format
                 Issue(
                     code="S031",
                     message="The rule uses uppercase A-F in a hex content match.\nConsider using lowercase a-f instead.",
-                )
+                ),
             )
 
         return issues

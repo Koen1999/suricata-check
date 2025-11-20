@@ -207,8 +207,9 @@ suricata-check -a
 ```
 
 Individual issues can be enabled and disabled using regular expressions. Issues are enabled when they are matched by the `-i` option, unless they are also matched by the `-e` option.
+Both the include and the exclude option support regex and can be provided multiple times.
 
-For example, if one would like to enable all issues from the `MandatoryChecker` and all issues from the `MetadataChecker` except `S802`, one could use the following options:
+For example, if one would like to enable all issues from the {py:obj}`suricata_check.checkers.MandatoryChecker` and all issues from the {py:obj}`suricata_check.checkers.stylguide.MetadataChecker` except `S802`, one could use the following options:
 
 ```bash
 suricata-check -i "M.*|S8.." -e S802
@@ -247,3 +248,8 @@ suricata-check --issue-severity=WARNING
 ## CI/CD Integration
 
 You can use `suricata-check` to generate output to be processed by platforms such as GitHub and GitLab to integrate it with your Continuous Integration and Continuous Deployment workflows using the `--gitlab` and `--github` options. Read more about those options in the [CI/CD documentation](./ci_cd.md).
+
+## Configuration parsing from INI file
+
+If you want to use `suricata-check` in a project, you can use `suricata-check.ini` instead of passing options to the CLI interface.
+Learn more on the [dedicated documention page for configuration using the INI file](./ini.md).

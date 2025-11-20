@@ -7,7 +7,7 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 import suricata_check
 
-CHECKER_CLASS = suricata_check.checkers.MetadataChecker
+CHECKER_CLASS = suricata_check.checkers.styleguide.MetadataChecker
 
 RULES = {
     # S800, bad

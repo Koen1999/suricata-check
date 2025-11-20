@@ -4,13 +4,13 @@ import logging
 import os
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import click
 import tabulate
 
 from suricata_check._checkers import get_checkers
-from suricata_check.checkers.interface.checker import CheckerInterface
+from suricata_check.checkers.interface._checker import CheckerInterface
 from suricata_check.utils.checker import get_rule_option
 from suricata_check.utils.checker_typing import (
     EXTENSIVE_SUMMARY_TYPE,
@@ -20,9 +20,11 @@ from suricata_check.utils.checker_typing import (
     SIMPLE_SUMMARY_TYPE,
     OutputReport,
     OutputSummary,
-    Rule,
     RuleReport,
 )
+
+if TYPE_CHECKING:
+    from suricata_check.utils.rule import Rule
 
 GITLAB_SEVERITIES = {
     logging.DEBUG: "info",
@@ -74,7 +76,7 @@ def write_output(
         for rule_report in rules:
             rule: Rule = rule_report.rule
             lines: str = (
-                "{}-{}".format(rule_report.line_begin, rule_report.line_end)
+                f"{rule_report.line_begin}-{rule_report.line_end}"
                 if rule_report.line_begin
                 else "Unknown"
             )
@@ -135,7 +137,7 @@ def __write_output_stats(output: OutputReport, out: str) -> None:
                         k,
                         v,
                         (
-                            "{:.0%}".format(v / n_rules)
+                            f"{v / n_rules:.0%}"
                             if k.startswith("Rules ") and n_rules > 0
                             else "-"
                         ),
@@ -168,7 +170,7 @@ def __write_output_stats(output: OutputReport, out: str) -> None:
         stats_fh.write(
             tabulate.tabulate(
                 (
-                    (k, v, "{:.0%}".format(v / n_issues) if n_issues > 0 else "-")
+                    (k, v, f"{v / n_issues:.0%}" if n_issues > 0 else "-")
                     for k, v in issues_by_group.items()
                 ),
                 headers=(
@@ -189,7 +191,7 @@ def __write_output_stats(output: OutputReport, out: str) -> None:
                         (
                             k,
                             v,
-                            "{:.0%}".format(v / n_rules) if n_rules > 0 else "-",
+                            f"{v / n_rules:.0%}" if n_rules > 0 else "-",
                         )
                         for k, v in checker_issues_by_type.items()
                     ),
@@ -270,7 +272,7 @@ def __write_output_github(output: OutputReport, rules_file: str) -> None:
                     end_line=line_end,
                     title=title,
                     message=issue_msg,
-                )
+                ),
             )
 
     for message_level, lines in output_lines.items():

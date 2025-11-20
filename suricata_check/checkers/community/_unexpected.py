@@ -1,13 +1,15 @@
 """`UnexpectedChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
     is_rule_option_set,
     is_rule_suboption_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.rule import Rule
 
 
 class UnexpectedChecker(CheckerInterface):
@@ -16,9 +18,11 @@ class UnexpectedChecker(CheckerInterface):
     Codes C000-C010 report on unexpected behavior.
     """
 
-    codes = {
-        "C000": {"severity": logging.WARNING},
-    }
+    codes = MappingProxyType(
+        {
+            "C000": {"severity": logging.WARNING},
+        },
+    )
 
     def _check_rule(
         self: "UnexpectedChecker",

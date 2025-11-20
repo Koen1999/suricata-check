@@ -14,6 +14,7 @@ from packaging.version import Version
 
 SURICATA_CHECK_DIR = os.path.dirname(__file__)
 UPDATE_CHECK_CACHE_PATH = os.path.expanduser("~/.suricata_check_version_check.json")
+UPDATE_CHECK_FREQUENCY = 1
 
 _logger = logging.getLogger(__name__)
 
@@ -36,11 +37,12 @@ def get_version() -> str:
 
             v = str(
                 setuptools_git_versioning.get_version(
-                    root=os.path.join(SURICATA_CHECK_DIR, "..")
-                )
+                    root=os.path.join(SURICATA_CHECK_DIR, ".."),
+                ),
             )
             _logger.debug(
-                "Detected suricata-check version using setuptools_git_versioning: %s", v
+                "Detected suricata-check version using setuptools_git_versioning: %s",
+                v,
             )
         except:  # noqa: E722
             v = __get_git_revision_short_hash()
@@ -56,6 +58,7 @@ def get_version() -> str:
 
 
 __version__: str = get_version()
+"""The version of the `suricata-check` module being executed."""
 
 __user_agent = f"suricata-check/{__version__} (+https://suricata-check.teuwen.net/)"
 
@@ -100,7 +103,7 @@ def __get_importlib_requirements() -> Optional[list[str]]:
         extra_requirements = dist.metadata.get_all(f"Requires-Dist-{extra}")
         if extra_requirements:
             requirements.extend(  # pyright: ignore[reportOptionalMemberAccess]
-                extra_requirements
+                extra_requirements,
             )
 
     _logger.debug("Detected suricata-check requirements using importlib")
@@ -121,10 +124,11 @@ def __get_pyproject_requirements() -> Optional[list[str]]:
         toml_content = tomllib.load(f)
         requirements = toml_content.get("project", {}).get("dependencies", [])
         for extra_requirements in toml_content.get("project", {}).get(
-            "optional-dependencies", []
+            "optional-dependencies",
+            [],
         ):
             requirements.extend(  # pyright: ignore[reportOptionalMemberAccess]
-                extra_requirements
+                extra_requirements,
             )
 
     _logger.debug("Detected suricata-check requirements using pyproject.toml")
@@ -143,18 +147,21 @@ def __get_latest_version() -> Optional[str]:
             headers["If-None-Match"] = cached_data["response_headers"]["etag"]
         if "last_checked" in cached_data:
             headers["If-Modified-Since"] = datetime.datetime.fromisoformat(
-                cached_data["last_checked"]
+                cached_data["last_checked"],
             ).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
     try:
         response = requests.get(
-            "https://pypi.org/pypi/suricata-check/json", headers=headers, timeout=5
+            "https://pypi.org/pypi/suricata-check/json",
+            headers=headers,
+            timeout=5,
         )
 
         if response.status_code == requests.codes.ok:
             pypi_json = response.json()
             __save_check_update(
-                pypi_json, {k.lower(): v for k, v in response.headers.items()}
+                pypi_json,
+                {k.lower(): v for k, v in response.headers.items()},
             )
             return pypi_json["info"]["version"]
 
@@ -173,7 +180,7 @@ def __get_saved_check_update() -> Optional[dict]:
         return None
 
     try:
-        with open(UPDATE_CHECK_CACHE_PATH, "r") as f:
+        with open(UPDATE_CHECK_CACHE_PATH) as f:
             data = json.load(f)
     except OSError:
         _logger.warning("Failed to read last date version was checked from cache file.")
@@ -181,13 +188,13 @@ def __get_saved_check_update() -> Optional[dict]:
         return None
     except json.JSONDecodeError:
         _logger.warning(
-            "Failed to decode cache file to determine last date version was checked."
+            "Failed to decode cache file to determine last date version was checked.",
         )
         return None
 
     if not isinstance(data, dict):
         _logger.warning(
-            "Cache file documenting the last date version was checked is malformed."
+            "Cache file documenting the last date version was checked is malformed.",
         )
         os.remove(UPDATE_CHECK_CACHE_PATH)
         return None
@@ -199,7 +206,7 @@ def __should_check_update() -> bool:
     current_version = __version__
     if current_version == "unknown":
         _logger.warning(
-            "Skipping update check because current version cannot be determined."
+            "Skipping update check because current version cannot be determined.",
         )
         return False
     if "dirty" in current_version:
@@ -215,11 +222,13 @@ def __should_check_update() -> bool:
 
     try:
         last_checked = datetime.datetime.fromisoformat(data["last_checked"])
-        if (datetime.datetime.now(tz=datetime.timezone.utc) - last_checked).days < 1:
+        if (
+            datetime.datetime.now(tz=datetime.timezone.utc) - last_checked
+        ).days < UPDATE_CHECK_FREQUENCY:
             return False
     except KeyError:
         _logger.warning(
-            "Cache file documenting the last date version was checked is malformed."
+            "Cache file documenting the last date version was checked is malformed.",
         )
 
     return True
@@ -231,7 +240,7 @@ def __save_check_update(pypi_json: dict, response_headers: dict) -> None:
             json.dump(
                 {
                     "last_checked": datetime.datetime.now(
-                        tz=datetime.timezone.utc
+                        tz=datetime.timezone.utc,
                     ).isoformat(),
                     "pypi_json": pypi_json,
                     "response_headers": response_headers,
@@ -243,6 +252,10 @@ def __save_check_update(pypi_json: dict, response_headers: dict) -> None:
 
 
 def check_for_update() -> None:
+    """Checks whether there is a new version of `suricata-check` available.
+
+    Makes an HTTPS request to PyPI.
+    """
     if not __should_check_update():
         return
 
@@ -267,5 +280,6 @@ def check_for_update() -> None:
         return
 
     _logger.info(
-        "You are using the latest version of suricata-check (%s).", __version__
+        "You are using the latest version of suricata-check (%s).",
+        __version__,
     )

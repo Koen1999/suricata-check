@@ -13,7 +13,7 @@ from suricata_check.utils.regex import (
     STICKY_BUFFER_NAMING,
     get_variable_groups,
 )
-from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.regex_provider import Pattern, get_regex_provider
 from suricata_check.utils.rule import Rule
 
 _LRU_CACHE_SIZE = 10
@@ -95,7 +95,9 @@ def __is_rule_option_set(rule: Rule, name: str) -> bool:
 
 
 def get_rule_suboptions(
-    rule: Rule, name: str, warn: bool = True
+    rule: Rule,
+    name: str,
+    warn: bool = True,
 ) -> Sequence[tuple[str, Optional[str]]]:
     """Returns a list of suboptions set in a rule."""
     values = get_rule_options(rule, name)
@@ -116,7 +118,8 @@ def get_rule_suboptions(
 
 
 def __split_suboption(
-    suboption: str, warn: bool
+    suboption: str,
+    warn: bool,
 ) -> Optional[tuple[str, Optional[str]]]:
     suboption = suboption.strip()
 
@@ -328,7 +331,10 @@ def is_rule_option_equal_to(rule: Rule, name: str, value: str) -> bool:
 
 
 def is_rule_suboption_equal_to(
-    rule: Rule, name: str, sub_name: str, value: str
+    rule: Rule,
+    name: str,
+    sub_name: str,
+    value: str,
 ) -> bool:
     """Checks whether a rule has a certain suboption set to a certain value.
 
@@ -684,7 +690,9 @@ def get_rule_options_positions(
 ) -> Iterable[int]:
     """Finds the positions of several options in the rule body."""
     return __get_rule_options_positions(
-        rule, tuple(sorted(names)), sequence=tuple(sequence) if sequence else None
+        rule,
+        tuple(sorted(names)),
+        sequence=tuple(sequence) if sequence else None,
     )
 
 
@@ -842,18 +850,21 @@ def are_rule_options_always_put_before(
     return True
 
 
-def select_rule_options_by_regex(rule: Rule, regex) -> Iterable[str]:  # noqa: ANN001
+def select_rule_options_by_regex(rule: Rule, regex: Pattern) -> Iterable[str]:
     """Selects rule options present in rule matching a regular expression."""
     return __select_rule_options_by_regex(rule, regex)
 
 
 @lru_cache(maxsize=_LRU_CACHE_SIZE)
-def __select_rule_options_by_regex(rule: Rule, regex) -> Iterable[str]:  # noqa: ANN001
+def __select_rule_options_by_regex(
+    rule: Rule,
+    regex: Pattern,
+) -> Iterable[str]:
     options = []
 
     for option in rule.options:
         name = option.name
-        if _regex_provider.match(regex, name):
+        if regex.match(name):
             options.append(name)
 
     return tuple(sorted(options))

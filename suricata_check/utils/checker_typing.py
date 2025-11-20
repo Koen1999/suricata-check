@@ -1,14 +1,15 @@
 """The `suricata_check.typing` module contains all types used by the `suricata-check` package."""
 
 import json
-from collections.abc import Iterable, MutableMapping, MutableSequence
+from collections.abc import MutableMapping, MutableSequence
 from dataclasses import dataclass, field
 from typing import (
+    TYPE_CHECKING,
     Optional,
-    TypeVar,
 )
 
-from suricata_check.utils.rule import Rule
+if TYPE_CHECKING:
+    from suricata_check.utils.rule import Rule as __Rule
 
 
 class InvalidRuleError(RuntimeError):
@@ -56,29 +57,20 @@ class Issue:
 
 
 ISSUES_TYPE = MutableSequence[Issue]
+"""Type representing a sequence of multiple `Issue` instances."""
 SIMPLE_SUMMARY_TYPE = MutableMapping[str, int]
+"""Type representing a dictionary-like object mapping a string to a number of issues."""
 RULE_SUMMARY_TYPE = SIMPLE_SUMMARY_TYPE
+"""Type representing a dictionary-like object mapping a string to a number of issues."""
 EXTENSIVE_SUMMARY_TYPE = MutableMapping[str, SIMPLE_SUMMARY_TYPE]
-
-Cls = TypeVar("Cls")
-
-
-def get_all_subclasses(cls: type[Cls]) -> Iterable[type[Cls]]:
-    """Returns all class types that subclass the provided type."""
-    all_subclasses = []
-
-    for subclass in cls.__subclasses__():
-        all_subclasses.append(subclass)
-        all_subclasses.extend(get_all_subclasses(subclass))
-
-    return all_subclasses
+"""Type representing a dictionary-like object mapping a string to a `SIMPLE_SUMMARY_TYPE`."""
 
 
 @dataclass
 class RuleReport:
     """The `RuleReport` dataclass represents a rule, together with information on its location and detected issues."""
 
-    rule: Rule
+    rule: "__Rule"
     summary: Optional[RULE_SUMMARY_TYPE] = None
     line_begin: Optional[int] = None
     line_end: Optional[int] = None
@@ -126,6 +118,7 @@ class RuleReport:
 
 
 RULE_REPORTS_TYPE = MutableSequence[RuleReport]
+"""Type representing a sequence of multiple `RuleReport` instances."""
 
 
 @dataclass

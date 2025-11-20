@@ -1,6 +1,7 @@
 """`StateChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
@@ -10,8 +11,9 @@ from suricata_check.utils.checker import (
     is_rule_option_set,
     is_rule_suboption_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.rule import Rule
 
 _regex_provider = get_regex_provider()
 
@@ -36,15 +38,17 @@ class StateChecker(CheckerInterface):
     Codes S520-S530 report on non-standard usages of `xbits`
     """
 
-    codes = {
-        "S500": {"severity": logging.INFO},
-        "S501": {"severity": logging.INFO},
-        "S510": {"severity": logging.INFO},
-        "S511": {"severity": logging.INFO},
-        "S520": {"severity": logging.INFO},
-        "S521": {"severity": logging.INFO},
-        "S522": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "S500": {"severity": logging.INFO},
+            "S501": {"severity": logging.INFO},
+            "S510": {"severity": logging.INFO},
+            "S511": {"severity": logging.INFO},
+            "S520": {"severity": logging.INFO},
+            "S521": {"severity": logging.INFO},
+            "S522": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(
         self: "StateChecker",
@@ -69,7 +73,9 @@ Consider specifying the connection state first like `established,to_server`.\
             )
 
         if is_rule_suboption_set(rule, "flow", "from_client") or is_rule_suboption_set(
-            rule, "flow", "from_server"
+            rule,
+            "flow",
+            "from_server",
         ):
             issues.append(
                 Issue(
@@ -149,7 +155,9 @@ Consider using the noalert option to prevent unnecessary alerts.\
             )
 
         if (is_rule_suboption_set(rule, "xbits", "set")) and not is_rule_suboption_set(
-            rule, "xbits", "expire"
+            rule,
+            "xbits",
+            "expire",
         ):
             issues.append(
                 Issue(

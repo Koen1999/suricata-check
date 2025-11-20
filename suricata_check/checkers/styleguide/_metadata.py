@@ -1,13 +1,15 @@
 """`MetadataChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
     is_rule_option_set,
     is_rule_suboption_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.rule import Rule
 
 
 class MetadataChecker(CheckerInterface):
@@ -16,12 +18,14 @@ class MetadataChecker(CheckerInterface):
     Codes S800-810 report on missing common `metadata` fields
     """
 
-    codes = {
-        "S800": {"severity": logging.INFO},
-        "S801": {"severity": logging.INFO},
-        "S802": {"severity": logging.INFO},
-        "S803": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "S800": {"severity": logging.INFO},
+            "S801": {"severity": logging.INFO},
+            "S802": {"severity": logging.INFO},
+            "S803": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(
         self: "MetadataChecker",

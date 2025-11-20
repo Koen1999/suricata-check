@@ -2,9 +2,10 @@
 
 import logging
 from collections.abc import Iterable
+from types import MappingProxyType
 from typing import Optional
 
-from suricata_check.checkers.interface.checker import CheckerInterface
+from suricata_check.checkers.interface._checker import CheckerInterface
 
 _logger = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ _logger = logging.getLogger(__name__)
 class DummyChecker(CheckerInterface):
     """Dummy class to prevent runtime errors on import."""
 
-    codes = {}
+    codes = MappingProxyType({})
     enabled_by_default = False
 
     def __init__(self: "DummyChecker", include: Optional[Iterable[str]] = None) -> None:

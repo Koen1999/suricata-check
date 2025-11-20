@@ -6,27 +6,27 @@ myst:
 ---
 # API Usage
 
-Sometimes it may be more convenient to avoid the CLI and instead use the module directly, which exposes more functionality and may be easier te extend if your project also uses Python. Below, we will characterize several use-cases you may encounter and how to address them using the functionality exposed by `suricata-check`.
+Sometimes it may be more convenient to avoid the CLI and instead use the module directly, which exposes more functionality and may be easier te extend if your project also uses Python. Below, we will characterize several use-cases you may encounter and how to address them using the functionality exposed by {py:obj}`suricata_check`.
 
-All publicly exposed modules, classes, and methods are documented and typed such that IDEs such as Visual Studio Code will provide useful information and suggestions as you write code using `suricata_check`.
+All publicly exposed modules, classes, and methods are documented and typed such that IDEs such as Visual Studio Code will provide useful information and suggestions as you write code using {py:obj}`suricata_check`.
 
 ## Analyze a single rule
 
-In order to analyze a single rule using the module, you first need to parse the rule with `suricata_check`.
-Thereafter, you can process it using `suricata_check.analyze_rule` as follows to obtain a `RuleReport`
+In order to analyze a single rule using the module, you first need to parse the rule with {py:obj}`suricata_check`.
+Thereafter, you can process it using {py:obj}`suricata_check.analyze_rule` as follows to obtain a {py:obj}`suricata_check.utils.checker_typing.RuleReport`
 
 ```python
 import suricata_check
 
 rule = """\
 alert ip any any -> any any (msg:"Some msg"; sid:1;)"""
-parsed_rule = suricata_check.utils_checker_typing.suricata_check.utils.rule.parse(rule)
+parsed_rule = suricata_check.utils.rule.parse(rule)
 assert parsed_rule is not None
 
 rule_report = suricata_check.analyze_rule(parsed_rule)
 ```
 
-Note that `parsed_rule` may be `None` if it is unparseable. Parseable rules need not be valid Suricata rules. If `suricata_check` cannot parse the rule, a `InvalidRuleError` will be raised.
+Note that if a rule is unparseable, `parsed_rule` may be `None` or {py:obj}`suricata_check.utils.rule.parse` may throw a {py:obj}`suricata_check.utils.rule.ParsingError`. Parseable rules need not be valid Suricata rules. If {py:obj}`suricata_check.utils.rule.parse` cannot parse the rule, a {py:obj}`suricata_check.utils.checker_typing.InvalidRuleError` will be raised.
 
 You can further inspect the rule report, which is implemented as a dataclass, by treating it as a dictionary.
 
@@ -52,7 +52,7 @@ for issue in rule_report.issues:
 
 ## Selecting checkers
 
-Sometimes you may only be interested in running a single checker, or enabling/disabling certain codes similar to the CLI usage. You can do so by passing checkers to `analyze_rule`.
+Sometimes you may only be interested in running a single checker, or enabling/disabling certain codes similar to the CLI usage. You can do so by passing checkers to {py:obj}`suricata_check.analyze_rule`.
 
 ```python
 checkers = suricata_check.get_checkers(include=("M.*",), exclude=tuple())
@@ -60,7 +60,7 @@ checkers = suricata_check.get_checkers(include=("M.*",), exclude=tuple())
 rule_report = suricata_check.analyze_rule(parsed_rule, checkers=checkers)
 ```
 
-If you have implemented a checker implementing the `CheckerInterface` as descibed in [CONTRIBUTING](./contributing.md), the checker will be discoverable by the `get_checkers` function. Any other class (e.g. `MyOwnChecker`) implementing `CheckerInterface`, may be passed to `analyze_rule` directly as follows:
+If you have implemented a checker implementing the `CheckerInterface` as descibed in [CONTRIBUTING](./contributing.md), the checker will be discoverable by the {py:obj}`suricata_check.get_checkers` function. Any other class (e.g. `MyOwnChecker`) implementing {py:obj}`suricata_check.checkers.interface.CheckerInterface`, may be passed to {py:obj}`suricata_check.analyze_rule` directly as follows:
 
 ```python
 rule_report = suricata_check.analyze_rule(parsed_rule, checkers=[MyOwnChecker()])
@@ -68,7 +68,7 @@ rule_report = suricata_check.analyze_rule(parsed_rule, checkers=[MyOwnChecker()]
 
 ## Processing rulesets
 
-Similar to the CLI, it is possible to process entire rulesets at once using `process_rules_file`. Also for this function, it is optionally possible to explcitly pass checkers to use.
+Similar to the CLI, it is possible to process entire rulesets at once using {py:obj}`suricata_check.process_rules_file`. Also for this function, it is optionally possible to explcitly pass checkers to use.
 
 ```python
 from suricata_check.checkers import MetadataChecker

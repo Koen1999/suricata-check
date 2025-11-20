@@ -1,34 +1,6 @@
 """The `suricata_check.checkers` module contains all rule checkers."""
 
-from suricata_check.checkers import interface
-from suricata_check.checkers.community import BestChecker, UnexpectedChecker
-from suricata_check.checkers.mandatory import MandatoryChecker
-from suricata_check.checkers.styleguide import (
-    MetadataChecker,
-    MsgChecker,
-    OrderChecker,
-    OverallChecker,
-    PcreChecker,
-    PerformanceChecker,
-    ReferenceChecker,
-    SidChecker,
-    StateChecker,
-    WhitespaceChecker,
-)
+from suricata_check.checkers import community, interface, styleguide
+from suricata_check.checkers._mandatory import MandatoryChecker
 
-__all__ = [
-    "BestChecker",
-    "MandatoryChecker",
-    "MetadataChecker",
-    "MsgChecker",
-    "OrderChecker",
-    "OverallChecker",
-    "PcreChecker",
-    "PerformanceChecker",
-    "ReferenceChecker",
-    "SidChecker",
-    "StateChecker",
-    "UnexpectedChecker",
-    "WhitespaceChecker",
-    "interface",
-]
+__all__ = ["MandatoryChecker", "community", "interface", "styleguide"]

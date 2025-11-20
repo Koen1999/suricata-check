@@ -12,6 +12,10 @@ This is possible using the `--github` and `--gitlab` CLI options. The integratio
 
 An example of such an integration for GitHub is available in the [`suricata-check-action` repository](https://github.com/Koen1999/suricata-check-action).
 
+## Passing CLI options using an INI file
+
+When integrating `suricata-check` into a project, it is recommended to configure suricata-check using a `.ini` file as documented on the [documentation page dedicated to configuration using the INI file](./ini.md). By doing so, all collaborators to the project will adhere to the same quality standards and CI/CD linting outcomes will be in-line with local linting outcomes.
+
 ## GitHub
 
 Integration with GitHub is easy. All you need to do is checkout the repository containing the rules that require checking, setup a Python environment and install `suricata-check`, and run it with the `--github` option to automatically issue the required GitHub workflow commands for integration.
@@ -25,9 +29,9 @@ name: Suricata Check
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: ["main", "master"]
   push:
-    branches: ["main"]
+    branches: ["main", "master"]
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
@@ -48,12 +52,22 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install "suricata-check[performance]>=0.3.0beta0"
+          python -m pip install --upgrade --upgrade-strategy eager pip
+          python -m pip install suricata-check[performance]
 
       - name: Test with suricata-check
         run: |
-          suricata-check --github --issue-severity=WARNING
+          suricata-check --github
+```
+
+Below you can find an example of how the issued detected by `suricata-check` would be highlighted in GitHub.
+
+```{figure} static/png/workflow.png
+---
+class: with-border
+---
+
+Example GitHub workflow where issues with Suricata rules are highlighted.
 ```
 
 ## GitLab

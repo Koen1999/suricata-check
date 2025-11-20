@@ -65,6 +65,9 @@ html_js_files = ["js/script.js"]
 myst_enable_extensions = ["linkify"]
 myst_heading_anchors = 5
 
+# -- Options for AutoAPI     -------------------------------------------------
+# https://sphinx-autoapi.readthedocs.io/en/latest/index.html
+
 autoapi_dirs = ["../suricata_check"]
 autoapi_options = [
     "members",
@@ -72,6 +75,7 @@ autoapi_options = [
     "show-module-summary",
     "special-members",
     "imported-members",
+    "undoc-members",
 ]
 autoapi_add_toctree_entry = False
 autoapi_python_class_content = "both"
@@ -89,5 +93,5 @@ viewcode_line_numbers = True
 html_baseurl = "https://suricata-check.teuwen.net/"
 sitemap_url_scheme = "{link}"
 sitemap_locales = ["en"]
-sitemap_excludes = ["search.html", "genindex.html"]
+sitemap_excludes = ["search.html"]
 html_extra_path = ["robots.txt"]

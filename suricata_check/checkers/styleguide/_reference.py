@@ -1,13 +1,15 @@
 """`ReferenceChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
     is_rule_option_equal_to_regex,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.rule import Rule
 
 _regex_provider = get_regex_provider()
 
@@ -26,10 +28,12 @@ class ReferenceChecker(CheckerInterface):
     Codes S700-710 report on non-standard usages of `reference`
     """
 
-    codes = {
-        "S700": {"severity": logging.INFO},
-        "S701": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "S700": {"severity": logging.INFO},
+            "S701": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(
         self: "ReferenceChecker",

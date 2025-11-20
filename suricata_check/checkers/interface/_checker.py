@@ -18,7 +18,7 @@ _logger = logging.getLogger(__name__)
 class CheckerInterface:
     """Interface for rule checkers returning a list of issues.
 
-    These checkers are automatically discovered through `suricata_check.suricata_check.get_checkers()`.
+    These checkers are automatically discovered through `suricata_check.get_checkers()`.
 
     Each code should start with an upper case letter (may be multiple), followed by three digits.
     In other words, each code should follow the following regex `[A-Z]{1,}[0-9]{3}`
@@ -37,11 +37,13 @@ class CheckerInterface:
     """A boolean indicating if the checker is enabled by default when discovered automatically."""
 
     def __init__(
-        self: "CheckerInterface", include: Optional[Iterable[str]] = None
+        self: "CheckerInterface",
+        include: Optional[Iterable[str]] = None,
     ) -> None:
         """Initializes the checker given a list of issue codes to emit."""
         if include is None:
             include = self.codes
+        _logger.debug("%s enabled with codes: %s", type(self).__name__, include)
         self.include = include
 
         super().__init__()
@@ -53,7 +55,7 @@ class CheckerInterface:
         """Checks a rule and returns a list of issues found."""
         self.__log_rule_processing(rule)
         return self.__add_checker_metadata(
-            self.__add_issue_metadata(self.__filter_issues(self._check_rule(rule)))
+            self.__add_issue_metadata(self.__filter_issues(self._check_rule(rule))),
         )
 
     @abc.abstractmethod

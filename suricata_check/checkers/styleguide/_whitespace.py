@@ -1,16 +1,18 @@
 """`WhitespaceChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
     is_rule_option_equal_to_regex,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex import (
     HEADER_REGEX,
 )
 from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.rule import Rule
 
 _regex_provider = get_regex_provider()
 
@@ -47,7 +49,7 @@ REGEX_S121 = _regex_provider.compile(
 )
 REGEX_S122 = _regex_provider.compile(r'^".*\\.*"$')
 REGEX_S123 = _regex_provider.compile(
-    r'^".*(?!\\(a|c[0-127]|e|f|n|r|t|0[0-9]{2}|[0-9]{3}|0\{[0-9]{3}\}|x[0-9a-f]{2}|x[0-9a-f]{3}|u[0-9a-f]{4}|d|D|h|H|s|S|v|V|w|W))(\\.).*"$'
+    r'^".*(?!\\(a|c[0-127]|e|f|n|r|t|0[0-9]{2}|[0-9]{3}|0\{[0-9]{3}\}|x[0-9a-f]{2}|x[0-9a-f]{3}|u[0-9a-f]{4}|d|D|h|H|s|S|v|V|w|W))(\\.).*"$',
 )
 
 
@@ -61,21 +63,23 @@ class WhitespaceChecker(CheckerInterface):
     Codes S120-S129 report on non-standard escaping of special characters.
     """
 
-    codes = {
-        "S100": {"severity": logging.INFO},
-        "S101": {"severity": logging.INFO},
-        "S102": {"severity": logging.INFO},
-        "S103": {"severity": logging.INFO},
-        "S104": {"severity": logging.INFO},
-        "S105": {"severity": logging.INFO},
-        "S106": {"severity": logging.INFO},
-        "S110": {"severity": logging.INFO},
-        "S111": {"severity": logging.INFO},
-        "S120": {"severity": logging.INFO},
-        "S121": {"severity": logging.INFO},
-        "S122": {"severity": logging.INFO},
-        "S123": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "S100": {"severity": logging.INFO},
+            "S101": {"severity": logging.INFO},
+            "S102": {"severity": logging.INFO},
+            "S103": {"severity": logging.INFO},
+            "S104": {"severity": logging.INFO},
+            "S105": {"severity": logging.INFO},
+            "S106": {"severity": logging.INFO},
+            "S110": {"severity": logging.INFO},
+            "S111": {"severity": logging.INFO},
+            "S120": {"severity": logging.INFO},
+            "S121": {"severity": logging.INFO},
+            "S122": {"severity": logging.INFO},
+            "S123": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(  # noqa: C901, PLR0912
         self: "WhitespaceChecker",

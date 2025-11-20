@@ -2,12 +2,14 @@
 
 import logging
 from collections.abc import Mapping, Sequence
+from types import MappingProxyType
 from typing import Optional
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import get_rule_option
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.rule import Rule
 
 SID_ALLOCATION: Mapping[str, Sequence[tuple[int, int]]] = {
     "local": [(1000000, 1999999)],
@@ -39,12 +41,14 @@ class SidChecker(CheckerInterface):
         S303: Allocation to unallocated SID range, whereas a reserved range should be used.
     """
 
-    codes = {
-        "S300": {"severity": logging.INFO},
-        "S301": {"severity": logging.INFO},
-        "S302": {"severity": logging.INFO},
-        "S303": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "S300": {"severity": logging.INFO},
+            "S301": {"severity": logging.INFO},
+            "S302": {"severity": logging.INFO},
+            "S303": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(
         self: "SidChecker",

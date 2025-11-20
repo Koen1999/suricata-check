@@ -6,11 +6,13 @@ myst:
 ---
 # Configuration using `suricata-check.ini`
 
-The CLI options mentioned in [CLI Reference](./cli.rst) can also be configured using a `.ini` file.This is recommended when working on shared projects or when integrating with [CI/CD](./ci_cd.md) to encourage consistent usage of `suricata-check`.
+The CLI options mentioned in [CLI Reference](./cli.rst) can also be configured using a `.ini` file.This is recommended when working on shared projects or when integrating with [CI/CD](./ci_cd.md) to encourage consistent usage of `suricata-check`. When configuring `suricata-check` using the INI file, CI/CD, as well as different collaborators will adhere to the same quality standards.
 
 The default `.ini` is called `suricata-check.ini` and should be located in the project directory or common working directory. If the default name and location are used, the configuration will be automatically discovered when you run `suricata-check`.
 
-The contents of `suricata-check.ini` can be configured as follows:
+For all of the CLI options described in [CLI Reference](./cli.rst), you can use the *long form* in the INI configuration file.
+
+The contents of `suricata-check.ini` can for example be configured as follows:
 
 ```ini
 [suricata-check]

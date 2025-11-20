@@ -19,10 +19,12 @@ def help_option(*param_decls: str, **kwargs: dict[str, Any]) -> Callable[[FC], F
     """
 
     def show_help(
-        ctx: click.Context, param: click.Parameter, value: bool  # noqa: ARG001
+        ctx: click.Context,
+        param: click.Parameter,  # noqa: ARG001
+        value: bool,
     ) -> None:
         """Callback that print the help page on ``<stdout>`` and exits."""
-        click.echo("suricata-check {}\n".format(get_version()))
+        click.echo(f"suricata-check {get_version()}\n")
 
         if value and not ctx.resilient_parsing:
             click.echo(ctx.get_help(), color=ctx.color)
@@ -37,7 +39,7 @@ def help_option(*param_decls: str, **kwargs: dict[str, Any]) -> Callable[[FC], F
     kwargs.setdefault(
         "help",
         gettext.gettext(
-            "Show this message and exit."
+            "Show this message and exit.",
         ),  # pyright: ignore[reportArgumentType]
     )
     kwargs.setdefault("callback", show_help)  # pyright: ignore[reportArgumentType]

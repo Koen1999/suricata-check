@@ -174,7 +174,7 @@ OTHER_BUFFERS = (
 )
 
 assert set(OTHER_BUFFERS).isdisjoint(
-    set(STICKY_BUFFER_NAMING.keys()).union(STICKY_BUFFER_NAMING.values())
+    set(STICKY_BUFFER_NAMING.keys()).union(STICKY_BUFFER_NAMING.values()),
 )
 
 BUFFER_KEYWORDS: Sequence[str] = tuple(
@@ -498,7 +498,7 @@ HEADER_REGEX = _regex_provider.compile(
     rf"{_ACTION_REGEX.pattern}\s*{_PROTOCOL_REGEX.pattern}\s*{_ADDR_REGEX.pattern}\s*{_PORT_REGEX.pattern}\s*{_DIRECTION_REGEX.pattern}\s*{_ADDR_REGEX.pattern}\s*{_PORT_REGEX.pattern}",
 )
 _OPTION_REGEX = _regex_provider.compile(
-    r"[a-z\-\._]+\s*(:(\s*([0-9]+|.+)\s*\,?\s*)+)?;"
+    r"[a-z\-\._]+\s*(:(\s*([0-9]+|.+)\s*\,?\s*)+)?;",
 )
 _BODY_REGEX = _regex_provider.compile(rf"\((\s*{_OPTION_REGEX.pattern}\s*)*\)")
 _RULE_REGEX = _regex_provider.compile(

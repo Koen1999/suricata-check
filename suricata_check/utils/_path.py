@@ -47,6 +47,6 @@ def find_rules_file(root: str) -> str:
 
         rules_file = rules_files[0]
 
-    _logger.info("Found Suricata rules file: %s", rules_file)
+    _logger.debug("Found Suricata rules file: %s", rules_file)
 
     return rules_file

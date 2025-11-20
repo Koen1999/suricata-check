@@ -1,6 +1,7 @@
 """`MsgChecker`."""
 
 import logging
+from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
 from suricata_check.utils.checker import (
@@ -9,8 +10,9 @@ from suricata_check.utils.checker import (
     is_rule_option_set,
     is_rule_suboption_set,
 )
-from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue, Rule
+from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
 from suricata_check.utils.regex_provider import get_regex_provider
+from suricata_check.utils.rule import Rule
 
 _regex_provider = get_regex_provider()
 
@@ -19,14 +21,16 @@ _MALWARE_REGEX = _regex_provider.compile(r"^.*(malware).*$", _regex_provider.IGN
 _S401_REGEX = _regex_provider.compile(r"""^".* [a-zA-Z0-9]+/[a-zA-Z0-9]+ .*"$""")
 _VAGUE_KEYWORDS = ("possible", "unknown")
 _S402_REGEX = _regex_provider.compile(
-    r"^.*({}).*$".format("|".join(_VAGUE_KEYWORDS)), _regex_provider.IGNORECASE
+    r"^.*({}).*$".format("|".join(_VAGUE_KEYWORDS)),
+    _regex_provider.IGNORECASE,
 )
 _UNDESIRABLE_DATE_REGEXES = (
     _regex_provider.compile(r"^.*(\d{4}/\d{2}/\d{2}).*$", _regex_provider.IGNORECASE),
     _regex_provider.compile(r"^.*(\d{4}-[2-9]\d-\d{2}).*$", _regex_provider.IGNORECASE),
 )  # Desirable format is ISO (YYYY-MM-DD)
 _S404_REGEX = _regex_provider.compile(
-    r"^.*(C2|C&C|Command and Control|Command & Control).*$", _regex_provider.IGNORECASE
+    r"^.*(C2|C&C|Command and Control|Command & Control).*$",
+    _regex_provider.IGNORECASE,
 )
 _S405_REGEX = _regex_provider.compile(
     r"^.*(Go|MSIL|ELF64|MSIL|JS|Win32|DOS|Amiga|C64|Plan9).*$",
@@ -54,18 +58,20 @@ class MsgChecker(CheckerInterface):
     Codes S400-S410 report on non-standard `msg` fields.
     """
 
-    codes = {
-        "S400": {"severity": logging.INFO},
-        "S401": {"severity": logging.INFO},
-        "S402": {"severity": logging.INFO},
-        "S403": {"severity": logging.INFO},
-        "S404": {"severity": logging.INFO},
-        "S405": {"severity": logging.INFO},
-        "S406": {"severity": logging.WARNING},
-        "S407": {"severity": logging.INFO},
-        "S408": {"severity": logging.INFO},
-        "S409": {"severity": logging.INFO},
-    }
+    codes = MappingProxyType(
+        {
+            "S400": {"severity": logging.INFO},
+            "S401": {"severity": logging.INFO},
+            "S402": {"severity": logging.INFO},
+            "S403": {"severity": logging.INFO},
+            "S404": {"severity": logging.INFO},
+            "S405": {"severity": logging.INFO},
+            "S406": {"severity": logging.WARNING},
+            "S407": {"severity": logging.INFO},
+            "S408": {"severity": logging.INFO},
+            "S409": {"severity": logging.INFO},
+        },
+    )
 
     def _check_rule(  # noqa: C901
         self: "MsgChecker",
@@ -74,7 +80,9 @@ class MsgChecker(CheckerInterface):
         issues: ISSUES_TYPE = []
 
         if is_rule_option_set(rule, "msg") and not is_rule_option_equal_to_regex(
-            rule, "msg", _S400_REGEX
+            rule,
+            "msg",
+            _S400_REGEX,
         ):
             issues.append(
                 Issue(
@@ -140,7 +148,9 @@ Consider writing CnC instead.\
             )
 
         if self.__desribes_malware(rule) and not is_rule_option_equal_to_regex(
-            rule, "msg", _S405_REGEX
+            rule,
+            "msg",
+            _S405_REGEX,
         ):
             issues.append(
                 Issue(

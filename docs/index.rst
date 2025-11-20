@@ -14,6 +14,7 @@ Welcome to suricata-check's documentation!
    cli_usage.md
    ignore.md
    ini.md
+   vscode.md
    ci_cd.md
    api_usage.md
    checker.md
