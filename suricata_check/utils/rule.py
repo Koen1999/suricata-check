@@ -96,6 +96,15 @@ class Rule:
 
         self.options = (*self.options, RuleOption(name=name, value=value))
 
+    def add_metadata_option(self, value: str) -> None:
+        """Adds metadata options in the rule's metadata list."""
+        if not isinstance(
+            value,
+            str,
+        ):  # pyright: ignore[reportUnnecessaryIsInstance]
+            raise TypeError("Metadata option value must be a string")
+        self.metadata = (*self.metadata, value)
+
     def add_metadata_options(self, values: Sequence[str]) -> None:
         """Adds metadata options in the rule's metadata list."""
         for value in values:
@@ -195,18 +204,18 @@ def parse(buffer: str) -> Optional["Rule"]:
 
     options = m.group("options")
 
-    __add_options_to_rule(text, rule, options)
+    __add_options_to_rule(rule, options)
 
     return rule
 
 
-def __add_options_to_rule(rule_text: str, rule: "Rule", options: str) -> None:
+def __add_options_to_rule(rule: "Rule", options: str) -> None:
     while True:
         if not options:
             break
         index = __find_opt_end(options)
         if index < 0:
-            raise ParsingError(f"end of option not found: {rule_text}")
+            raise ParsingError(f"end of option not found: {rule.raw}")
         option = options[:index].strip()
         options = options[index + 1 :].strip()
 
@@ -217,6 +226,17 @@ def __add_options_to_rule(rule_text: str, rule: "Rule", options: str) -> None:
             val = None
 
         __add_option_to_rule(rule, name, val)
+
+
+def __add_metadata_options_to_rule(rule: "Rule", options: str) -> None:
+    while True:
+        if not options:
+            break
+        index = __find_metadata_opt_end(options)
+        option = options[:index].strip()
+        options = options[index + 1 :].strip()
+
+        rule.add_metadata_option(option)
 
 
 def __add_option_to_rule(  # noqa: C901, PLR0912
@@ -239,7 +259,7 @@ def __add_option_to_rule(  # noqa: C901, PLR0912
     elif name == "metadata":
         if not isinstance(val, str):
             raise ParsingError(f"Invalid metadata value type ({type(val)}): {val}")
-        rule.add_metadata_options([v.strip() for v in val.split(",")])
+        __add_metadata_options_to_rule(rule, val)
     elif name == "flowbits":
         if not isinstance(val, str):
             raise ParsingError(f"Invalid flowbits value type ({type(val)}): {val}")
@@ -266,5 +286,19 @@ def __find_opt_end(options: str) -> int:
         i = options[offset:].find(";")
         if options[offset + i - 1] == "\\":
             offset += 2
+        else:
+            return offset + i
+
+
+def __find_metadata_opt_end(options: str) -> int:
+    """Find the end of a metadata option (,) handling quotes."""
+    offset = 0
+
+    while True:
+        i = options[offset:].find(",")
+        if i == -1:
+            i = len(options) + 1
+        if options[0 : offset + i - 1].count('"') == 1:
+            offset += i + 1
         else:
             return offset + i

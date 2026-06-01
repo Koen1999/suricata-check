@@ -478,8 +478,14 @@ METADATA_NON_DATE_KEYWORDS = (
     "confidence_level",
 )
 
+SURICATA_CHECK_METADATA_KEYWORDS = ("suricata-check",)
+
 ALL_METADATA_KEYWORDS = tuple(
-    sorted(set(METADATA_DATE_KEYWORDS).union(METADATA_NON_DATE_KEYWORDS)),
+    sorted(
+        set(METADATA_DATE_KEYWORDS)
+        .union(METADATA_NON_DATE_KEYWORDS)
+        .union(SURICATA_CHECK_METADATA_KEYWORDS),
+    ),
 )
 
 IP_ADDRESS_REGEX = _regex_provider.compile(r"^.*\d+\.\d+\.\d+\.\d+.*$")

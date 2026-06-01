@@ -33,18 +33,20 @@ def check_rule_option_recognition(rule: Rule) -> None:
         name = option.name
         if name not in ALL_KEYWORDS:
             _logger.warning(
-                "Option %s from rule %s is not recognized.",
+                "Option %s with value %s from rule %s is not recognized.",
                 name,
                 get_rule_option(rule, "sid"),
+                rule.raw,
             )
 
     for option in rule.metadata:
         name = _regex_provider.split(r"\s+", option)[0]
         if name not in ALL_METADATA_KEYWORDS:
             _logger.warning(
-                "Metadata option %s from rule %s is not recognized.",
+                "Metadata option %s with value %s from rule %s is not recognized.",
                 name,
                 get_rule_option(rule, "sid"),
+                rule.raw,
             )
 
 
