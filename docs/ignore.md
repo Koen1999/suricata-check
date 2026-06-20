@@ -26,4 +26,4 @@ You can also use regular expressions to suppress issues:
 alert ip any any -> any any (msg:"Test"; sid:1; metadata: suricata-check "S800,S.*,C.*";)
 ```
 
-Ignoring issues for specific rules as described above will result in output without any of the suppressed issues for that rule. Therefore, these issues will not be present in `stdout`, `suricata-check.fast`, `suricata-check.jsonl` and not reflected in `suricata-check.stats`.
+Ignoring issues for specific rules as described above will result in output without any of the suppressed issues for that rule. Therefore, these issues will not be present in `stdout`, `suricata-check.fast`, or `suricata-check.jsonl`. However, the total count of suppressed issues is reported in `suricata-check.stats` and printed to `stdout` as a summary line after the total number of issues found.

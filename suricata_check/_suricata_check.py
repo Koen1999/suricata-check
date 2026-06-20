@@ -631,8 +631,14 @@ def analyze_rule(
     for checker in checkers:
         try:
             issues = checker.check_rule(rule)
-            for r in compiled_ignore:
-                issues = list(filter(lambda issue: r.match(issue.code) is None, issues))
+            if compiled_ignore:
+                unsuppressed = issues
+                for r in compiled_ignore:
+                    unsuppressed = list(
+                        filter(lambda issue: r.match(issue.code) is None, unsuppressed)
+                    )
+                rule_report.suppressed_issues += len(issues) - len(unsuppressed)
+                issues = unsuppressed
             rule_report.add_issues(issues)
         except Exception as exception:  # noqa: BLE001
             _logger.warning(

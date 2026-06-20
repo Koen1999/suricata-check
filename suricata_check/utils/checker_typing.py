@@ -74,6 +74,7 @@ class RuleReport:
     summary: Optional[RULE_SUMMARY_TYPE] = None
     line_begin: Optional[int] = None
     line_end: Optional[int] = None
+    suppressed_issues: int = 0
 
     _issues: ISSUES_TYPE = field(default_factory=list, init=False)
 
