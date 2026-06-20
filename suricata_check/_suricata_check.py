@@ -635,7 +635,7 @@ def analyze_rule(
                 unsuppressed = issues
                 for r in compiled_ignore:
                     unsuppressed = list(
-                        filter(lambda issue: r.match(issue.code) is None, unsuppressed)
+                        filter(lambda issue: r.match(issue.code) is None, unsuppressed),
                     )
                 rule_report.suppressed_issues += len(issues) - len(unsuppressed)
                 issues = unsuppressed
