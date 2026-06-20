@@ -10,7 +10,7 @@ If you maintain a large rulebase in through version-control managed platform, yo
 
 This is possible using the `--github` and `--gitlab` CLI options. The integration can be further adjusted to the specific deployment environment needs using [the other available CLI options](./cli_usage.md).
 
-An example of such an integration for GitHub is available in the [`suricata-check-action` repository](https://github.com/Koen1999/suricata-check-action).
+An example of such an integration for GitHub is available in the [`suricata-check-action-example` repository](https://github.com/Koen1999/suricata-check-action-example).
 
 ## Passing CLI options using an INI file
 
@@ -20,9 +20,9 @@ When integrating `suricata-check` into a project, it is recommended to configure
 
 Integration with GitHub is easy. All you need to do is checkout the repository containing the rules that require checking, setup a Python environment and install `suricata-check`, and run it with the `--github` option to automatically issue the required GitHub workflow commands for integration.
 
-For example, when integrated with GitHub, issues can be highlighted in a pull requests (PRs) similar to [this example PR](https://github.com/Koen1999/suricata-check-action/pull/1/files).
+For example, when integrated with GitHub, issues can be highlighted in a pull requests (PRs) similar to [this example PR](https://github.com/Koen1999/suricata-check-action-example/pull/1/files).
 
-For GitHub, you can copy [this workflow](https://github.com/Koen1999/suricata-check-action/blob/main/.github/workflows/suricata-check.yml) and modify it to your needs.
+For GitHub, you can copy [this workflow](https://github.com/Koen1999/suricata-check-action-example/blob/main/.github/workflows/suricata-check.yml) and modify it to your needs.
 
 ```yaml
 name: Suricata Check
