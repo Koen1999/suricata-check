@@ -363,6 +363,13 @@ def test_main_ignore():
     if result.exit_code != 0:
         pytest.fail(result.output)
 
+    # Assert that suppressed issues field is set and non-zero
+    assert "Suppressed issues:" in result.output
+    suppressed_line = [line for line in result.output.splitlines() if "Suppressed issues:" in line]
+    assert len(suppressed_line) > 0
+    suppressed_count = int(suppressed_line[0].split(":")[-1].strip())
+    assert suppressed_count > 0
+
 
 def test_get_ini_exclude_tuple():
     ini = os.path.abspath(os.path.join("tests", "data", "suricata-check.ini"))
