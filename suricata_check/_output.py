@@ -159,6 +159,12 @@ def __write_output_stats(output: OutputReport, out: str) -> None:
             fg="blue",
         )
         click.secho(
+            f"Suppressed issues: {overall_summary['Suppressed Issues']}",
+            color=True,
+            bold=True,
+            fg="blue",
+        )
+        click.secho(
             f"Rules with Issues found: {overall_summary['Rules with Issues']}",
             color=True,
             bold=True,
@@ -349,6 +355,7 @@ def __get_overall_summary(
 ) -> SIMPLE_SUMMARY_TYPE:
     overall_summary = {
         "Total Issues": 0,
+        "Suppressed Issues": 0,
         "Rules with Issues": 0,
         "Rules without Issues": 0,
     }
@@ -357,6 +364,7 @@ def __get_overall_summary(
     for rule in rules:
         issues: ISSUES_TYPE = rule.issues
         overall_summary["Total Issues"] += len(issues)
+        overall_summary["Suppressed Issues"] += rule.suppressed_issues
 
         if len(issues) == 0:
             overall_summary["Rules without Issues"] += 1

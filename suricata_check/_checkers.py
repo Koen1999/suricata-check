@@ -76,7 +76,11 @@ def get_checkers(
             checkers.append(checker(include=relevant_codes))
 
         else:
-            _logger.info("Checker %s is disabled.", checker.__name__)
+            _logger.info(
+                "Checker %s is disabled.\
+Issues from this checker are not counted towards reported number of suppressed issues.",
+                checker.__name__,
+            )
 
     _logger.info(
         "Discovered and enabled checkers: [%s]",
