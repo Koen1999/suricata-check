@@ -5,7 +5,7 @@ import sys
 import tarfile
 import urllib.request
 import warnings
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 from typing import Callable
 
 import pytest
@@ -359,16 +359,16 @@ def test_main_ignore():
 
     __check_log_file()
     __check_fast_file([lambda line: "M001" not in line], [lambda file: "M000" in file])
+    __check_output(
+        result.output,
+        file_checks=[
+            lambda file: "Suppressed issues: " in file,
+            lambda file: "Suppressed issues: 0" not in file,
+        ],
+    )
 
     if result.exit_code != 0:
         pytest.fail(result.output)
-
-    # Assert that suppressed issues field is set and non-zero
-    assert "Suppressed issues:" in result.output
-    suppressed_line = [line for line in result.output.splitlines() if "Suppressed issues:" in line]
-    assert len(suppressed_line) > 0
-    suppressed_count = int(suppressed_line[0].split(":")[-1].strip())
-    assert suppressed_count > 0
 
 
 def test_get_ini_exclude_tuple():
@@ -433,7 +433,10 @@ def test_version():
         warnings.warn(RuntimeWarning("Version is unknown."))
 
 
-def __check_log_file(checks: Iterable[Callable[[str], bool]] = []):
+def __check_log_file(
+    line_checks: Sequence[Callable[[str], bool]] = [],
+    file_checks: Sequence[Callable[[str], bool]] = [],
+):
     log_file = "tests/data/out/suricata-check.log"
 
     if not os.path.exists(log_file):
@@ -447,11 +450,18 @@ def __check_log_file(checks: Iterable[Callable[[str], bool]] = []):
                 line,
             ):
                 pytest.fail(line)
-            for check in checks:
+            for check in line_checks:
                 if not check(line):
                     pytest.fail(line)
             if _regex_provider.match(r".+ - .+ - (WARNING) - .+", line):
                 warnings.warn(RuntimeWarning(line))
+
+    if len(file_checks) > 0:
+        with open(log_file) as log_fh:
+            file = "\n".join(log_fh.readlines())
+            for check in file_checks:
+                if not check(file):
+                    pytest.fail(file)
 
 
 def __check_fast_file(
@@ -477,6 +487,21 @@ def __check_fast_file(
             for check in file_checks:
                 if not check(file):
                     pytest.fail(file)
+
+
+def __check_output(
+    result: str,
+    line_checks: Sequence[Callable[[str], bool]] = [],
+    file_checks: Sequence[Callable[[str], bool]] = [],
+):
+    for line in result.split("\n"):
+        for check in line_checks:
+            if not check(line):
+                pytest.fail(line)
+
+    for check in file_checks:
+        if not check(result):
+            pytest.fail(result)
 
 
 def __main__():

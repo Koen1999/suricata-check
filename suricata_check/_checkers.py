@@ -77,7 +77,8 @@ def get_checkers(
 
         else:
             _logger.info(
-                "Checker %s is disabled. Its issues are not counted towards suppressed issues.",
+                "Checker %s is disabled.\
+Issues from this checker are not counted towards reported number of suppressed issues.",
                 checker.__name__,
             )
 
