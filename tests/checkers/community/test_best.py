@@ -56,6 +56,41 @@ sid:2400001; rev:2;)""": {
         "should_raise": [],
         "should_not_raise": ["C102"],
     },
+    # C103, bad
+    """alert ip any any -> any any (\
+msg:"rule"; \
+metadata: created_at 2024_09_16; \
+sid:2400002;)""": {
+        "should_raise": ["C103"],
+        "should_not_raise": [],
+    },
+    # C103, good
+    """alert ip any any -> any any (\
+msg:"rule"; \
+metadata: created_at 2024_09_16; \
+classtype: attempted-admin; \
+sid:2400002;)""": {
+        "should_raise": [],
+        "should_not_raise": ["C103"],
+    },
+    # C103, noalert exception
+    """alert ip any any -> any any (\
+msg:"rule"; \
+metadata: created_at 2024_09_16; \
+noalert; \
+sid:2400002;)""": {
+        "should_raise": [],
+        "should_not_raise": ["C103"],
+    },
+    # C103, flowbits noalert exception
+    """alert ip any any -> any any (\
+msg:"rule"; \
+metadata: created_at 2024_09_16; \
+flowbits:noalert; \
+sid:2400002;)""": {
+        "should_raise": [],
+        "should_not_raise": ["C103"],
+    },
 }
 
 

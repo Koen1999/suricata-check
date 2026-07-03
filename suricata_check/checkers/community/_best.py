@@ -24,6 +24,7 @@ class BestChecker(CheckerInterface):
             "C100": {"severity": logging.INFO},
             "C101": {"severity": logging.INFO},
             "C102": {"severity": logging.INFO},
+            "C103": {"severity": logging.INFO},
         },
     )
 
@@ -69,6 +70,20 @@ Consider adding the `created_at` metadata option to inform users of the recency 
                     message="""\
 The rule does not use set the `updated_at` metadata option while it has been revised since creation.
 Consider adding the `updated_at` metadata option to inform users of the recency of this signature.\
+""",
+                ),
+            )
+
+        if not (
+            is_rule_option_set(rule, "noalert")
+            or is_rule_suboption_set(rule, "flowbits", "noalert")
+        ) and not is_rule_option_set(rule, "classtype"):
+            issues.append(
+                Issue(
+                    code="C103",
+                    message="""\
+The rule does not set the `classtype` Suricata meta option.
+Consider adding `classtype` so Suricata can infer the alert priority for this rule.\
 """,
                 ),
             )
