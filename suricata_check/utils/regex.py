@@ -116,6 +116,20 @@ FLOW_KEYWORDS = (
     "flowint",
 )
 
+FLOW_OPTIONS: Sequence[str] = (
+    "to_client",
+    "to_server",
+    "from_client",
+    "from_server",
+    "established",
+    "not_established",
+    "stateless",
+    "only_stream",
+    "no_stream",
+    "only_frag",
+    "no_frag",
+)
+
 STREAM_KEYWORDS = ("stream_size",)
 
 FLOW_STREAM_KEYWORDS: Sequence[str] = tuple(

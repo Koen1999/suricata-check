@@ -4,21 +4,26 @@ import logging
 from types import MappingProxyType
 
 from suricata_check.checkers.interface import CheckerInterface
-from suricata_check.utils.checker import is_rule_option_set
+from suricata_check.utils.checker import (
+    get_rule_suboptions,
+    is_rule_option_set,
+)
 from suricata_check.utils.checker_typing import ISSUES_TYPE, Issue
+from suricata_check.utils.regex import FLOW_OPTIONS
 from suricata_check.utils.rule import Rule
 
 
 class MandatoryChecker(CheckerInterface):
     """The `MandatoryChecker` contains several checks based on the Suricata syntax that are critical.
 
-    Codes M000-M009 report on missing mandatory rule options.
+    Codes M000-M009 report on mandatory rule syntax violations.
     """
 
     codes = MappingProxyType(
         {
             "M000": {"severity": logging.ERROR},
             "M001": {"severity": logging.ERROR},
+            "M002": {"severity": logging.ERROR},
         },
     )
 
@@ -43,5 +48,17 @@ class MandatoryChecker(CheckerInterface):
                     message="The rule did not specify a sid, which is a mandatory field.",
                 ),
             )
+
+        for suboption, _ in get_rule_suboptions(rule, "flow"):
+            if suboption not in FLOW_OPTIONS:
+                issues.append(
+                    Issue(
+                        code="M002",
+                        message=f"""\
+The rule uses invalid `flow` option: {suboption}.
+Each `flow` suboption must be one of the Suricata-supported flow options.\
+""",
+                    ),
+                )
 
         return issues
