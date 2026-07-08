@@ -56,7 +56,7 @@ class MandatoryChecker(CheckerInterface):
                         code="M002",
                         message=f"""\
 The rule uses invalid `flow` option: {suboption}.
-Each `flow` suboption must be one of the Suricata-supported flow options.\
+Each `flow` suboption must be a valid Suricata flow option ({", ".join(FLOW_OPTIONS)}).\
 """,
                     ),
                 )
