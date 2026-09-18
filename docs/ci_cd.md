@@ -18,7 +18,7 @@ When integrating `suricata-check` into a project, it is recommended to configure
 
 ## GitHub
 
-Integration with GitHub is easy. We recommend using the [suricata-check-action](https://github.com/Koen1999/suricata-check-action) to automatically highlight issues in your pull requests. 
+Integration with GitHub is easy. We recommend using the [suricata-check-action](https://github.com/Koen1999/suricata-check-action) to automatically highlight issues in your pull requests.
 
 Unlike basic validators that only confirm a rule is syntactically correct and can be parsed by the Suricata engine, `suricata-check` performs a comprehensive audit. It evaluates critical factors such as runtime performance, the likelihood of false positives, and whether the rule effectively detects its intended target.
 
