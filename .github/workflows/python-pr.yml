@@ -199,7 +199,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
