@@ -31,7 +31,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_click",
     "sphinx_sitemap",
-    "sphinxext_copybutton",
+    "sphinx_copybutton",
     "sphinxext.opengraph",
 ]
 
