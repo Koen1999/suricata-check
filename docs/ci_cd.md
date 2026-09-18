@@ -18,11 +18,11 @@ When integrating `suricata-check` into a project, it is recommended to configure
 
 ## GitHub
 
-Integration with GitHub is easy. All you need to do is checkout the repository containing the rules that require checking, setup a Python environment and install `suricata-check`, and run it with the `--github` option to automatically issue the required GitHub workflow commands for integration.
+Integration with GitHub is easy. We recommend using the [suricata-check-action](https://github.com/Koen1999/suricata-check-action) to automatically highlight issues in your pull requests. 
 
-For example, when integrated with GitHub, issues can be highlighted in a pull requests (PRs) similar to [this example PR](https://github.com/Koen1999/suricata-check-action-example/pull/1/files).
+Unlike basic validators that only confirm a rule is syntactically correct and can be parsed by the Suricata engine, `suricata-check` performs a comprehensive audit. It evaluates critical factors such as runtime performance, the likelihood of false positives, and whether the rule effectively detects its intended target.
 
-For GitHub, you can copy [this workflow](https://github.com/Koen1999/suricata-check-action-example/blob/main/.github/workflows/suricata-check.yml) and modify it to your needs.
+To use it, simply add the following workflow to your repository:
 
 ```yaml
 name: Suricata Check
@@ -32,33 +32,31 @@ on:
     branches: ["main", "master"]
   push:
     branches: ["main", "master"]
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   suricata-check:
     name: Suricata Check
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: true
-
     steps:
       - uses: actions/checkout@v5
-
+      
       - name: Set up Python
         uses: actions/setup-python@v6
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade --upgrade-strategy eager pip
-          python -m pip install suricata-check[performance]
-
-      - name: Test with suricata-check
-        run: |
-          suricata-check --github
+        
+      - name: Run suricata-check
+        uses: Koen1999/suricata-check-action@v1
+        with:
+          python_version: '3.x'
+          extra_args: '--ini suricata-check.ini'
 ```
+
+For more details, see the [suricata-check-action-example](https://github.com/Koen1999/suricata-check-action-example) repository.
 
 Below you can find an example of how the issued detected by `suricata-check` would be highlighted in GitHub.
 
