@@ -526,7 +526,6 @@ _RULE_REGEX = _regex_provider.compile(
 )
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
 def __escape_regex(s: str) -> str:
     # Escape the escape character first
     s = s.replace("\\", "\\\\")
@@ -555,7 +554,6 @@ def get_options_regex(options: Iterable[str]) -> Pattern:
     return __get_options_regex(tuple(sorted(options)))
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
 def __get_options_regex(options: Sequence[str]) -> Pattern:
     return _regex_provider.compile(
         "(" + "|".join([__escape_regex(option) for option in options]) + ")",
@@ -616,7 +614,6 @@ def get_rule_body(rule: Rule) -> str:
     return __get_rule_body(rule)
 
 
-@lru_cache(maxsize=LRU_CACHE_SIZE)
 def __get_rule_body(rule: Rule) -> str:
     match = _BODY_REGEX.search(rule.raw)
 

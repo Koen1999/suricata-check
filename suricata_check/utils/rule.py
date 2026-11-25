@@ -4,7 +4,7 @@ This module is inspired by and mostly uses the same interface Python idstools pa
 """
 
 import inspect
-from collections.abc import Hashable, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Optional
 
@@ -37,17 +37,6 @@ class RuleOption:
 
     name: str
     value: Optional[str] = None
-
-    def _to_dict(self: "RuleOption") -> dict[str, Hashable]:
-        """Returns the RuleOption represented as a dictionary."""
-        return {
-            "name": self.name,
-            "value": self.value,
-        }
-
-    def __hash__(self) -> int:
-        """Returns a unique hash that can be used as a fingerprint for the rule option."""
-        return hash(tuple(sorted(self._to_dict().items())))
 
 
 @dataclass
@@ -126,28 +115,6 @@ class Rule:
         if not isinstance(value, str):  # pyright: ignore[reportUnnecessaryIsInstance]
             raise TypeError("Reference option value must be a string")
         self.references = (*self.references, value)
-
-    def _to_dict(self: "Rule") -> dict[str, Hashable]:
-        """Returns the Rule represented as a dictionary."""
-        return {
-            "raw": self.raw,
-            "header": self.header,
-            "enabled": self.enabled,
-            "action": self.action,
-            "proto": self.proto,
-            "source_addr": self.source_addr,
-            "source_port": self.source_port,
-            "direction": self.direction,
-            "dest_addr": self.dest_addr,
-            "dest_port": self.dest_port,
-            "options": self.options,
-            "metadata": self.metadata,
-            "flowbits": self.flowbits,
-        }
-
-    def __hash__(self) -> int:
-        """Returns a unique hash that can be used as a fingerprint for the rule."""
-        return hash(tuple(sorted(self._to_dict().items())))
 
 
 class ParsingError(RuntimeError):

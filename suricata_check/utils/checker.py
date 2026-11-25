@@ -2,7 +2,6 @@
 
 import logging
 from collections.abc import Iterable, Sequence
-from functools import lru_cache
 from typing import Optional, Union
 
 from suricata_check.utils.regex import (
@@ -15,9 +14,6 @@ from suricata_check.utils.regex import (
 )
 from suricata_check.utils.regex_provider import Pattern, get_regex_provider
 from suricata_check.utils.rule import Rule
-
-_LRU_CACHE_SIZE = 10
-
 
 _logger = logging.getLogger(__name__)
 
@@ -64,7 +60,6 @@ def is_rule_option_set(rule: Rule, name: str) -> bool:
     return __is_rule_option_set(rule, name)
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __is_rule_option_set(rule: Rule, name: str) -> bool:
     if name not in (
         "action",
@@ -182,7 +177,6 @@ def count_rule_options(
     return __count_rule_options(rule, name)
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __count_rule_options(
     rule: Rule,
     name: Union[str, Iterable[str]],
@@ -232,7 +226,6 @@ def get_rule_option(rule: Rule, name: str) -> Optional[str]:
     return __get_rule_option(rule, name)
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __get_rule_option(rule: Rule, name: str) -> Optional[str]:
     options = get_rule_options(rule, name)
 
@@ -268,7 +261,6 @@ def get_rule_options(
     return __get_rule_options(rule, name)
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __get_rule_options(
     rule: Rule,
     name: Union[str, Iterable[str]],
@@ -572,7 +564,6 @@ def get_all_variable_groups(
     return __get_all_variable_groups(rule)
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __get_all_variable_groups(
     rule: Rule,
 ) -> list[str]:
@@ -604,7 +595,6 @@ def get_rule_option_positions(
     return __get_rule_option_positions(rule, name, sequence=sequence)
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __get_rule_option_positions(
     rule: Rule,
     name: str,
@@ -636,7 +626,6 @@ def get_rule_option_position(rule: Rule, name: str) -> Optional[int]:
     return __get_rule_option_position(rule, name)
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __get_rule_option_position(rule: Rule, name: str) -> Optional[int]:
     positions = get_rule_option_positions(rule, name)
 
@@ -698,7 +687,6 @@ def get_rule_options_positions(
     )
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __get_rule_options_positions(
     rule: Rule,
     names: Iterable[str],
@@ -727,7 +715,6 @@ def is_rule_option_put_before(
     )
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __is_rule_option_put_before(
     rule: Rule,
     name: str,
@@ -771,7 +758,6 @@ def is_rule_option_always_put_before(
     )
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __is_rule_option_always_put_before(
     rule: Rule,
     name: str,
@@ -857,7 +843,6 @@ def select_rule_options_by_regex(rule: Rule, regex: Pattern) -> Iterable[str]:
     return __select_rule_options_by_regex(rule, regex)
 
 
-@lru_cache(maxsize=_LRU_CACHE_SIZE)
 def __select_rule_options_by_regex(
     rule: Rule,
     regex: Pattern,

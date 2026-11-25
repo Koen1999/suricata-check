@@ -2,7 +2,6 @@
 
 import logging
 import warnings
-from functools import lru_cache
 from typing import Optional
 
 import pytest
@@ -32,7 +31,6 @@ class GenericChecker:
         for handler in logger.handlers:
             handler.setLevel(level)
 
-    @lru_cache(maxsize=1)
     def _check_rule(
         self: "GenericChecker",
         rule: Rule,
